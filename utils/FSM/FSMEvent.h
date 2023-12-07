@@ -4,11 +4,11 @@
 
 namespace fsm
 {
-    struct FSMEventBase { };
+    struct EventBase { };
 
     template<unsigned INDEX>
-    struct FSMEvent : FSMEventBase
+    struct Event : EventBase
     {
         static const unsigned index = INDEX;
     };
-}
+};

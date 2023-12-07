@@ -55,10 +55,10 @@ namespace utl
             using RESULT = TypeUnit<H, typename List<TypeList...>::RESULT>;
         };
     }
-
+     
     template<class... TypeList>
-    using list_t = typename Private::List<TypeList...>::RESULT;
-    
+    using type_list_t = typename Private::List<TypeList...>::RESULT;
+
     namespace Private
     {
         template<class TypeList, class Target>
@@ -112,5 +112,5 @@ namespace utl
     }
 
     template<class... TypeList>
-    using remove_duplicates_t = typename Private::RemoveDuplicates<list_t<TypeList...>>::RESULT;
+    using remove_duplicates_t = typename Private::RemoveDuplicates<type_list_t<TypeList...>>::RESULT;
 }

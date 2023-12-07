@@ -4,12 +4,12 @@
 
 namespace fsm
 {
-    struct FSMStateBase { };
+    struct StateBase { };
 
-    template<unsigned INDEX, class Action=void>
-    struct FSMState : FSMStateBase
+    template<unsigned INDEX, class Action = void>
+    struct State : StateBase
     {
         static const unsigned index = INDEX;
         using action_t = Action;
     };
-}
+};

@@ -15,22 +15,22 @@ namespace utl
 		{
 			typedef TypeIfTrue TYPE;
 		};
-		
+
 		template<>
 		struct StaticTypeIf<false, class TypeIfTrue, class TypeIfFalse>
 		{
 			typedef TypeIfFalse TYPE;
 		};
-		
+
 		template<unsigned SIZE>
 		struct TypeSelector
 		{
 			static const bool isLE8bit = SIZE <= 0xFF;
 			static const bool isLE16bit = SIZE <= 0xFFFF;
-			
+
 			typedef typename StaticTypeIf<isLE8bit, uint8_t, typename StaticTypeIf<isLE16bit, uint16_t, uint32_t>::TYPE>::TYPE TYPE;
 		};
-	}
+	};
 	
 	template<unsigned SIZE, class DATA_T=uint8_t>
 	class circle_buffer
@@ -91,12 +91,12 @@ namespace utl
 			return true;
 		}
 		
-		bool shift(DATA_T* value)
+		bool shift(DATA_T &value)
 		{
 			if (isEmpty()) {
 				return false;
 			}
-			*value = m_data[m_readCount++ & m_mask];
+			value = m_data[m_readCount++ & m_mask];
 			return true;
 		}
 		
@@ -108,4 +108,4 @@ namespace utl
 		
 		inline unsigned size() { return SIZE; }
 	};
-}
+};

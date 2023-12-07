@@ -2,7 +2,7 @@
 
 #pragma once
 
-// #include <type_traits>
+#include <type_traits>
 
 #include "FSMState.h"
 #include "FSMEvent.h"
@@ -11,28 +11,28 @@
 
 namespace fsm
 {
-    struct FSMTransitionBase { };
+    struct TransitionBase { };
 
     template<
         class Source,
         class Event,
         class Target,
-        class Action
-        FSMGuard fsmGuard,
-        class = 
+        class Action,
+        Guard fsmGuard,
+        class =
             std::enable_if_t<
-                std::is_base_of_v<FSMStateBase, Source> && 
-                std::is_base_of_v<FSMEventBase, FSMEvent> &&
+                std::is_base_of_v<FSMStateBase, Source>&&
+                std::is_base_of_v<FSMEventBase, Event>&&
                 std::is_base_of_v<FSMStateBase, Target>
             >
     >
-    struct FSMTransition : FSMTransitionBase
+    struct Transition : TransitionBase
     {
         using source_t = Source;
-        using event_t = Event;
+        using event_t  = Event;
         using target_t = Target;
         using action_t = Action;
 
         static const Guard guard = fsmGuard;
     };
-}
+};

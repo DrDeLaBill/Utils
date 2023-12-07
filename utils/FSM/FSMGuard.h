@@ -4,10 +4,10 @@
 
 namespace fsm
 {
-    enum class FSMGuard : unsigned 
+    enum class Guard : unsigned
     {
         OFF,
         CONDITION_1,
         CONDITION_2
     };
-}
+};
