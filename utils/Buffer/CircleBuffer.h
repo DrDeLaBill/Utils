@@ -30,7 +30,7 @@ namespace utl
 
 			typedef typename StaticTypeIf<isLE8bit, uint8_t, typename StaticTypeIf<isLE16bit, uint16_t, uint32_t>::TYPE>::TYPE TYPE;
 		};
-	};
+	}
 	
 	template<unsigned SIZE, class DATA_T=uint8_t>
 	class circle_buffer
@@ -108,4 +108,4 @@ namespace utl
 		
 		inline unsigned size() { return SIZE; }
 	};
-};
+}

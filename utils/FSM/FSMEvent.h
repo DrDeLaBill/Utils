@@ -11,4 +11,4 @@ namespace fsm
     {
         static const unsigned index = INDEX;
     };
-};
+}

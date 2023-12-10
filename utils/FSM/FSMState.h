@@ -12,4 +12,4 @@ namespace fsm
         static const unsigned index = INDEX;
         using action_t = Action;
     };
-};
+}

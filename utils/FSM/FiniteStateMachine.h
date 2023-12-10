@@ -4,10 +4,5 @@
 
 namespace fsm
 {
-    struct Action
-    {
-        void operator()(void) {
-
-        }
-    };
+    
 }

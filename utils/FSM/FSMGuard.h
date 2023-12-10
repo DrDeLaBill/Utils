@@ -10,4 +10,4 @@ namespace fsm
         CONDITION_1,
         CONDITION_2
     };
-};
+}

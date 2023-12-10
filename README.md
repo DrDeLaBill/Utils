@@ -24,6 +24,10 @@
 
 [Динамический полиморфизм с использованием std::variant и std::visit](https://habr.com/ru/companies/otus/articles/546158/)
 
+[Replacing unique_ptr with C++17's std::variant a Practical Experiment](https://www.cppstories.com/2020/09/replacing-into-variant.html/#problem-passing-arguments)
+
+[CppCon 2018: Mateusz Pusz “Effective replacement of dynamic polymorphism with std::variant”](https://www.youtube.com/watch?v=gKbORJtnVu8)
+
 ### Consepts
 
 [концепты и required]()

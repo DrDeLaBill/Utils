@@ -35,4 +35,4 @@ namespace fsm
 
         static const Guard guard = fsmGuard;
     };
-};
+}

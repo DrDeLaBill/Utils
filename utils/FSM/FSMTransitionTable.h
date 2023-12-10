@@ -24,7 +24,7 @@ namespace fsm
             "FSM repeated transitions"
         );
 
-        // using transition_p = type_pack<T...>;
+        using transition_p = utl::type_list_t<T...>;
 
         using state_collection = utl::remove_duplicates_t<utl::type_list_t<typename T::source_t..., typename T::target_t...>>;
 
@@ -34,4 +34,4 @@ namespace fsm
         using event_v = decltype(get_types_obj(event_collection{}));
         using transition_v = std::variant<T...>;
     };
-};
+}
