@@ -43,3 +43,5 @@
 [SFINAE — это просто](https://habr.com/ru/articles/205772/)
 
 [Сообщение компилятору [[nodiscard]]](https://en.cppreference.com/w/cpp/language/attributes/nodiscard)
+
+[Просто о сложном — move в языке C++](https://habr.com/ru/articles/587644/)
