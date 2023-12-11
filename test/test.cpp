@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "FSMTransitionTable.h"
+#include "FiniteStateMachine.h"
 
 int main(int args, char** argv)
 {

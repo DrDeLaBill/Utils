@@ -11,5 +11,5 @@ namespace utl
     struct Time
     {
         static uint32_t getMillis();
-    }
+    };
 }

@@ -9,15 +9,15 @@
 
 namespace utl
 {
-    Timer::Timer(uint32_t delay): delay(delay), start(0) { }
+    Timer::Timer(uint32_t delay): delay(delay), start_time(0) { }
 
     void Timer::start()
     {
-        this->start = Time::getMillis();
+        this->start_time = Time::getMillis();
     }
 
     bool Timer::wait()
     {
-        return this->start + this->delay < Time::getMillis();
+        return this->start_time + this->delay < Time::getMillis();
     }
 }
