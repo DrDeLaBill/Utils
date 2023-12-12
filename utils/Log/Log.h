@@ -19,6 +19,14 @@ namespace utl
         printf("\n");
     }
 
+    // template<>
+    // void printTagLog(char* format)
+    // {
+    //     printf("%09lu->%s:\t", HAL_GetTick(), MODULE_TAG);
+    //     printMessage<Args...>(format);
+    //     printf("\n");
+    // }
+
     template<class... Args>
     void printLog(char* format)
     {
@@ -39,6 +47,12 @@ namespace utl
     void printMessage(char* format)
     {
         printf(format, Args...); 
+    }
+
+    template<>
+    void printMessage(char* format)
+    {
+        printf(format); 
     }
 
 }

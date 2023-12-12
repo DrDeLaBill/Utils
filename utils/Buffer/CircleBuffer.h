@@ -2,6 +2,7 @@
 
 #pragma once
 
+
 #include <stdint.h>
 
 
@@ -98,6 +99,22 @@ namespace utl
 			}
 			value = m_data[m_readCount++ & m_mask];
 			return true;
+		}
+
+		DATA_T& front()
+		{
+			if (isEmpty()) {
+				return DATA_T{};
+			}
+			return m_data[m_readCount & m_mask];
+		}
+
+		void pop()
+		{
+			if (isEmpty()) {
+				return;
+			}
+			return m_readCount++;
 		}
 		
 		void clear()

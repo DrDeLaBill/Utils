@@ -6,12 +6,12 @@
 namespace utl 
 {
     struct NullType { };
+
+    template<class H, class T = NullType>
+    struct TypeUnit { };
  
     namespace Private
-    {   
-        template<class H, class T = NullType>
-        struct TypeUnit { };
-        
+    {
         template<class T>
         struct Head { 
             using TYPE = T;

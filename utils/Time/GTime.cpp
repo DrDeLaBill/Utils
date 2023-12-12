@@ -1,6 +1,6 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include "Time.h"
+#include "GTime.h"
 
 #include <cstdint>
 
@@ -19,6 +19,7 @@
     defined(STM32F105xC) || \
     defined(STM32F107xC)
     #include "stm32f1xx_hal.h"
+    #define _STM_TIME
 #elif defined(STM32F405xx) || \
     defined(STM32F415xx) || \
     defined(STM32F407xx) || \
@@ -43,8 +44,9 @@
     defined(STM32F413xx) || \
     defined(STM32F423xx)
     #include "stm32f4xx_hal.h"
+    #define _STM_TIME
 #else
-    #error "Please select first the target STM32Fxxx device used in your application (in eeprom_at24cm01_storage.c file)"
+    #warning "Please select first the target STM32xxxx device used in your application (in Time.cpp file)"
 #endif
 
 
@@ -52,6 +54,10 @@ namespace utl
 {
     uint32_t Time::getMillis()
     {
+#ifdef _STM_TIME
         return HAL_GetTick();
+#else
+        return 0;
+#endif
     }
 }

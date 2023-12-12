@@ -10,6 +10,8 @@ file(GLOB ${PROJECT_NAME}_HEADERS "./*.h")
 file(GLOB ${PROJECT_NAME}_SOURCES "./*.cpp")
 set(ALL_SRCS "${${PROJECT_NAME}_SOURCES};${${PROJECT_NAME}_HEADERS}")
 add_executable(utilstest ${ALL_SRCS})
+
+# TODO: cmake finder
 SET(DIR_LIST "")
 MACRO(SUBDIRLIST result curdir)
   FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
@@ -34,7 +36,7 @@ target_link_libraries(
 )
 set_target_properties(
     utilstest PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     LINKER_LANGUAGE CXX
 )

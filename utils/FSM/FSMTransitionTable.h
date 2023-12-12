@@ -8,7 +8,7 @@
 #include "TypeListBuilder.h"
 
 template<class... Types>
-constexpr auto get_types_obj(utl::type_list_t<Types...>) {
+constexpr auto get_types_obj(utl::TypeUnit<Types...>) {
     return std::variant<Types...>{};
 }
 
@@ -26,7 +26,13 @@ namespace fsm
 
         using transition_p = utl::type_list_t<T...>;
 
-        using state_collection = utl::remove_duplicates_t<utl::type_list_t<typename T::source_t..., typename T::target_t...>>;
+        using state_collection = 
+            utl::remove_duplicates_t<
+                utl::type_list_t<
+                    typename T::source_t..., 
+                    typename T::target_t...
+                >
+            >;
 
         using event_collection = utl::remove_duplicates_t<typename T::event_t...>;
 

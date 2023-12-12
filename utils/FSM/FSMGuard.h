@@ -6,8 +6,14 @@ namespace fsm
 {
     enum class Guard : unsigned
     {
-        OFF,
-        CONDITION_1,
-        CONDITION_2
+        NO_GUARD,
+        NO_STATE
+    };
+
+    struct GuardEqual
+    {
+        constexpr bool operator()(const Guard& lhs, const Guard& rhs) {
+            return lhs == rhs;
+        }
     };
 }

@@ -19,6 +19,12 @@ namespace utl
     constexpr std::size_t size(Private::TypeUnit<H, NullType>) {
     	return 1;
     }
+
+    // TODO: get head & tail types
+    // template<class H, class... TypeList>
+    // constexpr head_t head(Private::TypeUnit<H, TypeList...>) {
+    //     return head_t<>
+    // }
     
     template<class H, class... TypeList>
     constexpr bool empty(Private::TypeUnit<H, TypeList...>) {
@@ -33,4 +39,6 @@ namespace utl
     constexpr bool empty(NullType) {
         return true;
     }
+
+    // TODO: операторы сравнения
 }

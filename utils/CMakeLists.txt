@@ -16,9 +16,28 @@ target_include_directories(
     PRIVATE
     ${CMAKE_CURRENT_SOURCE_DIR}
 )
+
+SET(DIR_LIST "")
+MACRO(SUBDIRLIST result curdir)
+  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+  SET(dirlist "")
+  FOREACH(child ${children})
+    IF(IS_DIRECTORY ${curdir}/${child})
+      LIST(APPEND dirlist ${curdir}/${child})
+    ENDIF()
+  ENDFOREACH()
+  SET(${result} ${dirlist})
+ENDMACRO()
+SUBDIRLIST(DIR_LIST "${CMAKE_CURRENT_SOURCE_DIR}")
+target_include_directories(
+    utilslib
+    PRIVATE
+    "${DIR_LIST}"
+)
+
 set_target_properties(
     utilslib PROPERTIES
-    CXX_STANDARD 17
+    CXX_STANDARD 20
     CXX_STANDARD_REQUIRED ON
     LINKER_LANGUAGE CXX
 )
