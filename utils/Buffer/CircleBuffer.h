@@ -92,7 +92,7 @@ namespace utl
 			return true;
 		}
 		
-		bool shift(DATA_T &value)
+		bool shift(DATA_T& value)
 		{
 			if (isEmpty()) {
 				return false;
@@ -101,12 +101,13 @@ namespace utl
 			return true;
 		}
 
-		DATA_T& front()
+		bool front(DATA_T& value)
 		{
 			if (isEmpty()) {
-				return DATA_T{};
+				return false;
 			}
-			return m_data[m_readCount & m_mask];
+			value = m_data[m_readCount & m_mask];
+			return true;
 		}
 
 		void pop()
@@ -114,7 +115,7 @@ namespace utl
 			if (isEmpty()) {
 				return;
 			}
-			return m_readCount++;
+			m_readCount++;
 		}
 		
 		void clear()

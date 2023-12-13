@@ -16,6 +16,7 @@
 #include "FSMTransitionTable.h"
 
 #include "CircleBuffer.h"
+#include "TypeListBuilder.h"
 
 
 namespace fsm
@@ -64,7 +65,7 @@ namespace fsm
         template<unsigned EVENT_INDEX>
         void push_event(const Event<EVENT_INDEX>& event)
         {
-            events.push_back(event);
+            events.push(event);
         }
 
         // template<class... EventTypes>
@@ -106,7 +107,10 @@ namespace fsm
             auto it = transitions.begin();
 
             for (unsigned i = 0; i < events.size(); i++) {
-                auto eventVariant = events.front();
+                event_v eventVariant;
+                if (!events.front(eventVariant)) {
+                    break;
+                }
                 auto lambda = [&](const auto& targetEvent) {
                     using event_t = std::decay_t<decltype(targetEvent)>;
                     tmpKey.event_idx = event_t::index;
@@ -148,14 +152,23 @@ namespace fsm
             state_v& tmpState = this->current_state;
 
             auto lambda = [&](const auto& targetVariant) {
-                using transition_v = std::decay_t<decltype(targetVariant)>;
-                using action_t = typename transition_v::action_t;
+                using event_transition_v = std::decay_t<decltype(targetVariant)>;
+                using action_t = typename event_transition_v::action_t;
 
-                if (!GuardEqual{}(tmpGuard, transition_v::guard)) {
+                if (!GuardEqual{}(tmpGuard, event_transition_v::guard)) {
                     return;
                 }
 
-                using target_t = typename transition_v::target_t;
+                using target_t = typename event_transition_v::target_t;
+
+
+                using type_t = utl::variant_factory<typename utl::removed_duplicates_t<
+                    typename utl::typelist_t<State<1>, State<2>, State<1>>::RESULT>
+                ::RESULT>::VARIANT;
+                //std::variant<State<1>, State<2>> var1 = State<3>{};
+                //state_v var1 = State<2>{};
+
+                state_v var = target_t{};
 
                 tmpKey.state_idx = target_t::index;
                 tmpState = target_t{};
@@ -167,29 +180,29 @@ namespace fsm
         }
 
         template<class... TrPacks>
-        void set_table(TrPacks...)
+        void set_table(utl::simple_list_t<TrPacks...>)
         {
-            (set_tuple(utl::TypeUnit<TrPacks>{}), ...);
+            (set_tuple(utl::getType<TrPacks>{}), ...);
         }
 
         template<class TrPack>
-        void set_tuple(utl::TypeUnit<TrPack> trPack)
+        void set_tuple(utl::getType<TrPack> trPack)
         {
-            using transition = utl::head_t<TrPack>;
+            using transition = typename decltype(trPack)::TYPE;
 
-            using state_t = typename transition::source_t;
-            using event_t = typename transition::event_t;
-            Guard guard = transition::guard;
+            using state_t = transition::source_t;
+            using event_t = transition::event_t;
+            Guard tmpGuard = transition::guard;
 
-            key_t key;
-            key.state_idx = state_t::index;
-            key.event_idx = event_t::index;
+            key_t tmpKey;
+            tmpKey.state_idx = state_t::index;
+            tmpKey.event_idx = event_t::index;
 
             transitions.insert({key, transition{}});
 
             if (!this->key.state_idx) {
-                this->key.state_idx = key.state_idx;
-                this->guard = guard;
+                this->key.state_idx = tmpKey.state_idx;
+                this->guard = tmpGuard;
                 this->current_state = state_t{};
             }
         }

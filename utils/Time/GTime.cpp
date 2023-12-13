@@ -46,7 +46,7 @@
     #include "stm32f4xx_hal.h"
     #define _STM_TIME
 #else
-    #warning "Please select first the target STM32xxxx device used in your application (in Time.cpp file)"
+    #pragma warning("Please select first the target STM32xxxx device used in your application (in Time.cpp file)")
 #endif
 
 

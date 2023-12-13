@@ -14,17 +14,17 @@ namespace fsm
         uint32_t event_idx = 0;
     };
 
-    class KeyEqual
+    struct KeyEqual
     {
-        constexpr bool operator()(const key_t& lhs, const key_t& rhs) const
+        constexpr bool operator()(const key_t& lhs, const key_t& rhs) const 
         {
             return lhs.state_idx == rhs.state_idx && lhs.event_idx == rhs.event_idx;
         }
     };
 
-    class KeyHash
+    struct KeyHash
     {
-        std::size_t operator()(const key_t& key)
+        std::size_t operator()(const key_t& key) const
         {
             std::size_t hash_1 = std::hash<unsigned>{}(key.state_idx);
             std::size_t hash_2 = std::hash<unsigned>{}(key.event_idx);

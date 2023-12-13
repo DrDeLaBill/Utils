@@ -1,116 +1,145 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#pragma once 
 
-
-namespace utl 
+namespace utl
 {
-    struct NullType { };
+	struct null_type_t {};
 
-    template<class H, class T = NullType>
-    struct TypeUnit { };
- 
-    namespace Private
-    {
-        template<class T>
-        struct Head { 
-            using TYPE = T;
-        };
-        
-        template<class H, class T>
-        struct Head<TypeUnit<H, T>> {
-            using TYPE = H;
-        };
-        
-        template<class T>
-        struct Tail {
-            using TYPE = NullType;
-        };
-        
-        template<class H, class T>
-        struct Tail<TypeUnit<H, T>> {
-            using TYPE = T;                 
-        };
-    }
-    
-    template<class T>
-    using head_t = typename Private::Head<T>::TYPE;
-    
-    template<class T>
-    using tail_t = typename Private::Tail<T>::TYPE;
-    
- 
-    namespace Private
-    {   
-        template<class... TypeList>
-        struct List { };
-        
-        template<>
-        struct List<> {
-            using RESULT = NullType;
-        };
-        
-        template<class H, class... TypeList>
-        struct List<H, TypeList...> {
-            using RESULT = TypeUnit<H, typename List<TypeList...>::RESULT>;
-        };
-    }
-     
-    template<class... TypeList>
-    using type_list_t = typename Private::List<TypeList...>::RESULT;
+	template<class Head, class Tail = null_type_t>
+	struct unit_t
+	{
+		using HEAD = Head;
+		using TAIL = Tail;
+	};
 
-    namespace Private
-    {
-        template<class TypeList, class Target>
-        struct EraseTarget
-        {
-        private:
-            using HEAD = typename Head<TypeList>::TYPE;
-            using TAIL = typename Tail<TypeList>::TYPE;
-            
-        public:
-            using RESULT = TypeUnit<HEAD, typename EraseTarget<TAIL, Target>::RESULT>;
-        };
-        
-        template<class Tail, class Target>
-        struct EraseTarget<TypeUnit<Target, Tail>, Target>
-        {
-            using RESULT = Tail;
-        };
-        
-        template<class Target>
-        struct EraseTarget<NullType, Target>
-        {
-            using RESULT = NullType;
-        };
-    }
+	// Simple type list
+	template<class... Types>
+	struct simple_list_t { };
 
-    template<class TypeList, class Target>
-    using erase_target_t = typename Private::EraseTarget<TypeList, Target>::RESULT;
-    
-    namespace Private
-    {
-        template<class TypeList>
-        struct RemoveDuplicates { };
-        
-        template<class Head, class Tail>
-        struct RemoveDuplicates<TypeUnit<Head, Tail>>
-        {
-        private:
-            using NEXT_PART = typename RemoveDuplicates<Tail>::RESULT;
-            using ERASE_RES = typename EraseTarget<NEXT_PART, Head>::RESULT;
-            
-        public:
-            using RESULT = TypeUnit<Head, ERASE_RES>;
-        };
-        
-        template<>
-        struct RemoveDuplicates<NullType>
-        {
-            using RESULT = NullType;
-        };
-    }
+	// Get concrete type
+	template<class T>
+	struct getType
+	{
+		using TYPE = T;
+	};
 
-    template<class... TypeList>
-    using remove_duplicates_t = typename Private::RemoveDuplicates<type_list_t<TypeList...>>::RESULT;
+	//template<class T>
+	//struct getType<simple_list_t<T>>
+	//{
+	//	using TYPE = T;
+	//};
+
+	template<template<class> class T, class U>
+	struct getType<T<U>>
+	{
+		using TYPE = typename getType<U>::TYPE;
+	};
+
+	// Type list with unit structure
+	template<class... Types>
+	struct typelist_t { };
+
+	template<>
+	struct typelist_t<>
+	{
+		using RESULT = null_type_t;
+	};
+
+	template<class Head, class... Types>
+	struct typelist_t<Head, Types...>
+	{
+		using RESULT = unit_t<Head, typename typelist_t<Types...>::RESULT>;
+	};
+
+	// Removed target type list
+	template<class TypeList, class Target>
+	struct removed_target_t { };
+
+	template<class Head, class Tail, class Target>
+	struct removed_target_t<unit_t<Head, Tail>, Target>
+	{
+		using RESULT = unit_t<Head, typename removed_target_t<Tail, Target>::RESULT>;
+	};
+
+	template<class Tail, class Target>
+	struct removed_target_t<unit_t<Target, Tail>, Target>
+	{
+		using RESULT = Tail;
+	};
+
+	template<class Target>
+	struct removed_target_t<null_type_t, Target>
+	{
+		using RESULT = null_type_t;
+	};
+
+	// Removed duplications type list
+	template<class... Types>
+	struct removed_duplicates_t
+	{
+		using RESULT = typename removed_duplicates_t<typename typelist_t<Types...>::RESULT>::RESULT;
+	};
+
+	template<class Head, class Tail>
+	struct removed_duplicates_t<unit_t<Head, Tail>>
+	{
+	private:
+		using NEXT_PART = typename removed_duplicates_t<Tail>::RESULT;
+		using REMOVED_T = typename removed_target_t<NEXT_PART, Head>::RESULT;
+	public:
+		using RESULT = unit_t<Head, typename REMOVED_T>;
+	};
+
+	template<>
+	struct removed_duplicates_t<null_type_t>
+	{
+		using RESULT = null_type_t;
+	};
+
+	// Variant factory
+	template<class... Types>
+	struct variant_factory { };
+
+	template<class Head, class Tail>
+	struct variant_factory<unit_t<Head, Tail>>
+	{
+		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
+	};
+
+	template<class Head, class Tail>
+	struct variant_factory<typelist_t<unit_t<Head, Tail>>>
+	{
+		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
+	};
+
+	template<class Head, class Tail, class Target>
+	struct variant_factory<removed_target_t<unit_t<Head, Tail>, Target>>
+	{
+		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
+	};
+
+	template<class Head, class Tail>
+	struct variant_factory<removed_duplicates_t<unit_t<Head, Tail>>>
+	{
+		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
+	};
+
+	template<class Head, class Tail, class... TypeList>
+	struct variant_factory<std::variant<TypeList...>, unit_t<Head, Tail>>
+	{
+		using VARIANT = typename variant_factory<std::variant<TypeList..., Head>, Tail>::VARIANT;
+	};
+
+	template<class... TypeList, class Head>
+	struct variant_factory<std::variant<TypeList...>, unit_t<Head, null_type_t>>
+	{
+		using VARIANT = std::variant<TypeList..., Head>;
+	};
+
+	template<>
+	struct variant_factory<std::variant<>, unit_t<null_type_t>>
+	{
+		using VARIANT = std::variant<null_type_t>;
+	};
 }

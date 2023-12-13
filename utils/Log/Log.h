@@ -12,7 +12,7 @@ namespace utl
 #if DEBUG
 
     template<class... Args>
-    void printTagLog(char* format)
+    void printTagLog(const char* format)
     {
         printf("%09lu->%s:\t", HAL_GetTick(), MODULE_TAG);
         printMessage<Args...>(format);
@@ -20,7 +20,7 @@ namespace utl
     }
 
     // template<>
-    // void printTagLog(char* format)
+    // void printTagLog(const char* format)
     // {
     //     printf("%09lu->%s:\t", HAL_GetTick(), MODULE_TAG);
     //     printMessage<Args...>(format);
@@ -28,7 +28,7 @@ namespace utl
     // }
 
     template<class... Args>
-    void printLog(char* format)
+    void printLog(const char* format)
     {
         printMessage<Args...>(format);
     }
@@ -36,21 +36,21 @@ namespace utl
 #else
 
     template<class... Args>
-    void printTagLog(char* format) { }
+    void printTagLog(const char*) { }
 
     template<class... Args>
-    void printLog(char* format) { }
+    void printLog(const char*) { }
 
 #endif
 
     template<class... Args>
-    void printMessage(char* format)
+    void printMessage(const char* format)
     {
         printf(format, Args...); 
     }
 
     template<>
-    void printMessage(char* format)
+    void printMessage(const char* format)
     {
         printf(format); 
     }

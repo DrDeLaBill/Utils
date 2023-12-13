@@ -7,10 +7,6 @@
 
 #include "TypeListBuilder.h"
 
-template<class... Types>
-constexpr auto get_types_obj(utl::TypeUnit<Types...>) {
-    return std::variant<Types...>{};
-}
 
 namespace fsm
 {
@@ -20,24 +16,25 @@ namespace fsm
     struct TransitionTable : TransitionTableBase
     {
         static_assert(
-            std::is_same_v<utl::remove_duplicates_t<T...>, utl::type_list_t<T...>>,
+            std::is_same_v<
+                utl::variant_factory<typename utl::typelist_t<T...>::RESULT>,
+                utl::variant_factory<typename utl::removed_duplicates_t<T...>::RESULT>
+            >,
             "FSM repeated transitions"
         );
 
-        using transition_p = utl::type_list_t<T...>;
+        using transition_p = utl::simple_list_t<T...>;
 
-        using state_collection = 
-            utl::remove_duplicates_t<
-                utl::type_list_t<
-                    typename T::source_t..., 
-                    typename T::target_t...
-                >
-            >;
+        using state_collection = typename utl::removed_duplicates_t<
+            typename T::source_t..., 
+            typename T::target_t...
+        >::RESULT;
+        using event_collection = typename utl::removed_duplicates_t<
+            typename T::event_t...
+        >::RESULT;
 
-        using event_collection = utl::remove_duplicates_t<typename T::event_t...>;
-
-        using state_v = decltype(get_types_obj(state_collection{}));
-        using event_v = decltype(get_types_obj(event_collection{}));
+        using state_v = typename utl::variant_factory<state_collection>::VARIANT;
+        using event_v = typename utl::variant_factory<event_collection>::VARIANT;
         using transition_v = std::variant<T...>;
     };
 }

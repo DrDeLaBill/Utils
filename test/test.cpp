@@ -2,6 +2,7 @@
 
 
 #include "Log.h"
+#include "CodeStopwatch.h"
 
 #include "FSMKey.h"
 #include "FSMGuard.h"
@@ -23,7 +24,7 @@ struct green_toggle {
 
 	void operator()(void) const
 	{
-		utl::printTagLog<>("green_toggle");
+		std::cout << "green_toggle" << std::endl;
 		// for (uint32_t i = 0; i != 10; i++) {
 			// HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 			// HAL_Delay(150);
@@ -35,7 +36,7 @@ struct yellow_toggle {
 
 	void operator()(void) const
 	{
-		utl::printTagLog<>("yellow_toggle");
+		std::cout << "yellow_toggle" << std::endl;
 		// for (uint32_t i = 0; i != 10; i++) {
 			// HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 			// HAL_Delay(150);
@@ -47,7 +48,7 @@ struct red_toggle {
 
 	void operator()(void) const
 	{
-		utl::printTagLog<>("red_toggle");
+		std::cout << "red_toggle" << std::endl;
 		// for (uint32_t i = 0; i != 10; i++) {
 			// HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 			// HAL_Delay(150);
@@ -56,12 +57,12 @@ struct red_toggle {
 };
 
 
-int main(int args, char** argv)
+int main()
 {
 	struct green_on {
 		void operator()(void) const
 		{
-			utl::printTagLog<>("green_on");
+			std::cout << "green_on" << std::endl;
 			// for (uint32_t i = 0; i != 10; i++) {
 				// HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
 				// HAL_Delay(50);
@@ -73,7 +74,7 @@ int main(int args, char** argv)
 
 		void operator()(void) const
 		{
-			utl::printTagLog<>("yellow_on");
+			std::cout << "yellow_on" << std::endl;
 			// for (uint32_t i = 0; i != 10; i++) {
 				// HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
 				// HAL_Delay(50);
@@ -85,7 +86,7 @@ int main(int args, char** argv)
 
 		void operator()(void) const
 		{
-			utl::printTagLog<>("red_on");
+			std::cout << "red_on" << std::endl;
 			// for (uint32_t i = 0; i != 10; i++) {
 				// HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
 				// HAL_Delay(50);
