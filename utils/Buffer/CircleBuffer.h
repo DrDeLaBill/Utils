@@ -5,6 +5,8 @@
 
 #include <stdint.h>
 
+#include "debug.h"
+
 
 namespace utl 
 {
@@ -51,16 +53,6 @@ namespace utl
 		
 		DATA_T m_data[SIZE];
 		
-		bool isEmpty()const
-        {
-			return m_writeCount == m_readCount;
-        }
-		
-        bool isFull()const
-        {
-			return ((INDEX_T)(m_writeCount - m_readCount) & (INDEX_T)~(m_mask)) != 0;
-        }
-		
         INDEX_T count()const
         {
 			return (m_writeCount - m_readCount) & m_mask;
@@ -68,24 +60,30 @@ namespace utl
 		
 		DATA_T& operator[] (INDEX_T i)
         {
-			if(isEmpty() || i > count()) {
+			if(empty() || i > count()) {
 				return DATA_T();
 			}
 			return m_data[(m_readCount + i) & m_mask];
         }
 
-        const DATA_T operator[] (INDEX_T i)const
+        const DATA_T operator[] (INDEX_T i) const
         {
-			if(isEmpty()) {
+			if(empty()) {
 				return DATA_T();
 			}
 			return m_data[(m_readCount + i) & m_mask];
         }
 		
 	public:
-		bool push(const DATA_T value) 
+		circle_buffer()
 		{
-			if (isFull()) {
+			m_readCount = 0;
+			m_writeCount = 0;
+		}
+
+		bool push_back(const DATA_T value) 
+		{
+			if (full()) {
 				return false;
 			}
 			m_data[m_writeCount++ & m_mask] = value;
@@ -94,28 +92,42 @@ namespace utl
 		
 		bool shift(DATA_T& value)
 		{
-			if (isEmpty()) {
+			if (empty()) {
 				return false;
 			}
 			value = m_data[m_readCount++ & m_mask];
 			return true;
 		}
 
-		bool front(DATA_T& value)
+		bool pop_front()
 		{
-			if (isEmpty()) {
+			if (empty()) {
 				return false;
 			}
-			value = m_data[m_readCount & m_mask];
+			m_readCount++;
 			return true;
 		}
 
-		void pop()
+		const DATA_T& front()
 		{
-			if (isEmpty()) {
-				return;
-			}
-			m_readCount++;
+			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
+			return m_data[m_readCount & m_mask];
+		}
+
+		const DATA_T& back()
+		{
+			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
+			return m_data[(m_writeCount - 1) & m_mask];
+		}
+
+		bool empty() const
+		{
+			return m_writeCount == m_readCount;
+		}
+
+		bool full() const
+		{
+			return ((INDEX_T)(m_writeCount - m_readCount) & (INDEX_T)~(m_mask)) != 0;
 		}
 		
 		void clear()

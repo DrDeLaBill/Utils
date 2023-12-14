@@ -18,6 +18,6 @@ namespace utl
         ~CodeStopwatch();
     private:
         std::string identifier;
-        const uint32_t start = Time::getMillis();
+        uint32_t start;
     };
 }

@@ -34,6 +34,11 @@
 
 
 
+## Warnings
+
+[warnings](https://habr.com/ru/articles/490850/)
+
+
 ## Common
 
 [Типы struct, union и enum в Modern C++](https://habr.com/ru/articles/334988/)

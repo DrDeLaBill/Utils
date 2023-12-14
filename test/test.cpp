@@ -15,9 +15,9 @@
 #include "FiniteStateMachine.h"
 
 
-#define STATE(str)	str = fsm::State<fsm::charHash(#str)>
-#define STATE_A(str, act)	str = fsm::State<fsm::charHash(#str), act>
-#define EVENT(str)	str = fsm::Event<fsm::charHash(#str)>
+#define STATE(str)	      str = fsm::State<fsm::charHash(#str)>;
+#define STATE_A(str, act) str = fsm::State<fsm::charHash(#str), act>;
+#define EVENT(str)	      str = fsm::Event<fsm::charHash(#str)>;
 
 
 struct green_toggle {
@@ -25,10 +25,6 @@ struct green_toggle {
 	void operator()(void) const
 	{
 		std::cout << "green_toggle" << std::endl;
-		// for (uint32_t i = 0; i != 10; i++) {
-			// HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-			// HAL_Delay(150);
-		// }
 	}
 };
 
@@ -37,10 +33,6 @@ struct yellow_toggle {
 	void operator()(void) const
 	{
 		std::cout << "yellow_toggle" << std::endl;
-		// for (uint32_t i = 0; i != 10; i++) {
-			// HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-			// HAL_Delay(150);
-		// }
 	}
 };
 
@@ -49,24 +41,18 @@ struct red_toggle {
 	void operator()(void) const
 	{
 		std::cout << "red_toggle" << std::endl;
-		// for (uint32_t i = 0; i != 10; i++) {
-			// HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-			// HAL_Delay(150);
-		// }
 	}
 };
 
 
 int main()
 {
+	// utl::CodeStopwatch stopwatch("MAIN"); // TODO: fix cmake (INTERFACE library)
+
 	struct green_on {
 		void operator()(void) const
 		{
 			std::cout << "green_on" << std::endl;
-			// for (uint32_t i = 0; i != 10; i++) {
-				// HAL_GPIO_TogglePin(LD1_GPIO_Port, LD1_Pin);
-				// HAL_Delay(50);
-			// }
 		}
 	};
 
@@ -75,10 +61,6 @@ int main()
 		void operator()(void) const
 		{
 			std::cout << "yellow_on" << std::endl;
-			// for (uint32_t i = 0; i != 10; i++) {
-				// HAL_GPIO_TogglePin(LD2_GPIO_Port, LD2_Pin);
-				// HAL_Delay(50);
-			// }
 		}
 	};
 
@@ -87,20 +69,22 @@ int main()
 		void operator()(void) const
 		{
 			std::cout << "red_on" << std::endl;
-			// for (uint32_t i = 0; i != 10; i++) {
-				// HAL_GPIO_TogglePin(LD3_GPIO_Port, LD3_Pin);
-				// HAL_Delay(50);
-			// }
 		}
 	};
 
 	using STATE_A(green_s, green_toggle);
+	std::cout << "state green_s : index = " << green_s::index << std::endl;
 	using STATE_A(yellow_s, yellow_toggle);
+	std::cout << "state yellow_s : index = " << yellow_s::index << std::endl;
 	using STATE_A(red_s, red_toggle);
+	std::cout << "state red_s : index = " << red_s::index << std::endl;
 
 	using EVENT(green_e);
+	std::cout << "event green_e : index = " << green_e::index << std::endl;
 	using EVENT(yellow_e);
+	std::cout << "event yellow_e : index = " << yellow_e::index << std::endl;
 	using EVENT(red_e);
+	std::cout << "event red_e : index = " << red_e::index << std::endl;
 
 
 	using a = fsm::Transition<green_s, yellow_e, yellow_s, yellow_on, fsm::Guard::NO_GUARD>;
@@ -115,7 +99,7 @@ int main()
 	fsm.push_event(yellow_e{});
 	fsm.push_event(green_e{});
 
-	for (int i = 0; i < 1000; i++) {
+	for (int i = 0; i < 10; i++) {
 		fsm.proccess();
 	}
 

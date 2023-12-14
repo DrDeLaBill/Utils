@@ -5,25 +5,35 @@ project(Utils VERSION 0.0.1)
 
 if(MSVC)
     message(STATUS "Add MSVC warnings")
-    if(STORAGEAT_BEDUG)
-        add_compile_options(
-            /Wall
-        )
-    endif()
     add_compile_options(
-        /W4 /we5240 /we4649 /we4330 /we4926
+        /WX /Wall /W4 /we5240 /we4649 /we4330 /we4926
     )
 else()
-    message(STATUS "Add GNU warnings")
-    if(STORAGEAT_BEDUG)
-        add_compile_options(
-            -Wall -Wextra -pedantic -Werror
-        )
-    else()
-        add_compile_options(
-            -Werror -Wattributes
-        )
-    endif()
+    message(STATUS "Add GCC warnings")
+    add_compile_options(
+        -Werror
+        -pedantic-errors
+
+        -Wall
+        -Wextra
+        -Wpedantic
+
+        -Wcast-align
+        -Wcast-qual
+        -Wconversion
+        -Wctor-dtor-privacy
+        -Wduplicated-branches
+        -Wduplicated-cond
+        -Wextra-semi
+        -Wfloat-equal
+        -Wlogical-op
+        -Wnon-virtual-dtor
+        -Wold-style-cast
+        -Woverloaded-virtual
+        -Wredundant-decls
+        -Wsign-conversion
+        -Wsign-promo
+    )
 endif()
 
 

@@ -4,6 +4,11 @@
 
 #include <cstdint>
 
+#include "debug.h"
+
+
+
+#define _STM_TIME
 #if defined(STM32F100xB) || \
     defined(STM32F100xE) || \
     defined(STM32F101x6) || \
@@ -18,8 +23,7 @@
     defined(STM32F103xG) || \
     defined(STM32F105xC) || \
     defined(STM32F107xC)
-    #include "stm32f1xx_hal.h"
-    #define _STM_TIME
+#   include "stm32f1xx_hal.h"
 #elif defined(STM32F405xx) || \
     defined(STM32F415xx) || \
     defined(STM32F407xx) || \
@@ -43,10 +47,10 @@
     defined(STM32F412Vx) || \
     defined(STM32F413xx) || \
     defined(STM32F423xx)
-    #include "stm32f4xx_hal.h"
-    #define _STM_TIME
+#   include "stm32f4xx_hal.h"
 #else
-    #pragma warning("Please select first the target STM32xxxx device used in your application (in Time.cpp file)")
+#   pragma _WARNING("Please select first the target STM32xxxx device used in your application")
+#   undef _STM_TIME
 #endif
 
 
@@ -61,3 +65,7 @@ namespace utl
 #endif
     }
 }
+
+#ifdef _STM_TIME
+#   undef _STM_TIME
+#endif

@@ -24,12 +24,6 @@ namespace utl
 		using TYPE = T;
 	};
 
-	//template<class T>
-	//struct getType<simple_list_t<T>>
-	//{
-	//	using TYPE = T;
-	//};
-
 	template<template<class> class T, class U>
 	struct getType<T<U>>
 	{
@@ -107,22 +101,17 @@ namespace utl
 		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
 	};
 
-	template<class Head, class Tail>
-	struct variant_factory<typelist_t<unit_t<Head, Tail>>>
+	template<template<class> class List, class Head, class Tail>
+	struct variant_factory<List<unit_t<Head, Tail>>>
 	{
 		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
 	};
 
-	template<class Head, class Tail, class Target>
-	struct variant_factory<removed_target_t<unit_t<Head, Tail>, Target>>
+	template<class... Types, template<class> class List>
+	struct variant_factory<List<Types...>>
 	{
-		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
-	};
-
-	template<class Head, class Tail>
-	struct variant_factory<removed_duplicates_t<unit_t<Head, Tail>>>
-	{
-		using VARIANT = typename variant_factory<std::variant<Head>, Tail>::VARIANT;
+		using LIST_RES = typename List<Types...>::RESULT;
+		using VARIANT = typename variant_factory<LIST_RES>::VARIANT;
 	};
 
 	template<class Head, class Tail, class... TypeList>

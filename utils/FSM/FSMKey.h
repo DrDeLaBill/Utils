@@ -18,7 +18,7 @@ namespace fsm
     {
         constexpr bool operator()(const key_t& lhs, const key_t& rhs) const 
         {
-            return lhs.state_idx == rhs.state_idx && lhs.event_idx == rhs.event_idx;
+            return (lhs.state_idx == rhs.state_idx) && (lhs.event_idx == rhs.event_idx);
         }
     };
 

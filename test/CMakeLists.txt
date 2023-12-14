@@ -29,6 +29,7 @@ target_include_directories(
     PRIVATE
     "${DIR_LIST}"
 )
+
 target_link_libraries(
     utilstest
     INTERFACE

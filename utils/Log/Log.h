@@ -5,32 +5,38 @@
 
 #include <cstdio>
 
+#include "GTime.h"
+
 
 namespace utl
 {
 
-#if DEBUG
-
     template<class... Args>
-    void printTagLog(const char* format)
+    void printMessage(const char* format, Args... args)
     {
-        printf("%09lu->%s:\t", HAL_GetTick(), MODULE_TAG);
-        printMessage<Args...>(format);
-        printf("\n");
+        printf(format, args...); 
     }
 
-    // template<>
-    // void printTagLog(const char* format)
-    // {
-    //     printf("%09lu->%s:\t", HAL_GetTick(), MODULE_TAG);
-    //     printMessage<Args...>(format);
-    //     printf("\n");
-    // }
+    template<>
+    void printMessage(const char* format)
+    {
+        printf(format); 
+    }
+
+#if _DEBUG || DEBUG
 
     template<class... Args>
-    void printLog(const char* format)
+    void printTagLog(const char* tag, const char* format, Args... args)
     {
-        printMessage<Args...>(format);
+        printMessage("%09lu->%s:\t", Time::getMillis(), tag);
+        printMessage(format, args...);
+        printMessage("\n");
+    }
+
+    template<class... Args>
+    void printLog(const char* format, Args... args)
+    {
+        printMessage(format, args...);
     }
 
 #else
@@ -42,17 +48,5 @@ namespace utl
     void printLog(const char*) { }
 
 #endif
-
-    template<class... Args>
-    void printMessage(const char* format)
-    {
-        printf(format, Args...); 
-    }
-
-    template<>
-    void printMessage(const char* format)
-    {
-        printf(format); 
-    }
 
 }

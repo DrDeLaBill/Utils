@@ -2,17 +2,18 @@
 
 #pragma once
 
-
+#include <iostream>
 #include <cstdint>
 #include <variant>
-//#include <algorithm>
 #include <unordered_map>
 
 #include "FSMKey.h"
 #include "FSMGuard.h"
 #include "FSMEvent.h"
+#include "FSMState.h"
 #include "FSMAction.h"
 #include "FSMCharHash.h"
+#include "FSMTransition.h"
 #include "FSMTransitionTable.h"
 
 #include "CircleBuffer.h"
@@ -39,8 +40,8 @@ namespace fsm
                 key_t, 
                 transition_v, 
                 KeyHash, 
-                KeyEqual
-                //std::allocator<std::pair<key_t, transition_v>>
+                KeyEqual,
+                std::allocator<std::pair<const key_t, transition_v>>
             >;
         using queue_t = 
             utl::circle_buffer<
@@ -62,10 +63,13 @@ namespace fsm
             set_table(transition_p{});
         }
 
-        template<unsigned EVENT_INDEX>
-        void push_event(const Event<EVENT_INDEX>& event)
+        // template<unsigned EVENT_INDEX>
+        void push_event(const event_v& event)
         {
-            events.push(event);
+            events.push_back(event);
+            // std::cout << "push event with index = " << decltype(event)::index << std::endl;
+            // std::cout << "push event with index = " << Event<EVENT_INDEX>::index << std::endl;
+            // std::cout << "pushed event with index = " << events.back() << std::endl;
         }
 
         // template<class... EventTypes>
@@ -102,15 +106,17 @@ namespace fsm
         {
             state_action();
 
+            if (events.empty()) {
+                return;
+            }
+
             key_t tmpKey;
             tmpKey.state_idx = this->key.state_idx;
             auto it = transitions.begin();
 
             for (unsigned i = 0; i < events.size(); i++) {
-                event_v eventVariant;
-                if (!events.front(eventVariant)) {
-                    break;
-                }
+                auto eventVariant = events.front();
+
                 auto lambda = [&](const auto& targetEvent) {
                     using event_t = std::decay_t<decltype(targetEvent)>;
                     tmpKey.event_idx = event_t::index;
@@ -120,12 +126,12 @@ namespace fsm
                 std::visit(lambda, eventVariant);
 
                 if (it != transitions.end()) {
-                    events.pop();
+                    events.pop_front();
                     on_event_invoke(tmpKey);
                     return;
                 } else {
-                    events.push(eventVariant);
-                    events.pop();
+                    events.push_back(eventVariant);
+                    events.pop_front();
                 }
             }
         }
@@ -161,13 +167,6 @@ namespace fsm
 
                 using target_t = typename event_transition_v::target_t;
 
-
-                using type_t = utl::variant_factory<typename utl::removed_duplicates_t<
-                    typename utl::typelist_t<State<1>, State<2>, State<1>>::RESULT>
-                ::RESULT>::VARIANT;
-                //std::variant<State<1>, State<2>> var1 = State<3>{};
-                //state_v var1 = State<2>{};
-
                 state_v var = target_t{};
 
                 tmpKey.state_idx = target_t::index;
@@ -198,7 +197,7 @@ namespace fsm
             tmpKey.state_idx = state_t::index;
             tmpKey.event_idx = event_t::index;
 
-            transitions.insert({key, transition{}});
+            transitions.insert({tmpKey, transition{}});
 
             if (!this->key.state_idx) {
                 this->key.state_idx = tmpKey.state_idx;
