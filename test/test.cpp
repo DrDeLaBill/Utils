@@ -47,7 +47,7 @@ struct red_toggle {
 
 int main()
 {
-	// utl::CodeStopwatch stopwatch("MAIN"); // TODO: fix cmake (INTERFACE library)
+	utl::CodeStopwatch stopwatch("MAIN"); // TODO: fix cmake (INTERFACE library)
 
 	struct green_on {
 		void operator()(void) const

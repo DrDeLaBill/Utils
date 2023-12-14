@@ -6,6 +6,8 @@ project(StorageAT-test VERSION 0.0.1)
 message(STATUS "Utils tests enabled.")
 
 
+add_library(utillib "../utils/Log/CodeStopWatch.cpp;../utils/Time/GTime.cpp")
+
 file(GLOB ${PROJECT_NAME}_HEADERS "./*.h")
 file(GLOB ${PROJECT_NAME}_SOURCES "./*.cpp")
 set(ALL_SRCS "${${PROJECT_NAME}_SOURCES};${${PROJECT_NAME}_HEADERS}")
@@ -14,14 +16,14 @@ add_executable(utilstest ${ALL_SRCS})
 # TODO: cmake finder
 SET(DIR_LIST "")
 MACRO(SUBDIRLIST result curdir)
-  FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
-  SET(dirlist "")
-  FOREACH(child ${children})
-    IF(IS_DIRECTORY ${curdir}/${child})
-      LIST(APPEND dirlist ${curdir}/${child})
-    ENDIF()
-  ENDFOREACH()
-  SET(${result} ${dirlist})
+    FILE(GLOB children RELATIVE ${curdir} ${curdir}/*)
+    SET(dirlist "")
+    FOREACH(child ${children})
+        IF(IS_DIRECTORY ${curdir}/${child})
+            LIST(APPEND dirlist ${curdir}/${child})
+        ENDIF()
+    ENDFOREACH()
+    SET(${result} ${dirlist})
 ENDMACRO()
 SUBDIRLIST(DIR_LIST "${CMAKE_CURRENT_SOURCE_DIR}/../utils")
 target_include_directories(
@@ -32,7 +34,7 @@ target_include_directories(
 
 target_link_libraries(
     utilstest
-    INTERFACE
+    INTERFACE // TODO: remove
     utilslib
 )
 set_target_properties(

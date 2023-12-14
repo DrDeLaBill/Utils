@@ -49,7 +49,7 @@
     defined(STM32F423xx)
 #   include "stm32f4xx_hal.h"
 #else
-#   pragma _WARNING("Please select first the target STM32xxxx device used in your application")
+#   pragma _WARNING("please select the target STM32xxxx used in your application")
 #   undef _STM_TIME
 #endif
 

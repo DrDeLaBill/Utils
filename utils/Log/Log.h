@@ -17,11 +17,11 @@ namespace utl
         printf(format, args...); 
     }
 
-    template<>
-    void printMessage(const char* format)
-    {
-        printf(format); 
-    }
+    // template<>
+    // void printMessage(const char* format)
+    // {
+    //     printf(format); 
+    // }
 
 #if _DEBUG || DEBUG
 

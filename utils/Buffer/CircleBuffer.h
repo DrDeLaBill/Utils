@@ -81,12 +81,21 @@ namespace utl
 			m_writeCount = 0;
 		}
 
-		bool push_back(const DATA_T value) 
+		bool push_back(const DATA_T& value) 
 		{
 			if (full()) {
 				return false;
 			}
 			m_data[m_writeCount++ & m_mask] = value;
+			return true;
+		}
+
+		bool push_front(const DATA_T& value)
+		{
+			if (full()) {
+				return false;
+			}
+			m_data[(--m_readCount) & mask] = value;
 			return true;
 		}
 		
@@ -105,6 +114,15 @@ namespace utl
 				return false;
 			}
 			m_readCount++;
+			return true;
+		}
+
+		bool pop_back()
+		{
+			if (empty()) {
+				return false;
+			}
+			m_writeCount--;
 			return true;
 		}
 
