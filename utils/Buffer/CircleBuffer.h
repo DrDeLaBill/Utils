@@ -5,7 +5,7 @@
 
 #include <stdint.h>
 
-#include "debug.h"
+#include "gmacro.h"
 
 
 namespace utl 

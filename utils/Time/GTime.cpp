@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "debug.h"
+#include "gmacro.h"
 
 
 
