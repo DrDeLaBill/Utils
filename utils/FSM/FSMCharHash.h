@@ -3,7 +3,7 @@
 #pragma once
 
 namespace fsm
-{// TODO: rebase to utl namespace
+{
     constexpr unsigned charHash(const char* data)
     {
         unsigned int  res = 0;

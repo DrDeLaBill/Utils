@@ -19,20 +19,14 @@ namespace utl
     constexpr std::size_t size(unit_t<Head, null_type_t>) {
     	return 1;
     }
-
-    // TODO: get head & tail types
-    // template<class H, class... TypeList>
-    // constexpr head_t head(Private::TypeUnit<H, TypeList...>) {
-    //     return head_t<>
-    // }
     
     template<class... TypeList>
-    constexpr bool empty(typelist_t<TypeList...>) {
-        return size(typename typelist_t<TypeList...>{}) == 0;
+    constexpr bool empty(unit_t<TypeList...>) {
+        return size(typename unit_t<TypeList...>{}) == 0;
     }
     
     template<>
-    constexpr bool empty(typelist_t<null_type_t>) {
+    constexpr bool empty(unit_t<null_type_t>) {
         return true;
     }
     

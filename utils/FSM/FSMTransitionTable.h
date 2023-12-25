@@ -3,7 +3,6 @@
 #pragma once
 
 #include <variant>
-//#include <type_traits>
 
 #include "TypeListBuilder.h"
 
@@ -15,6 +14,10 @@ namespace fsm
     template<class... T>
     struct TransitionTable : TransitionTableBase
     {
+        static_assert(
+            !utl::empty<utl::typelist_t<T...>>(), 
+            "FSM empty transition table"
+        );
         static_assert(
             std::is_same_v<
                 typename utl::variant_factory<utl::typelist_t<T...>>::VARIANT,

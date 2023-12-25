@@ -53,11 +53,6 @@ namespace utl
 		
 		DATA_T m_data[SIZE];
 		
-        INDEX_T count()const
-        {
-			return (m_writeCount - m_readCount) & m_mask;
-        }
-		
 		DATA_T& operator[] (INDEX_T i)
         {
 			if(empty() || i > count()) {
@@ -152,6 +147,11 @@ namespace utl
         {
 			m_readCount  = 0;
 			m_writeCount = 0;
+        }
+		
+        INDEX_T count()const
+        {
+			return (m_writeCount - m_readCount) & m_mask;
         }
 		
 		inline unsigned size() { return SIZE; }

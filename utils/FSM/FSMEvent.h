@@ -6,17 +6,10 @@ namespace fsm
 {
     struct EventBase { };
 
-    // TODO: template<unsigned INDEX, unsigned PRIORITY>
-    template<unsigned INDEX>
+    template<unsigned INDEX, unsigned PRIORITY = 0>
     struct Event : EventBase
     {
         static constexpr unsigned index = INDEX;
-        // TODO: static constexpr unsigned priority = PRIORITY;
+        static constexpr unsigned priority = PRIORITY;
     };
-
-    // template<class... EventTypes>
-    // constexpr utl::type_list_t<> get_event_typelist()
-    // {
-
-    // }
 }

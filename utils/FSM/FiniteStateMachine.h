@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include <iostream>
+
 #include <cstdint>
 #include <variant>
 #include <unordered_map>
@@ -18,6 +18,12 @@
 
 #include "CircleBuffer.h"
 #include "TypeListBuilder.h"
+
+#include "gmacro.h"
+
+
+#define FSM_CREATE_STATE(name, action)   using name = fsm::State<fsm::charHash(#name), action>
+#define FSM_CREATE_EVENT(name, priority) using name = fsm::Event<fsm::charHash(#name), priority>
 
 
 namespace fsm
@@ -63,24 +69,18 @@ namespace fsm
             set_table(transition_p{});
         }
 
-        // template<unsigned EVENT_INDEX>
         void push_event(const event_v& event)
         {
             events.push_back(event);
-            // std::cout << "push event with index = " << decltype(event)::index << std::endl;
-            // std::cout << "push event with index = " << Event<EVENT_INDEX>::index << std::endl;
-            // std::cout << "pushed event with index = " << events.back() << std::endl;
         }
 
-        // template<class... EventTypes>
-        // void push_events(const utl::type_list_t<EventTypes...>&)
-        // {
-        //     for (unsigned i = 0; i < utl::size(utl::type_list_t<EventTypes...>); i++) {
-        //         push_event<event::index>(utl::get_type_unit<eventTypes, i>());
-        //     }
-        // }
+        template<class... Event>
+        void push_events(Event...)
+        {
+            (events.push_back(Event{}), ...);
+        }
 
-        void set_guard(const Guard& guard) // TODO: : guard(guard)
+        void set_guard(const Guard& guard)
         {
             this->guard = guard;
         }
@@ -110,22 +110,52 @@ namespace fsm
                 return;
             }
 
+
             key_t tmpKey;
             tmpKey.state_idx = this->key.state_idx;
+            unsigned maxPriority = 0;
+
             auto it = transitions.begin();
-
-            for (unsigned i = 0; i < events.size(); i++) {
+            for (unsigned i = 0; i < events.count(); i++) {
                 auto eventVariant = events.front();
-
+                
                 auto lambda = [&](const auto& targetEvent) {
                     using event_t = std::decay_t<decltype(targetEvent)>;
                     tmpKey.event_idx = event_t::index;
                     it = transitions.find(tmpKey);
+                    
+                    if (it == transitions.end()) {
+                        return;
+                    }
+                    if (event_t::priority > maxPriority) {
+                        maxPriority = event_t::priority;
+                    }
+                };
+
+                std::visit(lambda, eventVariant);
+                
+                events.push_back(eventVariant);
+                events.pop_front();
+            }
+
+            it = transitions.begin();
+            for (unsigned i = 0; i < events.count(); i++) {
+                auto eventVariant = events.front();
+
+                bool transitionFound = false;
+                auto lambda = [&](const auto& targetEvent) {
+                    using event_t = std::decay_t<decltype(targetEvent)>;
+                    tmpKey.event_idx = event_t::index;
+                    it = transitions.find(tmpKey);
+
+                    if (it != transitions.end() && maxPriority == event_t::priority) {
+                        transitionFound = true;
+                    }
                 };
 
                 std::visit(lambda, eventVariant);
 
-                if (it != transitions.end()) {
+                if (transitionFound) {
                     events.pop_front();
                     on_event_invoke(tmpKey);
                     return;
