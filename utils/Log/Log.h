@@ -1,52 +1,65 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef __LOG_H
+#define __LOG_H
 
 
-#include <cstdio>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
-#include "GTime.h"
+
+#include <stdio.h>
+
+#include "gtime.h"
+#include "bmacro.h"
 
 
-namespace utl
-{
-
-    template<class... Args>
-    void printMessage(const char* format, Args... args)
-    {
-        printf(format, args...); 
-    }
-
-    // template<>
-    // void printMessage(const char* format)
-    // {
-    //     printf(format); 
-    // }
+#ifndef printMessage
+#   if defined(__GNUC__)
+#       define printMessage(format, ...) printf(format __VA_OPT__(,) __VA_ARGS__);
+#   elif defined(_MSC_VER)
+#       define printMessage(format, ...) printf(format, ## __VA_ARGS__);
+#   else
+#       define printMessage(format, ...) { }
+#       pragma _WARNING("please check compiler")
+#   endif
+#endif
 
 #if _DEBUG || DEBUG
 
-    template<class... Args>
-    void printTagLog(const char* tag, const char* format, Args... args)
-    {
-        printMessage("%09lu->%s:\t", Time::getMillis(), tag);
-        printMessage(format, args...);
-        printMessage("\n");
-    }
+#   ifndef printTagLog
+#       if defined(__GNUC__)
+#           define printTagLog(tag, format, ...) printMessage("%08lu->%s:\t" format "\n", getMillis(), tag __VA_OPT__(,) __VA_ARGS__);
+#       elif defined(_MSC_VER)
+#           define printTagLog(tag, format, ...) printMessage("%08lu->%s:\t" format "\n", getMillis(), tag, ## __VA_ARGS__);
+#       endif
+#   endif
 
-    template<class... Args>
-    void printLog(const char* format, Args... args)
-    {
-        printMessage(format, args...);
-    }
+#   ifndef printLog
+#       if defined(__GNUC__)
+#           define printLog(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
+#       elif defined(_MSC_VER)
+#           define printLog(format, ...) printMessage(format, ## __VA_ARGS__);
+#       endif
+#   endif
 
 #else
 
-    template<class... Args>
-    void printTagLog(const char*) { }
+#   ifndef printTagLog
+#       define printTagLog(tag, format, ...)  { }
+#   endif
 
-    template<class... Args>
-    void printLog(const char*) { }
+#   ifndef printLog
+#       define printLog(format, ...) { }
+#   endif
 
 #endif
 
+
+#ifdef __cplusplus
 }
+#endif
+
+
+#endif

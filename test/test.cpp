@@ -1,7 +1,7 @@
 #include <iostream>
 
 
-#include "Log.h"
+#include "log.h"
 #include "CodeStopwatch.h"
 
 #include "FiniteStateMachine.h"
@@ -11,7 +11,7 @@ struct green_toggle {
 
 	void operator()(void) const
 	{
-		std::cout << "green_toggle" << std::endl;
+		printTagLog("MAIN", "green_toggle");
 	}
 };
 
@@ -19,7 +19,7 @@ struct yellow_toggle {
 
 	void operator()(void) const
 	{
-		std::cout << "yellow_toggle" << std::endl;
+		printTagLog("MAIN", "yellow_toggle");
 	}
 };
 
@@ -27,14 +27,14 @@ struct red_toggle {
 
 	void operator()(void) const
 	{
-		std::cout << "red_toggle" << std::endl;
+		printTagLog("MAIN", "red_toggle");
 	}
 };
 
 struct green_on {
 	void operator()(void) const
 	{
-		std::cout << "green_on" << std::endl;
+		printTagLog("MAIN", "green_on");
 	}
 };
 
@@ -42,7 +42,7 @@ struct yellow_on {
 
 	void operator()(void) const
 	{
-		std::cout << "yellow_on" << std::endl;
+		printTagLog("MAIN", "yellow_on");
 	}
 };
 
@@ -50,7 +50,7 @@ struct red_on {
 
 	void operator()(void) const
 	{
-		std::cout << "red_on" << std::endl;
+		printTagLog("MAIN", "red_on");
 	}
 };
 
@@ -83,12 +83,15 @@ int main()
 		green_e{}
 	);
 	fsm.push_event(priority_e{});
-	// fsm.push_event(yellow_e{});
-	// fsm.push_event(green_e{});
+	fsm.push_event(yellow_e{});
+	fsm.push_event(green_e{});
 
 	for (int i = 0; i < 10; i++) {
 		fsm.proccess();
 	}
+
+	printTagLog("MAIN", "OK");
+	printTagLog("LOG", "OK");
 
     return 0;
 }

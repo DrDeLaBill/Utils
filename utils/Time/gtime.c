@@ -1,14 +1,12 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include "GTime.h"
+#include "gtime.h"
 
-#include <cstdint>
+#include <stdint.h>
 
-#include "gmacro.h"
+#include "bmacro.h"
 
 
-
-#define _STM_TIME
 #if defined(STM32F100xB) || \
     defined(STM32F100xE) || \
     defined(STM32F101x6) || \
@@ -24,6 +22,7 @@
     defined(STM32F105xC) || \
     defined(STM32F107xC)
 #   include "stm32f1xx_hal.h"
+#   define _HAL_TIME
 #elif defined(STM32F405xx) || \
     defined(STM32F415xx) || \
     defined(STM32F407xx) || \
@@ -48,24 +47,33 @@
     defined(STM32F413xx) || \
     defined(STM32F423xx)
 #   include "stm32f4xx_hal.h"
+#   define _HAL_TIME
+#elif defined(__GNUC__)
+#   include <sys/time.h>
+#   pragma _WARNING("please select the target STM32xxxx used in your application")
+#elif defined(_MSC_VER)
+#   include <time.h>
+#   pragma _WARNING("please select the target STM32xxxx used in your application")
 #else
 #   pragma _WARNING("please select the target STM32xxxx used in your application")
-#   undef _STM_TIME
 #endif
 
 
-namespace utl
+uint32_t getMillis()
 {
-    uint32_t Time::getMillis()
-    {
-#ifdef _STM_TIME
-        return HAL_GetTick();
+#if defined(_HAL_TIME)
+    return HAL_GetTick();
+#elif defined(__GNUC__)
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    return time.tv_sec * 1000 + time.tv_usec / 1000;
+#elif defined(_MSC_VER)
+    return clock();
 #else
-        return 0;
+    return 0;
 #endif
-    }
 }
 
-#ifdef _STM_TIME
-#   undef _STM_TIME
+#ifdef _HAL_TIME
+#   undef _HAL_TIME
 #endif

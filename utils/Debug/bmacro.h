@@ -1,12 +1,19 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef __B_MACRO_H
+#define __B_MACRO_H
+
+
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 
 #include "bedug.h"
 
 
 #ifndef BEDUG_ASSERT
-#   define BEDUG_ASSERT(condition, message) if (!condition) bedug::assert(__FILE__, __LINE__, message);
+#   define BEDUG_ASSERT(condition, message) if (!condition) { b_assert(__FILE__, __LINE__, message); }
 #endif
 
 #ifndef __STR_DEF2__
@@ -23,4 +30,12 @@
 
 #ifndef _WARNING
 #   define _WARNING(msgStr) message( __LOC__ " : warning : " msgStr )
+#endif
+
+
+#ifdef __cplusplus
+}
+#endif
+
+
 #endif

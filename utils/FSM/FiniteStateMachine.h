@@ -19,7 +19,7 @@
 #include "CircleBuffer.h"
 #include "TypeListBuilder.h"
 
-#include "gmacro.h"
+#include "bmacro.h"
 
 
 #define FSM_CREATE_STATE(name, action)   using name = fsm::State<fsm::charHash(#name), action>

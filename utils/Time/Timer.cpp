@@ -4,7 +4,7 @@
 
 #include <cstdint>
 
-#include "GTime.h"
+#include "gtime.h"
 
 
 namespace utl
@@ -13,11 +13,11 @@ namespace utl
 
     void Timer::start()
     {
-        this->start_time = Time::getMillis();
+        this->start_time = getMillis();
     }
 
     bool Timer::wait()
     {
-        return this->start_time + this->delay < Time::getMillis();
+        return this->start_time + this->delay < getMillis();
     }
 }

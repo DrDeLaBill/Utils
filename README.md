@@ -1,6 +1,8 @@
-# G Libraries
+# Utils
 
+Utils pack for STM32xxxx
 
+# References
 
 ## FSM
 
@@ -50,3 +52,5 @@
 [Сообщение компилятору [[nodiscard]]](https://en.cppreference.com/w/cpp/language/attributes/nodiscard)
 
 [Просто о сложном — move в языке C++](https://habr.com/ru/articles/587644/)
+
+[Macros](https://blog.kowalczyk.info/article/j/guide-to-predefined-macros-in-c-compilers-gcc-clang-msvc-etc..html)

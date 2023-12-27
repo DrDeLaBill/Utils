@@ -1,15 +1,23 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef __G_TIME_H
+#define __G_TIME_H
 
 
-#include <cstdint>
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 
-namespace utl
-{
-    struct Time
-    {
-        static uint32_t getMillis();
-    };
+#include <stdint.h>
+
+
+uint32_t getMillis();
+
+
+#ifdef __cplusplus
 }
+#endif
+
+
+#endif
