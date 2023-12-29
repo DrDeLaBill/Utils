@@ -12,8 +12,8 @@ namespace utl
     class Timer
     {
     private:
-        uint32_t start_time;
         uint32_t delay;
+        uint32_t start_time;
 
     public:
         Timer(uint32_t delay);

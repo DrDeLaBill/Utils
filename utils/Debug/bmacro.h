@@ -25,7 +25,7 @@ extern "C" {
 #endif
 
 #ifndef __LOC__
-#   define __LOC__ __FILE__ "("__STR_DEF1__(__LINE__)")"
+#   define __LOC__ __FILE__ "(" __STR_DEF1__(__LINE__) ")"
 #endif
 
 #ifndef _WARNING

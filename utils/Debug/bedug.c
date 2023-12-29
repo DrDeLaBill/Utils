@@ -5,10 +5,10 @@
 #include "log.h"
 
 
-#if _DEBUG || DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
 void b_assert(const char* file, int line, const char* message)
 {
-    printLog("%s (%ld): bedug assert failed : %s\n", file, line, message);
+    printLog("%s (%d): bedug assert failed : %s\n", file, line, message);
 }
 #else
 void b_assert(const char*, int, const char*) { }

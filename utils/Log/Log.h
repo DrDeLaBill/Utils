@@ -26,7 +26,7 @@ extern "C" {
 #   endif
 #endif
 
-#if _DEBUG || DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
 
 #   ifndef printTagLog
 #       if defined(__GNUC__)
