@@ -11,12 +11,12 @@
 #	include "hal_defs.h"
 #elif defined(__GNUC__)
 #   include <sys/time.h>
-#   pragma _WARNING("please select the target STM32xxxx used in your application")
 #elif defined(_MSC_VER)
 #   include <time.h>
-#   pragma _WARNING("please select the target STM32xxxx used in your application")
-#else
-#   pragma _WARNING("please select the target STM32xxxx used in your application")
+#endif
+
+#ifndef USE_HAL_DRIVER
+#   pragma _WARNING("Please select the target STM32xxxx used in your application")
 #endif
 
 

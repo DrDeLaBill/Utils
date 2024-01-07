@@ -45,7 +45,7 @@
 		defined(STM32F423xx)
 #		include "stm32f4xx_hal.h"
 #	else
-#		error "Please select first the target STM32F4xx device used in your application (in flash_w25qxx_storage.c file)"
+#		error "Please select the target STM32xxxx used in your application"
 #	endif
 #endif
 

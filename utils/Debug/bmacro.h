@@ -29,7 +29,7 @@ extern "C" {
 #endif
 
 #ifndef _WARNING
-#   define _WARNING(msgStr) message( __LOC__ " : warning : " msgStr )
+#   define _WARNING(msgStr) message( __LOC__ " : an unimportant warning has been occurred, PLEASE DON'T WORRY, keep using the system : " msgStr )
 #endif
 
 

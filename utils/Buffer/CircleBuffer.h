@@ -123,13 +123,13 @@ namespace utl
 
 		const DATA_T& front()
 		{
-			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
+			BEDUG_ASSERT(!empty(), "get front unit - circle buffer is empty");
 			return m_data[m_readCount & m_mask];
 		}
 
 		const DATA_T& back()
 		{
-			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
+			BEDUG_ASSERT(!empty(), "get back unit - circle buffer is empty");
 			return m_data[(m_writeCount - 1) & m_mask];
 		}
 
