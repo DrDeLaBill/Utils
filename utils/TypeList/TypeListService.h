@@ -10,6 +10,7 @@
 
 namespace utl 
 {
+    // Get type list length
     template<class... TypeList>
     constexpr std::size_t size(unit_t<TypeList...>) {
     	return 1 + size(typename unit_t::TAIL{});

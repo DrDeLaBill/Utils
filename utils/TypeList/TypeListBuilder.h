@@ -85,7 +85,7 @@ namespace utl
 		using NEXT_PART = typename removed_duplicates_t<Tail>::RESULT;
 		using REMOVED_T = typename removed_target_t<NEXT_PART, Head>::RESULT;
 	public:
-		using RESULT = unit_t<Head, typename REMOVED_T>;
+		using RESULT = unit_t<Head, REMOVED_T>;
 	};
 
 	template<>
