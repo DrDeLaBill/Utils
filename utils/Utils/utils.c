@@ -6,10 +6,11 @@
 #include <stdbool.h>
 
 #include "log.h"
+#include "gtime.h"
 #include "hal_defs.h" // TODO: add if else preprocessor condition
 
 
-#ifdef DEBUG
+#if defined(_DEBUG) || defined(DEBUG)
 void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) {
     const uint8_t cols_count = 16;
     uint32_t i = 0;
@@ -41,14 +42,19 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
         i++;
     } while (i * cols_count < len);
 }
-#else /* DEBUG */
-void util_debug_hex_dump(const char* tag, const uint8_t* buf, uint32_t start_counter, uint16_t len) {}
-#endif /* DEBUG */
+#else
+void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) 
+{
+    (void*)buf;
+    (void)start_counter;
+    (void)len;
+}
+#endif
 
 bool util_wait_event(bool (*condition) (void), uint32_t time)
 {
-    uint32_t start_time = HAL_GetTick();
-    while (__abs_dif(start_time, HAL_GetTick()) < time) {
+    uint32_t start_time = getMillis();
+    while (__abs_dif(start_time, getMillis()) < time) {
         if (condition()) {
             return true;
         }
