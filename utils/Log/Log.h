@@ -10,6 +10,7 @@ extern "C" {
 
 
 #include <stdio.h>
+#include <string.h>
 
 #include "gtime.h"
 #include "bmacro.h"

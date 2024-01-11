@@ -1,7 +1,10 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#ifndef __HAL_DEFS_H
-#define __HAL_DEFS_H
+#ifndef _HAL_DEFS_H_
+#define _HAL_DEFS_H_
+
+
+#include <stdint.h>
 
 
 #if defined(USE_HAL_DRIVER)
@@ -48,6 +51,19 @@
 #		error "Please select the target STM32xxxx used in your application"
 #	endif
 #endif
+
+
+#define TIMESTAMP2000_01_01_00_00_00 (946670400)
+
+#define SECOND_MS ((uint32_t)(1000))
+
+#define MINUTE_MS ((uint32_t)(60 * SECOND_MS))
+
+#define HOUR_MS   ((uint32_t)(60 * MINUTE_MS))
+
+#define DAY_MS    ((uint32_t)(24 * HOUR_MS))
+
+#define WEEK_MS   ((uint32_t)(7 * DAY_MS))
 
 
 #endif

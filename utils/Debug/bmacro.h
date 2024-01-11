@@ -13,7 +13,7 @@ extern "C" {
 
 
 #ifndef BEDUG_ASSERT
-#   define BEDUG_ASSERT(condition, message) if (!condition) { b_assert(__FILE__, __LINE__, message); }
+#   define BEDUG_ASSERT(condition, message) if (!(condition)) { b_assert(__FILE__, __LINE__, message); }
 #endif
 
 #ifndef __STR_DEF2__
