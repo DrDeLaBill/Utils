@@ -5,6 +5,7 @@
 #include <variant>
 
 #include "TypeListBuilder.h"
+#include "TypeListService.h"
 
 
 namespace fsm
@@ -15,7 +16,7 @@ namespace fsm
     struct TransitionTable : TransitionTableBase
     {
         static_assert(
-            !utl::empty<utl::typelist_t<T...>>(), 
+            !utl::empty(typename utl::typelist_t<T...>::RESULT{}),
             "FSM empty transition table"
         );
         static_assert(

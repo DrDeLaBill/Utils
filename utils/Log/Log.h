@@ -39,9 +39,17 @@ extern "C" {
 
 #   ifndef printLog
 #       if defined(__GNUC__)
-#           define printLog(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
+#           define printPretty(format, ...) printMessage("          \t" format __VA_OPT__(,) __VA_ARGS__);
 #       elif defined(_MSC_VER)
-#           define printLog(format, ...) printMessage(format, ## __VA_ARGS__);
+#           define printPretty(format, ...) printMessage("          \t" format, ## __VA_ARGS__);
+#       endif
+#   endif
+
+#   ifndef print
+#       if defined(__GNUC__)
+#           define print(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
+#       elif defined(_MSC_VER)
+#           define print(format, ...) printMessage(format, ## __VA_ARGS__);
 #       endif
 #   endif
 
@@ -52,7 +60,7 @@ extern "C" {
 #   endif
 
 #   ifndef printLog
-#       define printLog(format, ...) { }
+#       define printPretty(format, ...) { }
 #   endif
 
 #endif

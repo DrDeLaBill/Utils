@@ -90,7 +90,7 @@ namespace utl
 			if (full()) {
 				return false;
 			}
-			m_data[(--m_readCount) & mask] = value;
+			m_data[(--m_readCount) & m_mask] = value;
 			return true;
 		}
 		

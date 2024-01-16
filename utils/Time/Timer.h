@@ -18,6 +18,7 @@ namespace utl
     public:
         Timer(uint32_t delay);
         void start();
+        void reset();
         bool wait();
 
     };

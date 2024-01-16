@@ -17,6 +17,6 @@ namespace utl
     CodeStopwatch::~CodeStopwatch()
     {
         uint32_t end = getMillis();
-        printLog("Code execution time for %s identifier: %ld ms\n", this->identifier.c_str(), end - this->start);
+        printPretty("Code execution time for %s identifier: %ld ms\n", this->identifier.c_str(), end - this->start);
     }
 }

@@ -14,7 +14,7 @@ extern "C" {
 
 
 #ifndef __abs_dif
-#	define __abs_dif(num1, num2) ((num1 > num2) ? num1 - num2 : num2 - num1)
+#	define __abs_dif(num1, num2) (((num1) > (num2)) ? (num1) - (num2) : (num2) - (num1))
 #endif
 
 #ifndef __arr_len

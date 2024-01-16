@@ -18,6 +18,7 @@
 
 #include "CircleBuffer.h"
 #include "TypeListBuilder.h"
+#include "TypeListService.h"
 
 #include "bmacro.h"
 
@@ -46,8 +47,8 @@ namespace fsm
                 key_t, 
                 transition_v, 
                 KeyHash, 
-                KeyEqual,
-                std::allocator<std::pair<const key_t, transition_v>>
+                KeyEqual
+//                std::allocator<std::pair<const key_t, transition_v>>
             >;
         using queue_t = 
             utl::circle_buffer<
@@ -219,8 +220,8 @@ namespace fsm
         {
             using transition = typename decltype(trPack)::TYPE;
 
-            using state_t = transition::source_t;
-            using event_t = transition::event_t;
+            using state_t = typename transition::source_t;
+            using event_t = typename transition::event_t;
             Guard tmpGuard = transition::guard;
 
             key_t tmpKey;

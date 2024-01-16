@@ -20,8 +20,13 @@ namespace utl
         this->start_time = getMillis();
     }
 
+    void Timer::reset()
+    {
+    	this->start_time = 0;
+    }
+
     bool Timer::wait()
     {
-        return this->start_time + this->delay < getMillis();
+        return this->start_time + this->delay > getMillis();
     }
 }
