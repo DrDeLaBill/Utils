@@ -12,7 +12,7 @@ namespace utl
     class Timer
     {
     private:
-        const uint32_t delay;
+        uint32_t delay;
         uint32_t start_time;
 
     public:

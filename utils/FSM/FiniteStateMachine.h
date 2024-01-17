@@ -81,6 +81,11 @@ namespace fsm
             (events.push_back(Event{}), ...);
         }
 
+        void clear_events()
+        {
+        	events.clear();
+        }
+
         void set_guard(const Guard& guard)
         {
             this->guard = guard;
