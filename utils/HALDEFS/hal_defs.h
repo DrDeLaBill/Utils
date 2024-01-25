@@ -55,15 +55,17 @@
 
 #define TIMESTAMP2000_01_01_00_00_00 (946670400)
 
-#define SECOND_MS ((uint32_t)(1000))
+#define SECOND_MS    ((uint32_t)(1000))
 
-#define MINUTE_MS ((uint32_t)(60 * SECOND_MS))
+#define MINUTE_MS    ((uint32_t)(60 * SECOND_MS))
 
-#define HOUR_MS   ((uint32_t)(60 * MINUTE_MS))
+#define HOUR_MS      ((uint32_t)(60 * MINUTE_MS))
 
-#define DAY_MS    ((uint32_t)(24 * HOUR_MS))
+#define DAY_MS       ((uint32_t)(24 * HOUR_MS))
 
-#define WEEK_MS   ((uint32_t)(7 * DAY_MS))
+#define WEEK_MS      ((uint32_t)(7 * DAY_MS))
+
+#define BITS_IN_BYTE (8)
 
 
 #endif
