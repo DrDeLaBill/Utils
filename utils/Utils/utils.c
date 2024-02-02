@@ -7,10 +7,12 @@
 
 #include "log.h"
 #include "gtime.h"
-#include "hal_defs.h"
+#ifdef USE_HAL_DRIVER
+#   include "hal_defs.h"
+#endif
 
 
-#if defined(_DEBUG) || defined(DEBUG)
+#if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
 void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) {
     const uint8_t cols_count = 16;
     uint32_t i = 0;
