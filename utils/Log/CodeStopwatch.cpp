@@ -2,21 +2,29 @@
 
 #include "CodeStopwatch.h"
 
-#include <string>
+#include <memory>
+#include <cstring>
 #include <cstdint>
 
-#include "gtime.h"
 #include "log.h"
+#include "utils.h"
+#include "gtime.h"
 
 
 namespace utl
 {
-    CodeStopwatch::CodeStopwatch(std::string identifier):
-        identifier(std::move(identifier)), start(getMillis()) { }
+    CodeStopwatch::CodeStopwatch(const char* identifier, uint32_t trig_time):
+		start(getMillis()), trig_time(trig_time)
+	{
+		memcpy(this->identifier, identifier, std::min(strlen(identifier), IDENTIFIER_LEN));
+	}
 
     CodeStopwatch::~CodeStopwatch()
     {
-        uint32_t end = getMillis();
-        printPretty("Code execution time for %s identifier: %ld ms\n", this->identifier.c_str(), end - this->start);
+    	uint32_t cur_time = getMillis();
+        uint32_t delta = __abs_dif(cur_time, start);
+        if (delta > this->trig_time) {
+        	printPretty("Code execution time for %s identifier: %lu ms\n", this->identifier, delta);
+        }
     }
 }

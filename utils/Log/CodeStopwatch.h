@@ -4,7 +4,6 @@
 
 
 #include <cstdint>
-#include <string>
 
 
 namespace utl
@@ -12,10 +11,12 @@ namespace utl
     class CodeStopwatch
     {
     public:
-        CodeStopwatch(std::string identifier);
+        CodeStopwatch(const char* identifier, uint32_t trig_time = 0);
         ~CodeStopwatch();
     private:
-        std::string identifier;
+        static constexpr unsigned IDENTIFIER_LEN = 6;
+        char identifier[IDENTIFIER_LEN];
         uint32_t start;
+        uint32_t trig_time;
     };
 }

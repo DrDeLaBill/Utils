@@ -1,7 +1,7 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#ifndef __UTILS_H
-#define __UTILS_H
+#ifndef _UTILS_H_
+#define _UTILS_H_
 
 
 #ifdef __cplusplus
@@ -19,6 +19,10 @@ extern "C" {
 
 #ifndef __arr_len
 #    define __arr_len(arr) (sizeof(arr) / sizeof(*arr))
+#endif
+
+#ifndef __div_up
+#	define __div_up(num, div) (((num) / (div)) + ((num) % (div) ? 1 : 0))
 #endif
 
 
