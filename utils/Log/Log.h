@@ -27,7 +27,7 @@ extern "C" {
 #   endif
 #endif
 
-#if defined(_DEBUG) || defined(DEBUG)
+#if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
 
 #   ifndef printTagLog
 #       if defined(__GNUC__)

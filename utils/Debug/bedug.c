@@ -5,7 +5,7 @@
 #include "log.h"
 
 
-#if defined(_DEBUG) || defined(DEBUG)
+#if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
 void b_assert(const char* file, int line, const char* message)
 {
     print("%s (%d) : bedug assert failed, THERE IS NO REASON TO PANIC, the system is stable : %s\n", file, line, message);

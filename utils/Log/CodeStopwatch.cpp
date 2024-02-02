@@ -15,8 +15,8 @@ namespace utl
 {
     CodeStopwatch::CodeStopwatch(const char* identifier, uint32_t trig_time):
 		start(getMillis()), trig_time(trig_time)
-	{
-		memcpy(this->identifier, identifier, std::min(strlen(identifier), IDENTIFIER_LEN));
+    {
+        memcpy(this->identifier, identifier, std::min(strlen(identifier), static_cast<size_t>(IDENTIFIER_LEN)));
 	}
 
     CodeStopwatch::~CodeStopwatch()

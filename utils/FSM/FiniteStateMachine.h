@@ -46,11 +46,11 @@ namespace fsm
             std::unordered_map<
                 key_t, 
                 transition_v, 
-                KeyHash, 
+                KeyHash,
                 KeyEqual
 //                std::allocator<std::pair<const key_t, transition_v>>
             >;
-        using queue_t = 
+        using queue_t =
             utl::circle_buffer<
                 EVENT_STACK_SIZE,
                 event_v
