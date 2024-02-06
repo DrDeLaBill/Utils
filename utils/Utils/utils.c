@@ -34,7 +34,7 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
                 break;
             }
             char c = buf[i * cols_count + j];
-            if (c > 31 && c != 0xFF) {
+            if (c > 31 && c < 0xFF) {
                 print("%c", (char)c);
             } else {
             	print(".");
