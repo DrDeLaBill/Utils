@@ -13,9 +13,7 @@
 #   include <sys/time.h>
 #elif defined(_MSC_VER)
 #   include <time.h>
-#endif
-
-#ifndef USE_HAL_DRIVER
+#else
 #   pragma _WARNING("Please select the target STM32xxxx used in your application")
 #endif
 
