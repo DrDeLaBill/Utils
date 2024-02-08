@@ -45,11 +45,11 @@ extern "C" {
 #       endif
 #   endif
 
-#   ifndef print
+#   ifndef gprint
 #       if defined(__GNUC__)
-#           define print(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
+#           define gprint(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
 #       elif defined(_MSC_VER)
-#           define print(format, ...) printMessage(format, ## __VA_ARGS__);
+#           define gprint(format, ...) printMessage(format, ## __VA_ARGS__);
 #       endif
 #   endif
 

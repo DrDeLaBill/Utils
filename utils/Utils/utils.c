@@ -21,12 +21,12 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
         printPretty("0x%08X:  ", (unsigned int)(start_counter + i * cols_count));
         for (uint32_t j = 0; j < cols_count; j++) {
             if (i * cols_count + j > len) {
-            	print("   ");
+            	gprint("   ");
             } else {
-            	print("%02X ", buf[i * cols_count + j]);
+            	gprint("%02X ", buf[i * cols_count + j]);
             }
             if ((j + 1) % 8 == 0) {
-            	print("| ");
+            	gprint("| ");
             }
         }
         for (uint32_t j = 0; j < cols_count; j++) {
@@ -35,12 +35,12 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
             }
             char c = buf[i * cols_count + j];
             if (c > 31 && c < 0xFF) {
-                print("%c", (char)c);
+                gprint("%c", (char)c);
             } else {
-            	print(".");
+            	gprint(".");
             }
         }
-        print("\n");
+        gprint("\n");
         i++;
     } while (i * cols_count < len);
 }
