@@ -24,7 +24,7 @@ namespace utl
     	uint32_t cur_time = getMillis();
         uint32_t delta = __abs_dif(cur_time, start);
         if (delta > this->trig_time) {
-        	printPretty("Code execution time for %s identifier: %lu ms\n", this->identifier, delta);
+            printPretty("Code execution time for %s identifier: %u ms\n", this->identifier, delta);
         }
     }
 }

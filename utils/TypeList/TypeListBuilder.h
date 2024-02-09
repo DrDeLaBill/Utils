@@ -129,9 +129,27 @@ namespace utl
 		using VARIANT = std::variant<TypeList..., Head>;
 	};
 
-	template<>
-	struct variant_factory<std::variant<>, unit_t<null_type_t>>
+    template<class Type>
+    struct variant_factory<std::variant<Type>, unit_t<null_type_t>>
 	{
 		using VARIANT = std::variant<null_type_t>;
 	};
+
+    template<class Type>
+    struct variant_factory<std::variant<Type>, null_type_t>
+    {
+        using VARIANT = std::variant<null_type_t>;
+    };
+
+    template<>
+    struct variant_factory<std::variant<>, unit_t<null_type_t>>
+    {
+        using VARIANT = std::variant<null_type_t>;
+    };
+
+    template<>
+    struct variant_factory<std::variant<>, null_type_t>
+    {
+        using VARIANT = std::variant<null_type_t>;
+    };
 }

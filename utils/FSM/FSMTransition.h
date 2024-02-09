@@ -19,12 +19,11 @@ namespace fsm
         class Target,
         class Action,
         Guard trGuard,
-        class =
-            std::enable_if_t<
-                std::is_base_of_v<StateBase, Source>&&
-                std::is_base_of_v<EventBase, Event>&&
-                std::is_base_of_v<StateBase, Target>
-            >
+        class = std::enable_if_t<
+            std::is_base_of_v<StateBase, Source> &&
+            std::is_base_of_v<EventBase, Event> &&
+            std::is_base_of_v<StateBase, Target>
+        >
     >
     struct Transition : TransitionBase
     {

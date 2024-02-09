@@ -196,14 +196,13 @@ namespace fsm
             auto lambda = [&](const auto& targetVariant) {
                 using event_transition_v = std::decay_t<decltype(targetVariant)>;
                 using action_t = typename event_transition_v::action_t;
+                const Guard trGuard = event_transition_v::guard;
 
-                if (!GuardEqual{}(tmpGuard, event_transition_v::guard)) {
+                if (!GuardEqual{}(tmpGuard, trGuard)) {
                     return;
                 }
 
                 using target_t = typename event_transition_v::target_t;
-
-                state_v var = target_t{};
 
                 tmpKey.state_idx = target_t::index;
                 tmpState = target_t{};
