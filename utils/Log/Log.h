@@ -31,14 +31,14 @@ extern "C" {
 
 #   ifndef printTagLog
 #       ifdef USE_HAL_DRIVER
-#			define printTagLog_PARAM "lu"
+#			define __printTagLog_PARAM "lu"
 #		else
-#			define printTagLog_PARAM "u"
+#			define __printTagLog_PARAM "u"
 # 		endif
 #       if defined(__GNUC__)
-#           define printTagLog(tag, format, ...) printMessage("%08" printTagLog_PARAM "->%s:\t" format "\n", getMillis(), tag __VA_OPT__(,) __VA_ARGS__);
+#           define printTagLog(tag, format, ...) printMessage("%08" __printTagLog_PARAM "->%s:\t" format "\n", getMillis(), tag __VA_OPT__(,) __VA_ARGS__);
 #       elif defined(_MSC_VER)
-#           define printTagLog(tag, format, ...) printMessage("%08" printTagLog_PARAM "->%s:\t" format "\n", getMillis(), tag, ## __VA_ARGS__);
+#           define printTagLog(tag, format, ...) printMessage("%08" __printTagLog_PARAM "->%s:\t" format "\n", getMillis(), tag, ## __VA_ARGS__);
 #       endif
 #   endif
 

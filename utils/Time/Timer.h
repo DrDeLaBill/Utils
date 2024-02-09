@@ -3,7 +3,9 @@
 #pragma once
 
 
-#include <cstdint>
+#ifdef USE_HAL_DRIVER
+#   include <cstdint>
+#endif
 
 
 namespace utl
@@ -12,11 +14,20 @@ namespace utl
     class Timer
     {
     private:
-        uint32_t delay;
+#ifdef USE_HAL_DRIVER
+        const uint32_t delay;
         uint32_t start_time;
+#else
+        const unsigned long long delay;
+        unsigned long long start_time;
+#endif
 
     public:
+#ifdef USE_HAL_DRIVER
         Timer(uint32_t delay);
+#else
+        Timer(unsigned long long delay);
+#endif
         void start();
         void reset();
         bool wait();

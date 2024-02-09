@@ -18,14 +18,18 @@
 #endif
 
 
+#ifdef USE_HAL_DRIVER
 uint32_t getMillis()
+#else
+unsigned long long getMillis()
+#endif
 {
 #if defined(USE_HAL_DRIVER)
     return HAL_GetTick();
 #elif defined(__GNUC__)
     struct timeval time;
     gettimeofday(&time, NULL);
-    return time.tv_sec * 1000 + time.tv_usec / 1000;
+    return ((unsigned long long)(time.tv_sec) * 1000) + ((unsigned long long)(time.tv_usec) / 1000);
 #elif defined(_MSC_VER)
     return clock();
 #else
