@@ -12,7 +12,7 @@ namespace fsm
 
     struct GuardEqual
     {
-        constexpr bool operator()(const Guard& lhs, const Guard& rhs) {
+        constexpr bool operator()(const Guard& lhs, const Guard& rhs) const {
             return lhs == rhs;
         }
     };

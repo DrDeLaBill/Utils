@@ -25,6 +25,14 @@ extern "C" {
 #	define __div_up(num, div) (((num) / (div)) + ((num) % (div) ? 1 : 0))
 #endif
 
+#ifndef __min
+#   define __min(num1, num2) ((num1) < (num2) ? (num1) : (num2))
+#endif
+
+#ifndef __max
+#   define __max(num1, num2) ((num1) > (num2) ? (num1) : (num2))
+#endif
+
 
 void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len);
 bool     util_wait_event(bool (*condition) (void), uint32_t time);

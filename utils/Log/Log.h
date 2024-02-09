@@ -31,7 +31,7 @@ extern "C" {
 
 #   ifndef printTagLog
 #       if defined(__GNUC__)
-#           define printTagLog(tag, format, ...) printMessage("%08lu->%s:\t" format "\n", getMillis(), tag __VA_OPT__(,) __VA_ARGS__);
+#           define printTagLog(tag, format, ...) printMessage("%08u->%s:\t" format "\n", getMillis(), tag __VA_OPT__(,) __VA_ARGS__);
 #       elif defined(_MSC_VER)
 #           define printTagLog(tag, format, ...) printMessage("%08lu->%s:\t" format "\n", getMillis(), tag, ## __VA_ARGS__);
 #       endif
