@@ -15,7 +15,7 @@ namespace utl
     {
     private:
 #ifdef USE_HAL_DRIVER
-        const uint32_t delay;
+        uint32_t delay;
         uint32_t start_time;
 #else
         const unsigned long long delay;
