@@ -1,15 +1,25 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
+#include <log.h>
 #include "utils.h"
 
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "log.h"
 #include "gtime.h"
 #ifdef USE_HAL_DRIVER
 #   include "hal_defs.h"
 #endif
+
+
+void util_old_timer_start(util_old_timer_t* timer, uint32_t delay) {
+    timer->start = HAL_GetTick();
+    timer->delay = delay;
+}
+
+bool util_old_timer_wait(util_old_timer_t* tm) {
+    return ((uint32_t)((uint32_t)HAL_GetTick() - (uint32_t)tm->start)) < ((uint32_t)tm->delay);
+}
 
 
 #if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
@@ -72,4 +82,13 @@ uint8_t util_get_number_len(int number)
         counter++;
     }
     return counter;
+}
+
+uint32_t util_small_pow(const uint32_t number, uint32_t degree)
+{
+	uint32_t res = number;
+	while (--degree) {
+		res *= number;
+	}
+	return res;
 }

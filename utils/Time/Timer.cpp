@@ -42,4 +42,9 @@ namespace utl
     {
         return this->start_time + this->delay > getMillis();
     }
+
+    void Timer::changeDelay(const uint32_t delay)
+    {
+    	this->delay = delay;
+    }
 }

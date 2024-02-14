@@ -1,8 +1,8 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
+#include <log.h>
 #include "bedug.h"
 
-#include "log.h"
 
 
 #if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)

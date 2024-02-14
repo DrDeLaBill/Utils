@@ -32,5 +32,7 @@ namespace utl
         void reset();
         bool wait();
 
+        void changeDelay(const uint32_t delay);
+
     };
 }
