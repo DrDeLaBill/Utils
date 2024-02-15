@@ -76,22 +76,20 @@ namespace utl
 			m_writeCount = 0;
 		}
 
-		bool push_back(const DATA_T& value) 
+		void push_back(const DATA_T& value)
 		{
 			if (full()) {
-				return false;
+				pop_front();
 			}
 			m_data[m_writeCount++ & m_mask] = value;
-			return true;
 		}
 
-		bool push_front(const DATA_T& value)
+		void push_front(const DATA_T& value)
 		{
 			if (full()) {
-				return false;
+				pop_back();
 			}
 			m_data[(--m_readCount) & m_mask] = value;
-			return true;
 		}
 		
 		bool shift(DATA_T& value)
