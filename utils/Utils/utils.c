@@ -13,12 +13,12 @@
 
 
 void util_old_timer_start(util_old_timer_t* timer, uint32_t delay) {
-    timer->start = HAL_GetTick();
+    timer->start = getMillis();
     timer->delay = delay;
 }
 
 bool util_old_timer_wait(util_old_timer_t* tm) {
-    return ((uint32_t)((uint32_t)HAL_GetTick() - (uint32_t)tm->start)) < ((uint32_t)tm->delay);
+    return ((uint32_t)((uint32_t)getMillis() - (uint32_t)tm->start)) < ((uint32_t)tm->delay);
 }
 
 

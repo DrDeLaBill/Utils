@@ -12,7 +12,9 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "hal_defs.h"
+#ifdef USE_HAL_DRIVER
+#   include "hal_defs.h"
+#endif
 
 
 #ifndef __abs
@@ -50,10 +52,12 @@ void     util_old_timer_start(util_old_timer_t* tm, uint32_t waitMs);
 bool     util_old_timer_wait(util_old_timer_t* tm);
 
 
+#ifdef USE_HAL_DRIVER
 typedef struct _util_port_pin_t {
     GPIO_TypeDef* port;
     uint16_t      pin;
 } util_port_pin_t;
+#endif
 
 
 void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len);

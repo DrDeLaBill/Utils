@@ -1,11 +1,9 @@
-/* Copyright © 2023 Georgy E. All rights reserved. */
+/* Copyright © 2024 Georgy E. All rights reserved. */
 
 #pragma once
 
 
-#ifdef USE_HAL_DRIVER
-#   include <cstdint>
-#endif
+#include <cstdint>
 
 
 namespace utl
@@ -18,7 +16,7 @@ namespace utl
         uint32_t delay;
         uint32_t start_time;
 #else
-        const unsigned long long delay;
+        unsigned long long delay;
         unsigned long long start_time;
 #endif
 
@@ -32,7 +30,11 @@ namespace utl
         void reset();
         bool wait();
 
+#ifdef USE_HAL_DRIVER
         void changeDelay(const uint32_t delay);
+#else
+        void changeDelay(const unsigned long long delay);
+#endif
 
     };
 }
