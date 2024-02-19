@@ -43,7 +43,11 @@ namespace utl
         return this->start_time + this->delay > getMillis();
     }
 
-    void Timer::changeDelay(const unsigned long long delay)
+#ifdef USE_HAL_DRIVER
+	void Timer::changeDelay(const uint32_t delay)
+#else
+	void Timer::changeDelay(const unsigned long long delay)
+#endif
     {
     	this->delay = delay;
     }

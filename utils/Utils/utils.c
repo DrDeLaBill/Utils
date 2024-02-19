@@ -92,3 +92,11 @@ uint32_t util_small_pow(const uint32_t number, uint32_t degree)
 	}
 	return res;
 }
+
+int util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2)
+{
+    int range1 = __abs_dif(rngh1, rngl1);
+    int range2 = __abs_dif(rngh2, rngl2);
+    int delta  = __abs_dif(rngl1,   val);
+    return rngl2 + ((delta * range2) / range1);
+}
