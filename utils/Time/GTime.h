@@ -12,7 +12,11 @@ extern "C" {
 #include <stdint.h>
 
 
+#ifdef USE_HAL_DRIVER
 uint32_t getMillis();
+#else
+unsigned long long getMillis();
+#endif
 
 
 #ifdef __cplusplus

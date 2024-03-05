@@ -184,6 +184,22 @@ namespace fsm
             on_event_invoke(tmpKey);
         }
 
+        bool is_state(state_v target)
+        {
+        	bool result = false;
+
+        	auto lambda_i = [&] (const auto& state_i) {
+        		auto lambda_j = [&] (const auto& state_j) {
+            		result = state_i.index == state_j.index;
+        		};
+            	std::visit(lambda_j, current_state);
+        	};
+
+        	std::visit(lambda_i, target);
+
+        	return result;
+        }
+
     private:
         void on_event_invoke(key_t& targetKey)
         {
