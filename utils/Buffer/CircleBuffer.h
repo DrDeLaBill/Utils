@@ -53,10 +53,21 @@ namespace utl
 		
 		DATA_T m_data[SIZE];
 		
+	public:
+		circle_buffer()
+		{
+			m_readCount = 0;
+			m_writeCount = 0;
+		}
+
 		DATA_T& operator[] (INDEX_T i)
         {
 			if(empty() || i > count()) {
-				return DATA_T();
+#ifdef USE_HAL_DRIVER
+				return m_data[0];
+#else
+				throw;
+#endif
 			}
 			return m_data[(m_readCount + i) & m_mask];
         }
@@ -64,17 +75,14 @@ namespace utl
         const DATA_T operator[] (INDEX_T i) const
         {
 			if(empty()) {
+#ifdef USE_HAL_DRIVER
 				return DATA_T();
+#else
+				throw;
+#endif
 			}
 			return m_data[(m_readCount + i) & m_mask];
         }
-		
-	public:
-		circle_buffer()
-		{
-			m_readCount = 0;
-			m_writeCount = 0;
-		}
 
 		void push_back(const DATA_T& value)
 		{
@@ -147,11 +155,11 @@ namespace utl
 			m_writeCount = 0;
         }
 		
-        INDEX_T count()const
+        INDEX_T count() const
         {
-			return (m_writeCount - m_readCount) & m_mask;
+			return full() ? SIZE : ((m_writeCount - m_readCount) & m_mask);
         }
-		
+
 		inline unsigned size() { return SIZE; }
 	};
 }
