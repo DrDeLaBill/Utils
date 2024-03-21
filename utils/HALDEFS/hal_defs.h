@@ -50,6 +50,13 @@
 #	else
 #		error "Please select the target STM32xxxx used in your application"
 #	endif
+
+
+typedef struct _GPIO_PAIR {
+	GPIO_TypeDef* port;
+	uint16_t      pin;
+} GPIO_PAIR;
+
 #endif
 
 
@@ -68,6 +75,5 @@
 #define WEEK_MS                      ((uint32_t)(7 * DAY_MS))
 
 #define BITS_IN_BYTE                 ((uint8_t)8)
-
 
 #endif

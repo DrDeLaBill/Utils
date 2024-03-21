@@ -16,18 +16,18 @@ extern "C" {
 #include "bmacro.h"
 
 
-#ifndef printMessage
-#   if defined(__GNUC__)
-#       define printMessage(format, ...) printf(format __VA_OPT__(,) __VA_ARGS__);
-#   elif defined(_MSC_VER)
-#       define printMessage(format, ...) printf(format, ## __VA_ARGS__);
-#   else
-#       define printMessage(format, ...) { }
-#       pragma _WARNING("please check compiler")
-#   endif
-#endif
+#if defined(_DEBUG) || defined(DEBUG)
 
-#if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
+#	ifndef printMessage
+#   	if defined(__GNUC__)
+#       	define printMessage(format, ...) printf(format __VA_OPT__(,) __VA_ARGS__);
+#   	elif defined(_MSC_VER)
+#       	define printMessage(format, ...) printf(format, ## __VA_ARGS__);
+#   	else
+#       	define printMessage(format, ...) { }
+#       	pragma _WARNING("please check compiler")
+#   	endif
+#	endif
 
 #   ifndef printTagLog
 #       ifdef USE_HAL_DRIVER
@@ -52,7 +52,7 @@ extern "C" {
 
 #   ifndef gprint
 #       if defined(__GNUC__)
-#           define gprint(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
+#           define gprint(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__); // TODO: __VA_OPT__ is not available until C++20
 #       elif defined(_MSC_VER)
 #           define gprint(format, ...) printMessage(format, ## __VA_ARGS__);
 #       endif
@@ -60,12 +60,20 @@ extern "C" {
 
 #else
 
+#	ifndef printMessage
+#		define printMessage(format, ...) { }
+#	endif
+
 #   ifndef printTagLog
 #       define printTagLog(tag, format, ...)  { }
 #   endif
 
 #   ifndef printLog
 #       define printPretty(format, ...) { }
+#   endif
+
+#   ifndef gprint
+#       define gprint(format, ...) { }
 #   endif
 
 #endif
