@@ -17,7 +17,7 @@ namespace utl
 		start(getMillis()), trig_time(trig_time)
     {
     	memset(this->identifier, 0, IDENTIFIER_LEN);
-        memcpy(this->identifier, identifier, std::min(strlen(identifier), static_cast<size_t>(IDENTIFIER_LEN)));
+        memcpy(this->identifier, identifier, std::min(strlen(identifier), static_cast<size_t>(IDENTIFIER_LEN) - 1));
 	}
 
     CodeStopwatch::~CodeStopwatch()
