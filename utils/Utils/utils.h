@@ -12,6 +12,9 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "bmacro.h"
+
+
 #ifdef USE_HAL_DRIVER
 #   include "hal_defs.h"
 #endif
@@ -51,6 +54,17 @@ extern "C" {
 
 #ifndef __reset_bit
 #	define __reset_bit(REG, NUM) ((REG) &= ~((uint64_t)1 << (NUM)))
+#endif
+
+
+#ifndef TYPE_PACK
+#   ifdef __MINGW32__
+#       define TYPE_PACK( __Type__, __Declaration__ ) // TODO
+#   elif defined(__GNUC__)
+#       define TYPE_PACK( __Type__, __Declaration__ )  __Type__ __attribute__((__packed__, aligned(1))) __Declaration__
+#   elif defined(_MSC_VER)
+#       define TYPE_PACK( __Type__, __Declaration__ ) __pragma(pack(push, 1) ) __Type__ __Declaration__ __pragma(pack(pop))
+#   endif
 #endif
 
 
