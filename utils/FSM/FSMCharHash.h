@@ -14,6 +14,7 @@ namespace fsm
                 res = ((res ^ symbol) & 1) ? (res >> 1) ^ 0x8C : (res >> 1);
                 symbol >>= 1;
             }
+            res <<= 1;
         }
 
         return res;

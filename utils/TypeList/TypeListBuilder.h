@@ -43,6 +43,12 @@ namespace utl
 		using RESULT = null_type_t;
 	};
 
+	template<class Head>
+	struct typelist_t<Head>
+	{
+		using RESULT = unit_t<Head, typename typelist_t<>::RESULT>;
+	};
+
 	template<class Head, class... Types>
 	struct typelist_t<Head, Types...>
 	{
@@ -76,6 +82,12 @@ namespace utl
 	struct removed_duplicates_t
 	{
 		using RESULT = typename removed_duplicates_t<typename typelist_t<Types...>::RESULT>::RESULT;
+	};
+
+	template<class Head>
+	struct removed_duplicates_t<Head>
+	{
+		using RESULT = unit_t<Head, null_type_t>;
 	};
 
 	template<class Head, class Tail>
@@ -129,27 +141,39 @@ namespace utl
 		using VARIANT = std::variant<TypeList..., Head>;
 	};
 
-    template<class Type>
-    struct variant_factory<std::variant<Type>, unit_t<null_type_t>>
+	template<class Type>
+	struct variant_factory<std::variant<Type>, unit_t<null_type_t>>
 	{
-		using VARIANT = std::variant<null_type_t>;
+		using VARIANT = std::variant<Type>;
 	};
 
-    template<class Type>
-    struct variant_factory<std::variant<Type>, null_type_t>
-    {
-        using VARIANT = std::variant<null_type_t>;
-    };
+	template<class Type>
+	struct variant_factory<std::variant<Type>, null_type_t>
+	{
+	    using VARIANT = std::variant<Type>;
+	};
 
-    template<>
-    struct variant_factory<std::variant<>, unit_t<null_type_t>>
-    {
-        using VARIANT = std::variant<null_type_t>;
-    };
+	template<class Type>
+	struct variant_factory<Type, unit_t<null_type_t>>
+	{
+	    using VARIANT = std::variant<Type>;
+	};
 
-    template<>
-    struct variant_factory<std::variant<>, null_type_t>
-    {
-        using VARIANT = std::variant<null_type_t>;
-    };
+	template<class Type>
+	struct variant_factory<Type, null_type_t>
+	{
+	    using VARIANT = std::variant<Type>;
+	};
+
+	template<>
+	struct variant_factory<std::variant<>, unit_t<null_type_t>>
+	{
+	    using VARIANT = std::variant<null_type_t>;
+	};
+
+	template<>
+	struct variant_factory<std::variant<>, null_type_t>
+	{
+	    using VARIANT = std::variant<null_type_t>;
+	};
 }
