@@ -101,33 +101,27 @@ namespace utl
 			return true;
 		}
 
-		bool pop_front()
+		const DATA_T& pop_front()
 		{
-			if (empty()) {
-				return false;
-			}
-			m_readCount++;
-			return true;
+			BEDUG_ASSERT(!empty(), "error pop front unit - circle buffer is empty");
+			return m_data[m_readCount++ & m_mask];
 		}
 
-		bool pop_back()
+		const DATA_T& pop_back()
 		{
-			if (empty()) {
-				return false;
-			}
-			m_writeCount--;
-			return true;
+			BEDUG_ASSERT(!empty(), "error pop back unit - circle buffer is empty");
+			return m_data[(m_writeCount-- - 1) & m_mask];
 		}
 
 		const DATA_T& front()
 		{
-			BEDUG_ASSERT(!empty(), "get front unit - circle buffer is empty");
+			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
 			return m_data[m_readCount & m_mask];
 		}
 
 		const DATA_T& back()
 		{
-			BEDUG_ASSERT(!empty(), "get back unit - circle buffer is empty");
+			BEDUG_ASSERT(!empty(), "error get back unit - circle buffer is empty");
 			return m_data[(m_writeCount - 1) & m_mask];
 		}
 
