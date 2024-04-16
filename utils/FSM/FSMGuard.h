@@ -2,6 +2,10 @@
 
 #pragma once
 
+
+#define FSM_ENABLE_GUARD (false)
+
+
 namespace fsm
 {
     enum class Guard : unsigned

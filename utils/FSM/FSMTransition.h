@@ -18,7 +18,9 @@ namespace fsm
         class Event,
         class Target,
         class Action,
-        Guard trGuard,
+#if FSM_ENABLE_GUARD
+        Guard trGuard = fsm::Guard::NO_GUARD,
+#endif
         class = std::enable_if_t<
             std::is_base_of_v<StateBase, Source> &&
             std::is_base_of_v<EventBase, Event> &&
@@ -32,6 +34,8 @@ namespace fsm
         using target_t = Target;
         using action_t = Action;
 
+#if FSM_ENABLE_GUARD
         static const Guard guard = trGuard;
+#endif
     };
 }

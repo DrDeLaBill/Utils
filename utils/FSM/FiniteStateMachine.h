@@ -48,7 +48,6 @@ namespace fsm
                 transition_v, 
                 KeyHash,
                 KeyEqual
-//                std::allocator<std::pair<const key_t, transition_v>>
             >;
         using queue_t =
             utl::circle_buffer<
@@ -60,7 +59,9 @@ namespace fsm
         tuple_t transitions;
         queue_t events;
         state_v current_state;
+#if FSM_ENABLE_GUARD
         Guard guard = Guard::NO_GUARD;
+#endif
 
     public:
         using transition_p = typename TrTable::transition_p;
@@ -88,7 +89,9 @@ namespace fsm
 
         void set_guard(const Guard& guard)
         {
+#if FSM_ENABLE_GUARD
             this->guard = guard;
+#endif
         }
 
         template<class... Args>
@@ -206,17 +209,22 @@ namespace fsm
             transition_v targetVariant = transitions[targetKey];
 
             key_t& tmpKey = this->key;
+#if FSM_ENABLE_GUARD
             Guard& tmpGuard = this->guard;
+#endif
             state_v& tmpState = this->current_state;
 
             auto lambda = [&](const auto& targetVariant) {
                 using event_transition_v = std::decay_t<decltype(targetVariant)>;
                 using action_t = typename event_transition_v::action_t;
+
+#if FSM_ENABLE_GUARD
                 const Guard trGuard = event_transition_v::guard;
 
                 if (!GuardEqual{}(tmpGuard, trGuard)) {
                     return;
                 }
+#endif
 
                 using target_t = typename event_transition_v::target_t;
 
@@ -242,7 +250,9 @@ namespace fsm
 
             using state_t = typename transition::source_t;
             using event_t = typename transition::event_t;
+#if FSM_ENABLE_GUARD
             Guard tmpGuard = transition::guard;
+#endif
 
             key_t tmpKey;
             tmpKey.state_idx = state_t::index;
@@ -252,7 +262,9 @@ namespace fsm
 
             if (!this->key.state_idx) {
                 this->key.state_idx = tmpKey.state_idx;
+#if FSM_ENABLE_GUARD
                 this->guard = tmpGuard;
+#endif
                 this->current_state = state_t{};
             }
         }
