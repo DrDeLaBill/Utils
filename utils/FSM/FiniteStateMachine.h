@@ -1,6 +1,7 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _FINITE_STATE_MACHINE_H_
+#define _FINITE_STATE_MACHINE_H_
 
 
 #include <cstdint>
@@ -42,26 +43,24 @@ namespace fsm
     private:
         static constexpr unsigned EVENT_STACK_SIZE = 8;
 
-        using tuple_t = 
+        using tuple_t =
             std::unordered_map<
-                key_t, 
-                transition_v, 
+                key_t,
+                transition_v,
                 KeyHash,
                 KeyEqual
-            >;
+                >;
         using queue_t =
             utl::circle_buffer<
                 EVENT_STACK_SIZE,
                 event_v
-            >;
+                >;
 
         key_t key;
         tuple_t transitions;
         queue_t events;
         state_v current_state;
-#if FSM_ENABLE_GUARD
         Guard guard = Guard::NO_GUARD;
-#endif
 
     public:
         using transition_p = typename TrTable::transition_p;
@@ -84,14 +83,12 @@ namespace fsm
 
         void clear_events()
         {
-        	events.clear();
+            events.clear();
         }
 
         void set_guard(const Guard& guard)
         {
-#if FSM_ENABLE_GUARD
             this->guard = guard;
-#endif
         }
 
         template<class... Args>
@@ -119,66 +116,43 @@ namespace fsm
                 return;
             }
 
-
-            key_t tmpKey;
-            tmpKey.state_idx = this->key.state_idx;
+            auto it              = transitions.begin();
             unsigned maxPriority = 0;
-
-            auto it = transitions.begin();
+            unsigned index       = 0;
             for (unsigned i = 0; i < events.count(); i++) {
-                auto eventVariant = events.front();
-                
+                key_t tmpKey{ this->key.state_idx, 0 };
+                auto eventVariant = events[i];
+
                 auto lambda = [&](const auto& targetEvent) {
-                    using event_t = std::decay_t<decltype(targetEvent)>;
+                    using event_t    = std::decay_t<decltype(targetEvent)>;
                     tmpKey.event_idx = event_t::index;
-                    it = transitions.find(tmpKey);
-                    
+                    it               = transitions.find(tmpKey);
+
                     if (it == transitions.end()) {
                         return;
                     }
-                    if (event_t::priority > maxPriority) {
+
+                    if(event_t::priority > maxPriority) {
                         maxPriority = event_t::priority;
+                        index       = i;
                     }
                 };
-
                 std::visit(lambda, eventVariant);
-                
-                events.push_back(eventVariant);
-                events.pop_front();
             }
 
-            it = transitions.begin();
-            for (unsigned i = 0; i < events.count(); i++) {
-                auto eventVariant = events.front();
+            auto lambda = [&](const auto& targetEvent) {
+                using event_t = std::decay_t<decltype(targetEvent)>;
+                key_t tmpKey{ this->key.state_idx, event_t::index };
+                on_event_invoke(tmpKey);
+            };
 
-                bool transitionFound = false;
-                auto lambda = [&](const auto& targetEvent) {
-                    using event_t = std::decay_t<decltype(targetEvent)>;
-                    tmpKey.event_idx = event_t::index;
-                    it = transitions.find(tmpKey);
-
-                    if (it != transitions.end() && maxPriority == event_t::priority) {
-                        transitionFound = true;
-                    }
-                };
-
-                std::visit(lambda, eventVariant);
-
-                if (transitionFound) {
-                    events.pop_front();
-                    on_event_invoke(tmpKey);
-                    return;
-                } else {
-                    events.push_back(eventVariant);
-                    events.pop_front();
-                }
-            }
+            std::visit(lambda, events[index]);
         }
 
         template<
             class TEvent,
             class=std::enable_if_t<std::is_base_of_v<EventBase, TEvent>>
-        >
+            >
         void on_event(const TEvent& event)
         {
             key_t tmpKey;
@@ -189,18 +163,18 @@ namespace fsm
 
         bool is_state(state_v target)
         {
-        	bool result = false;
+            bool result = false;
 
-        	auto lambda_i = [&] (const auto& state_i) {
-        		auto lambda_j = [&] (const auto& state_j) {
-            		result = state_i.index == state_j.index;
-        		};
-            	std::visit(lambda_j, current_state);
-        	};
+            auto lambda_i = [&] (const auto& state_i) {
+                auto lambda_j = [&] (const auto& state_j) {
+                    result = state_i.index == state_j.index;
+                };
+                std::visit(lambda_j, current_state);
+            };
 
-        	std::visit(lambda_i, target);
+            std::visit(lambda_i, target);
 
-        	return result;
+            return result;
         }
 
     private:
@@ -209,22 +183,18 @@ namespace fsm
             transition_v targetVariant = transitions[targetKey];
 
             key_t& tmpKey = this->key;
-#if FSM_ENABLE_GUARD
             Guard& tmpGuard = this->guard;
-#endif
             state_v& tmpState = this->current_state;
 
             auto lambda = [&](const auto& targetVariant) {
                 using event_transition_v = std::decay_t<decltype(targetVariant)>;
                 using action_t = typename event_transition_v::action_t;
 
-#if FSM_ENABLE_GUARD
                 const Guard trGuard = event_transition_v::guard;
 
                 if (!GuardEqual{}(tmpGuard, trGuard)) {
                     return;
                 }
-#endif
 
                 using target_t = typename event_transition_v::target_t;
 
@@ -250,9 +220,7 @@ namespace fsm
 
             using state_t = typename transition::source_t;
             using event_t = typename transition::event_t;
-#if FSM_ENABLE_GUARD
             Guard tmpGuard = transition::guard;
-#endif
 
             key_t tmpKey;
             tmpKey.state_idx = state_t::index;
@@ -262,11 +230,12 @@ namespace fsm
 
             if (!this->key.state_idx) {
                 this->key.state_idx = tmpKey.state_idx;
-#if FSM_ENABLE_GUARD
                 this->guard = tmpGuard;
-#endif
                 this->current_state = state_t{};
             }
         }
     };
 }
+
+
+#endif

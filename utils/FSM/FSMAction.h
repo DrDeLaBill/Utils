@@ -1,6 +1,8 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _FSM_ACTION_H_
+#define _FSM_ACTION_H_
+
 
 namespace fsm
 {
@@ -11,3 +13,6 @@ namespace fsm
         }
     };
 }
+
+
+#endif

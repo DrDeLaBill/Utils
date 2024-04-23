@@ -1,6 +1,8 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _FSM_TRANSITION_TABLE_H_
+#define _FSM_TRANSITION_TABLE_H_
+
 
 #include <variant>
 
@@ -42,3 +44,6 @@ namespace fsm
         using transition_v = std::variant<T...>;
     };
 }
+
+
+#endif
