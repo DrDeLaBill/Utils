@@ -116,28 +116,35 @@ namespace fsm
                 return;
             }
 
-            auto it              = transitions.begin();
-            unsigned maxPriority = 0;
-            unsigned index       = 0;
+            auto it  = transitions.begin();
+            auto res = events.front();
             for (unsigned i = 0; i < events.count(); i++) {
-                key_t tmpKey{ this->key.state_idx, 0 };
-                auto eventVariant = events[i];
+                auto eventVariant = events.pop_front();
 
-                auto lambda = [&](const auto& targetEvent) {
-                    using event_t    = std::decay_t<decltype(targetEvent)>;
-                    tmpKey.event_idx = event_t::index;
-                    it               = transitions.find(tmpKey);
+                bool change = false;
+                auto lambda = [&](const auto& targetEvent, auto& lastVariant) {
+                    using target_event_t = std::decay_t<decltype(targetEvent)>;
+                    using last_event_t   = std::decay_t<decltype(lastVariant)>;
 
+                    key_t tmpKey{ this->key.state_idx, target_event_t::index };
+                    it = transitions.find(tmpKey);
                     if (it == transitions.end()) {
                         return;
                     }
 
-                    if(event_t::priority > maxPriority) {
-                        maxPriority = event_t::priority;
-                        index       = i;
+                    if(target_event_t::priority > last_event_t::priority) {
+                        change = true;
                     }
                 };
-                std::visit(lambda, eventVariant);
+
+                std::visit(lambda, eventVariant, res);
+
+                if (change) {
+                    events.push_back(res);
+                    res = eventVariant;
+                } else {
+                    events.push_back(eventVariant);
+                }
             }
 
             auto lambda = [&](const auto& targetEvent) {
@@ -146,7 +153,7 @@ namespace fsm
                 on_event_invoke(tmpKey);
             };
 
-            std::visit(lambda, events[index]);
+            std::visit(lambda, res);
         }
 
         template<
