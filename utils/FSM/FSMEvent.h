@@ -1,6 +1,8 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _FSM_EVENT_H_
+#define _FSM_EVENT_H_
+
 
 namespace fsm
 {
@@ -13,3 +15,6 @@ namespace fsm
         static constexpr unsigned priority = PRIORITY;
     };
 }
+
+
+#endif

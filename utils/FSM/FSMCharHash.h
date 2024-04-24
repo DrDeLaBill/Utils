@@ -1,6 +1,8 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _FSM_CHAR_HASH_H_
+#define _FSM_CHAR_HASH_H_
+
 
 namespace fsm
 {
@@ -20,3 +22,6 @@ namespace fsm
         return res;
     }
 }
+
+
+#endif

@@ -53,10 +53,21 @@ namespace utl
 		
 		DATA_T m_data[SIZE];
 		
+	public:
+		circle_buffer()
+		{
+			m_readCount = 0;
+			m_writeCount = 0;
+		}
+
 		DATA_T& operator[] (INDEX_T i)
         {
 			if(empty() || i > count()) {
-				return DATA_T();
+#ifdef USE_HAL_DRIVER
+				return m_data[0];
+#else
+				throw;
+#endif
 			}
 			return m_data[(m_readCount + i) & m_mask];
         }
@@ -64,17 +75,14 @@ namespace utl
         const DATA_T operator[] (INDEX_T i) const
         {
 			if(empty()) {
+#ifdef USE_HAL_DRIVER
 				return DATA_T();
+#else
+				throw;
+#endif
 			}
 			return m_data[(m_readCount + i) & m_mask];
         }
-		
-	public:
-		circle_buffer()
-		{
-			m_readCount = 0;
-			m_writeCount = 0;
-		}
 
 		void push_back(const DATA_T& value)
 		{
@@ -101,33 +109,27 @@ namespace utl
 			return true;
 		}
 
-		bool pop_front()
+		const DATA_T& pop_front()
 		{
-			if (empty()) {
-				return false;
-			}
-			m_readCount++;
-			return true;
+			BEDUG_ASSERT(!empty(), "error pop front unit - circle buffer is empty");
+			return m_data[m_readCount++ & m_mask];
 		}
 
-		bool pop_back()
+		const DATA_T& pop_back()
 		{
-			if (empty()) {
-				return false;
-			}
-			m_writeCount--;
-			return true;
+			BEDUG_ASSERT(!empty(), "error pop back unit - circle buffer is empty");
+			return m_data[(m_writeCount-- - 1) & m_mask];
 		}
 
 		const DATA_T& front()
 		{
-			BEDUG_ASSERT(!empty(), "get front unit - circle buffer is empty");
+			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
 			return m_data[m_readCount & m_mask];
 		}
 
 		const DATA_T& back()
 		{
-			BEDUG_ASSERT(!empty(), "get back unit - circle buffer is empty");
+			BEDUG_ASSERT(!empty(), "error get back unit - circle buffer is empty");
 			return m_data[(m_writeCount - 1) & m_mask];
 		}
 
@@ -147,11 +149,11 @@ namespace utl
 			m_writeCount = 0;
         }
 		
-        INDEX_T count()const
+        INDEX_T count() const
         {
-			return (m_writeCount - m_readCount) & m_mask;
+			return full() ? SIZE : ((m_writeCount - m_readCount) & m_mask);
         }
-		
+
 		inline unsigned size() { return SIZE; }
 	};
 }

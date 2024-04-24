@@ -1,6 +1,7 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _FSM_KEY_H_
+#define _FSM_KEY_H_
 
 
 #include <cstdint>
@@ -33,3 +34,6 @@ namespace fsm
         }
     };
 }
+
+
+#endif
