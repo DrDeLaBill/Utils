@@ -54,7 +54,7 @@ namespace fsm
             utl::circle_buffer<
                 EVENT_STACK_SIZE,
                 event_v
-                >;
+			>;
 
         key_t key;
         tuple_t transitions;
@@ -116,50 +116,51 @@ namespace fsm
                 return;
             }
 
-            auto it  = transitions.begin();
-            auto res = events.front();
+
+            key_t resKey{ this->key.state_idx, 0 };
+            auto resVariant      = events.front();
+            unsigned maxPriority = 0;
+            bool found           = false;
+            auto it              = transitions.begin();
             for (unsigned i = 0; i < events.count(); i++) {
                 auto eventVariant = events.pop_front();
 
-                bool change = false;
-                auto lambda = [&](const auto& targetEvent, auto& lastVariant) {
-                    using target_event_t = std::decay_t<decltype(targetEvent)>;
-                    using last_event_t   = std::decay_t<decltype(lastVariant)>;
-
-                    key_t tmpKey{ this->key.state_idx, target_event_t::index };
-                    it = transitions.find(tmpKey);
+                key_t tmpKey{ this->key.state_idx, 0 };
+                bool changed = false;
+                auto lambda = [&](const auto& targetEvent) {
+                    using event_t    = std::decay_t<decltype(targetEvent)>;
+                    tmpKey.event_idx = event_t::index;
+                    it               = transitions.find(tmpKey);
                     if (it == transitions.end()) {
                         return;
                     }
-
-                    if(target_event_t::priority > last_event_t::priority) {
-                        change = true;
+                    if (!found || event_t::priority > maxPriority) {
+                    	resKey.event_idx = event_t::index;
+                        maxPriority      = event_t::priority;
+                        changed          = true;
+                        found            = true;
                     }
                 };
 
-                std::visit(lambda, eventVariant, res);
+                std::visit(lambda, eventVariant);
 
-                if (change) {
-                    events.push_back(res);
-                    res = eventVariant;
+                if (changed) {
+                	events.push_back(resVariant);
+                	resVariant = eventVariant;
                 } else {
-                    events.push_back(eventVariant);
+                	events.push_back(eventVariant);
                 }
             }
 
-            auto lambda = [&](const auto& targetEvent) {
-                using event_t = std::decay_t<decltype(targetEvent)>;
-                key_t tmpKey{ this->key.state_idx, event_t::index };
-                on_event_invoke(tmpKey);
-            };
-
-            std::visit(lambda, res);
+            if (found) {
+				on_event_invoke(resKey);
+            }
         }
 
         template<
             class TEvent,
             class=std::enable_if_t<std::is_base_of_v<EventBase, TEvent>>
-            >
+		>
         void on_event(const TEvent& event)
         {
             key_t tmpKey;

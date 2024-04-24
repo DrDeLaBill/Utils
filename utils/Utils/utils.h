@@ -12,6 +12,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "gtime.h"
 #include "bmacro.h"
 
 
@@ -69,13 +70,13 @@ extern "C" {
 
 
 typedef struct _util_timer_t {
-    uint32_t start;
-    uint32_t delay;
+    TIME_MS_T start;
+    TIME_MS_T delay;
 } util_old_timer_t;
 
 
-void     util_old_timer_start(util_old_timer_t* tm, uint32_t waitMs);
-bool     util_old_timer_wait(util_old_timer_t* tm);
+void util_old_timer_start(util_old_timer_t* tm, TIME_MS_T waitMs);
+bool util_old_timer_wait(util_old_timer_t* tm);
 
 
 #ifdef USE_HAL_DRIVER
@@ -87,7 +88,7 @@ typedef struct _util_port_pin_t {
 
 
 void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len);
-bool     util_wait_event(bool (*condition) (void), uint32_t time);
+bool     util_wait_event(bool (*condition) (void), TIME_MS_T time);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(const uint32_t number, uint32_t degree);
 int      util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2);

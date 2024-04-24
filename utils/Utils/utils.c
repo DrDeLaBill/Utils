@@ -6,19 +6,18 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "gtime.h"
 #ifdef USE_HAL_DRIVER
 #   include "hal_defs.h"
 #endif
 
 
-void util_old_timer_start(util_old_timer_t* timer, uint32_t delay) {
+void util_old_timer_start(util_old_timer_t* timer, TIME_MS_T delay) {
     timer->start = getMillis();
     timer->delay = delay;
 }
 
 bool util_old_timer_wait(util_old_timer_t* tm) {
-    return ((uint32_t)((uint32_t)getMillis() - (uint32_t)tm->start)) < ((uint32_t)tm->delay);
+    return ((TIME_MS_T)((TIME_MS_T)getMillis() - (TIME_MS_T)tm->start)) < ((TIME_MS_T)tm->delay);
 }
 
 
@@ -63,9 +62,9 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
 }
 #endif
 
-bool util_wait_event(bool (*condition) (void), uint32_t time)
+bool util_wait_event(bool (*condition) (void), TIME_MS_T time)
 {
-    uint32_t start_time = getMillis();
+    TIME_MS_T start_time = getMillis();
     while (__abs_dif(start_time, getMillis()) < time) {
         if (condition()) {
             return true;
