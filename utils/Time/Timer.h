@@ -13,28 +13,22 @@ namespace utl
     {
     private:
 #ifdef USE_HAL_DRIVER
-        uint32_t delay;
-        uint32_t start_time;
+        using time_ms_t = uint32_t;
 #else
-        unsigned long long delay;
-        unsigned long long start_time;
+        using time_ms_t = unsigned long long;
 #endif
 
+        time_ms_t delay;
+        time_ms_t start_time;
+
     public:
-#ifdef USE_HAL_DRIVER
-        Timer(uint32_t delay);
-#else
-        Timer(unsigned long long delay);
-#endif
+        Timer(time_ms_t delay);
+        
         void start();
         void reset();
         bool wait();
 
-#ifdef USE_HAL_DRIVER
-        void changeDelay(const uint32_t delay);
-#else
-        void changeDelay(const unsigned long long delay);
-#endif
+        void changeDelay(const time_ms_t delay_ms);
 
     };
 }

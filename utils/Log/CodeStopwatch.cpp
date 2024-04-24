@@ -22,10 +22,14 @@ namespace utl
 
     CodeStopwatch::~CodeStopwatch()
     {
-    	uint32_t cur_time = getMillis();
-        long unsigned delta = __abs_dif(cur_time, start);
+    	time_ms_t cur_time = getMillis();
+        time_ms_t delta = __abs_dif(cur_time, start);
         if (delta > this->trig_time) {
+#ifdef USE_HAL_DRIVER
             printPretty("Code execution time for %s identifier: %lu ms\n", this->identifier, delta);
+#else
+            printPretty("Code execution time for %s identifier: %llu ms\n", this->identifier, delta);
+#endif
         }
     }
 }

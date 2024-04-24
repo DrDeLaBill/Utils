@@ -16,7 +16,12 @@ namespace utl
     private:
         static constexpr unsigned IDENTIFIER_LEN = 6;
         char identifier[IDENTIFIER_LEN];
-        uint32_t start;
-        uint32_t trig_time;
+#ifdef USE_HAL_DRIVER
+        using time_ms_t = uint32_t;
+#else
+        using time_ms_t = unsigned long long;
+#endif
+        time_ms_t start;
+        time_ms_t trig_time;
     };
 }

@@ -3,7 +3,8 @@
 #pragma once
 
 
-#include <stdint.h>
+#include <cstdint>
+#include <cstring>
 
 #include "bmacro.h"
 
@@ -64,6 +65,7 @@ namespace utl
         {
 			if(empty() || i > count()) {
 #ifdef USE_HAL_DRIVER
+				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
 				return m_data[0];
 #else
 				throw;
@@ -76,7 +78,8 @@ namespace utl
         {
 			if(empty()) {
 #ifdef USE_HAL_DRIVER
-				return DATA_T();
+				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
+				return m_data[0];
 #else
 				throw;
 #endif
@@ -89,7 +92,7 @@ namespace utl
 			if (full()) {
 				pop_front();
 			}
-			m_data[m_writeCount++ & m_mask] = value;
+			m_data[(++m_writeCount) & m_mask] = value;
 		}
 
 		void push_front(const DATA_T& value)
@@ -112,24 +115,40 @@ namespace utl
 		const DATA_T& pop_front()
 		{
 			BEDUG_ASSERT(!empty(), "error pop front unit - circle buffer is empty");
+			if (empty()) {
+				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
+				return m_data[0];
+			}
 			return m_data[m_readCount++ & m_mask];
 		}
 
 		const DATA_T& pop_back()
 		{
 			BEDUG_ASSERT(!empty(), "error pop back unit - circle buffer is empty");
+			if (empty()) {
+				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
+				return m_data[0];
+			}
 			return m_data[(m_writeCount-- - 1) & m_mask];
 		}
 
 		const DATA_T& front()
 		{
 			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
+			if (empty()) {
+				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
+				return m_data[0];
+			}
 			return m_data[m_readCount & m_mask];
 		}
 
 		const DATA_T& back()
 		{
 			BEDUG_ASSERT(!empty(), "error get back unit - circle buffer is empty");
+			if (empty()) {
+				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
+				return m_data[0];
+			}
 			return m_data[(m_writeCount - 1) & m_mask];
 		}
 

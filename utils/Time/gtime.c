@@ -18,11 +18,7 @@
 #endif
 
 
-#ifdef USE_HAL_DRIVER
-uint32_t getMillis()
-#else
-unsigned long long getMillis()
-#endif
+TIME_MS_T getMillis()
 {
 #if defined(USE_HAL_DRIVER)
     return HAL_GetTick();

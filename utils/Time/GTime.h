@@ -13,10 +13,13 @@ extern "C" {
 
 
 #ifdef USE_HAL_DRIVER
-uint32_t getMillis();
+#   define TIME_MS_T uint32_t 
 #else
-unsigned long long getMillis();
+#   define TIME_MS_T unsigned long long 
 #endif
+
+
+TIME_MS_T getMillis();
 
 
 #ifdef __cplusplus
