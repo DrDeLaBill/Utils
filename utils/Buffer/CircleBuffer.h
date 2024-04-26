@@ -92,7 +92,7 @@ namespace utl
 			if (full()) {
 				pop_front();
 			}
-			m_data[(++m_writeCount) & m_mask] = value;
+			m_data[(m_writeCount++) & m_mask] = value;
 		}
 
 		void push_front(const DATA_T& value)
