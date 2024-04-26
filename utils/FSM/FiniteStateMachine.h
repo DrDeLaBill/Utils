@@ -117,36 +117,39 @@ namespace fsm
             }
 
 
+            event_v resVariant;
             key_t resKey{ this->key.state_idx, 0 };
-            auto resVariant      = events.front();
-            unsigned maxPriority = 0;
-            bool found           = false;
-            auto it              = transitions.begin();
+            bool found = false;
+            auto it    = transitions.begin();
             for (unsigned i = 0; i < events.count(); i++) {
                 auto eventVariant = events.pop_front();
 
                 key_t tmpKey{ this->key.state_idx, 0 };
                 bool changed = false;
-                auto lambda = [&](const auto& targetEvent) {
-                    using event_t    = std::decay_t<decltype(targetEvent)>;
-                    tmpKey.event_idx = event_t::index;
+                auto lambda = [&](const auto& targetEvent, const auto& lastEvent) {
+                    using target_event_t = std::decay_t<decltype(targetEvent)>;
+                    using last_event_t   = std::decay_t<decltype(lastEvent)>;
+
+                    tmpKey.event_idx = target_event_t::index;
                     it               = transitions.find(tmpKey);
                     if (it == transitions.end()) {
                         return;
                     }
-                    if (!found || event_t::priority > maxPriority) {
-                    	resKey.event_idx = event_t::index;
-                        maxPriority      = event_t::priority;
+
+                    if (!found || target_event_t::priority > last_event_t::priority) {
+                    	resKey.event_idx = target_event_t::index;
                         changed          = true;
-                        found            = true;
                     }
                 };
 
-                std::visit(lambda, eventVariant);
+                std::visit(lambda, eventVariant, resVariant);
 
                 if (changed) {
-                	events.push_back(resVariant);
+                	if (found) {
+                		events.push_back(resVariant);
+                	}
                 	resVariant = eventVariant;
+                	found = true;
                 } else {
                 	events.push_back(eventVariant);
                 }
