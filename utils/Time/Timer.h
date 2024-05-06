@@ -27,6 +27,7 @@ namespace utl
         void start();
         void reset();
         bool wait();
+        uint32_t end();
 
         void changeDelay(const time_ms_t delay_ms);
 

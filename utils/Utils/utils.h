@@ -91,7 +91,7 @@ void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_
 bool     util_wait_event(bool (*condition) (void), TIME_MS_T time);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(const uint32_t number, uint32_t degree);
-int      util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2);
+int      util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, size_t rngh2);
 
 
 #ifdef __cplusplus
