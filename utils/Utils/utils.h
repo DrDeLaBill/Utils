@@ -87,11 +87,23 @@ typedef struct _util_port_pin_t {
 #endif
 
 
+typedef enum _ALIGN_MODE {
+	ALIGN_MODE_LEFT = 1,
+	ALIGN_MODE_RIGHT,
+	ALIGN_MODE_CENTER
+} ALIGN_MODE;
+
+
+#define IS_ALIGN_MODE(MODE) ((MODE) == ALIGN_MODE_LEFT || (MODE) == ALIGN_MODE_RIGHT || (MODE) == ALIGN_MODE_CENTER)
+
+
+
 void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len);
 bool     util_wait_event(bool (*condition) (void), TIME_MS_T time);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(const uint32_t number, uint32_t degree);
-int      util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2);
+size_t   util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, size_t rngh2);
+void     util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode);
 
 
 #ifdef __cplusplus

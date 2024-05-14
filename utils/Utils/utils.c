@@ -92,10 +92,50 @@ uint32_t util_small_pow(const uint32_t number, uint32_t degree)
 	return res;
 }
 
-int util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2)
+size_t util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, size_t rngh2)
 {
-    int range1 = __abs_dif(rngh1, rngl1);
-    int range2 = __abs_dif(rngh2, rngl2);
-    int delta  = __abs_dif(rngl1,   val);
+	size_t range1 = __abs_dif(rngh1, rngl1);
+	size_t range2 = __abs_dif(rngh2, rngl2);
+	size_t delta  = __abs_dif(rngl1,   val);
     return rngl2 + ((delta * range2) / range1);
+}
+
+void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode)
+{
+	BEDUG_ASSERT(IS_ALIGN_MODE(mode), "Unknown align mode");
+	if (!IS_ALIGN_MODE(mode)) {
+		mode = ALIGN_MODE_CENTER;
+	}
+
+	max_len -= 1;
+	size_t len = strlen(phrase);
+	size_t need_len = __min(max_len, target_len);
+	if (len >= need_len) {
+		return;
+	}
+
+	size_t symbols_count = need_len - len;
+	switch (mode) {
+	case ALIGN_MODE_LEFT:
+		memset(phrase + len, symbol, symbols_count);
+		break;
+	case ALIGN_MODE_RIGHT:
+		for (size_t i = len; i > 0 ; i--) {
+			phrase[i - 1 + symbols_count] = phrase[i - 1];
+		}
+		memset(phrase, symbol, symbols_count);
+		break;
+	case ALIGN_MODE_CENTER:
+		for (size_t i = len; i > 0 ; i--) {
+			phrase[i - 1 + symbols_count / 2] = phrase[i - 1];
+		}
+		memset(phrase, symbol, symbols_count / 2);
+		memset(phrase + symbols_count / 2 + len, symbol, symbols_count - symbols_count / 2);
+		break;
+	default:
+		BEDUG_ASSERT(false, "Unknown align mode");
+		return;
+	};
+
+	phrase[need_len] = 0;
 }

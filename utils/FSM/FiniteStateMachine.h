@@ -49,12 +49,12 @@ namespace fsm
                 transition_v,
                 KeyHash,
                 KeyEqual
-                >;
+			>;
         using queue_t =
             utl::circle_buffer<
                 EVENT_STACK_SIZE,
                 event_v
-			>;
+		>;
 
         key_t key;
         tuple_t transitions;
