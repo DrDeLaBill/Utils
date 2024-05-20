@@ -21,7 +21,7 @@ bool util_old_timer_wait(util_old_timer_t* tm) {
 }
 
 
-#if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
+#if defined(_DEBUG) || defined(DEBUG)
 void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) {
     const uint8_t cols_count = 16;
     uint32_t i = 0;
@@ -100,42 +100,20 @@ size_t util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, 
     return rngl2 + ((delta * range2) / range1);
 }
 
-void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode)
+unsigned util_hash(const uint8_t* data, const unsigned size)
 {
-	BEDUG_ASSERT(IS_ALIGN_MODE(mode), "Unknown align mode");
-	if (!IS_ALIGN_MODE(mode)) {
-		mode = ALIGN_MODE_CENTER;
+	unsigned hash = 0;
+
+	for (unsigned i = 0; i < size; i++) {
+		uint8_t symbol = data[i];
+        for (unsigned j = sizeof (char) * 8; j > 0; j--) {
+        	hash = ((hash ^ (unsigned)symbol) & 1) ? (hash >> 1) ^ 0x8C : (hash >> 1);
+            symbol >>= 1;
+        }
+        hash <<= 1;
 	}
 
-	max_len -= 1;
-	size_t len = strlen(phrase);
-	size_t need_len = __min(max_len, target_len);
-	if (len >= need_len) {
-		return;
-	}
-
-	size_t symbols_count = need_len - len;
-	switch (mode) {
-	case ALIGN_MODE_LEFT:
-		memset(phrase + len, symbol, symbols_count);
-		break;
-	case ALIGN_MODE_RIGHT:
-		for (size_t i = len; i > 0 ; i--) {
-			phrase[i - 1 + symbols_count] = phrase[i - 1];
-		}
-		memset(phrase, symbol, symbols_count);
-		break;
-	case ALIGN_MODE_CENTER:
-		for (size_t i = len; i > 0 ; i--) {
-			phrase[i - 1 + symbols_count / 2] = phrase[i - 1];
-		}
-		memset(phrase, symbol, symbols_count / 2);
-		memset(phrase + symbols_count / 2 + len, symbol, symbols_count - symbols_count / 2);
-		break;
-	default:
-		BEDUG_ASSERT(false, "Unknown align mode");
-		return;
-	};
-
-	phrase[need_len] = 0;
+	return hash;
 }
+
+
