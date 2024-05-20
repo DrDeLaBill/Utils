@@ -103,7 +103,7 @@ bool     util_wait_event(bool (*condition) (void), TIME_MS_T time);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(const uint32_t number, uint32_t degree);
 size_t   util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, size_t rngh2);
-void     util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode);
+unsigned util_hash(const uint8_t* data, const unsigned size);
 
 
 #ifdef __cplusplus
