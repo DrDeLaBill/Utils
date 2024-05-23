@@ -3,7 +3,7 @@
 #pragma once
 
 
-#include <cstdint>
+#include "gtime.h"
 
 
 namespace utl
@@ -12,24 +12,18 @@ namespace utl
     class Timer
     {
     private:
-#ifdef USE_HAL_DRIVER
-        using time_ms_t = uint32_t;
-#else
-        using time_ms_t = unsigned long long;
-#endif
-
-        time_ms_t delay;
-        time_ms_t start_time;
+        TIME_MS_T delay;
+        TIME_MS_T start_time;
 
     public:
-        Timer(time_ms_t delay);
+        Timer(const TIME_MS_T delay);
         
         void start();
         void reset();
         bool wait();
-        uint32_t end();
+        TIME_MS_T end();
 
-        void changeDelay(const time_ms_t delay_ms);
+        void changeDelay(const TIME_MS_T delay_ms);
 
     };
 }
