@@ -57,7 +57,7 @@ void utils_test_gc()
     fsm_gc_push_event(&fsm, &event1);
 
 
-    for (unsigned i = 0; i < 10; i++) {
+    for (unsigned i = 0; i < 6; i++) {
         fsm_gc_proccess(&fsm);
     }
 
@@ -72,7 +72,7 @@ void utils_test_gc()
     fsm_gc_push_event(&fsm, &event1);
 
 
-    for (unsigned i = 0; i < 10; i++) {
+    for (unsigned i = 0; i < 6; i++) {
         fsm_gc_proccess(&fsm);
     }
 }

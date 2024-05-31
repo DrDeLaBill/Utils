@@ -6,6 +6,7 @@ message(STATUS "Utils C compiler: ${CMAKE_C_COMPILER}")
 message(STATUS "Utils C++ compiler: ${CMAKE_CXX_COMPILER}")
 
 add_subdirectory(utils)
+
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     
     message(STATUS "Utils generated as current project")    
@@ -52,8 +53,6 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
         message(STATUS "Enable Utils testing")
         enable_testing()
         add_subdirectory(test)
-        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DUTILS_TEST")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUTILS_TEST")
     endif()
 else()
 
