@@ -9,7 +9,7 @@
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 {
     if (!size) {
-        BEDUG_ASSERT(false, "Empty fsm transition table");
+        BEDUG_ASSERT(false, "Empty FSM transition table");
         return;
     }
     fsm->_initialized = true;
@@ -34,7 +34,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 
 void fsm_gc_proccess(fsm_gc_t* fsm) 
 {
-    BEDUG_ASSERT(fsm->_initialized, "fsm has not initilazed");
+    BEDUG_ASSERT(fsm->_initialized, "FSM has not initilazed");
     if (fsm->_state && fsm->_table) {
         fsm->_state->state();
         for (unsigned i = 0; i < fsm->_events_count; i++) {
@@ -54,6 +54,6 @@ void fsm_gc_proccess(fsm_gc_t* fsm)
             }
         } 
     } else {
-        BEDUG_ASSERT(false, "fsm state and event must no be NULL");
+        BEDUG_ASSERT(false, "FSM state and event must no be NULL");
     }
 }

@@ -57,6 +57,10 @@ extern "C" {
 #	define __reset_bit(REG, NUM) ((REG) &= ~((uint64_t)1 << (NUM)))
 #endif
 
+#ifndef __concat
+#   define __concat(a,b) a##b 
+#endif
+
 
 #ifndef TYPE_PACK
 #   ifdef __MINGW32__

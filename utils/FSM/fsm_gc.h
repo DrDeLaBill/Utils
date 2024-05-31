@@ -45,8 +45,6 @@ typedef struct _fsm_gc_t {
 static size_t _fsm_gc_events_count = 1;
 
 
-#define FSM_GC_CONCAT(a,b) a##b 
-
 #define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { FUNC };
 
 #define FSM_GC_CREATE_EVENT(NAME)             fsm_gc_event_t NAME = { 0 };
