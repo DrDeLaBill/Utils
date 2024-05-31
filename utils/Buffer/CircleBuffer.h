@@ -3,6 +3,7 @@
 #pragma once
 
 
+#include <limits>
 #include <cstdint>
 #include <cstring>
 
@@ -20,8 +21,8 @@ namespace utl
 			typedef TypeIfTrue TYPE;
 		};
 
-		template<>
-		struct StaticTypeIf<false, class TypeIfTrue, class TypeIfFalse>
+		template<class TypeIfTrue, class TypeIfFalse>
+		struct StaticTypeIf<false, TypeIfTrue, TypeIfFalse>
 		{
 			typedef TypeIfFalse TYPE;
 		};
@@ -29,10 +30,18 @@ namespace utl
 		template<unsigned SIZE>
 		struct TypeSelector
 		{
-			static const bool isLE8bit = SIZE <= 0xFF;
-			static const bool isLE16bit = SIZE <= 0xFFFF;
+			static constexpr bool isLE8bit  = SIZE <= std::numeric_limits<uint8_t>::max();
+			static constexpr bool isLE16bit = SIZE <= std::numeric_limits<uint16_t>::max();
 
-			typedef typename StaticTypeIf<isLE8bit, uint8_t, typename StaticTypeIf<isLE16bit, uint16_t, uint32_t>::TYPE>::TYPE TYPE;
+			typedef typename StaticTypeIf<
+				isLE8bit,
+				uint8_t,
+				typename StaticTypeIf<
+					isLE16bit,
+					uint16_t,
+					uint32_t
+				>::TYPE
+			>::TYPE TYPE;
 		};
 	}
 	
@@ -45,7 +54,7 @@ namespace utl
 
 	private:
 	
-		typedef typename prvt::TypeSelector<SIZE>::TYPE INDEX_T;
+		using INDEX_T = typename prvt::TypeSelector<SIZE>::TYPE;
 	
 		static const INDEX_T m_mask = SIZE - 1;
 		

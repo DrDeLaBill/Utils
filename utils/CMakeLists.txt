@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.5.0)
 
-project(utilslib VERSION 0.0.1)
+project(utilslib VERSION 1.0.0)
 
 
 file(GLOB ${PROJECT_NAME}_HEADERS "./*/*.h")

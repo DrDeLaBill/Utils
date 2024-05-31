@@ -8,7 +8,7 @@
 
 namespace utl
 {
-    Timer::Timer(const time_ms_t delay):
+    Timer::Timer(const TIME_MS_T delay):
         delay(delay), start_time(0)
 	{
         BEDUG_ASSERT(this->delay > 0, "The delay for the timer must be greater than 0");
@@ -29,12 +29,12 @@ namespace utl
         return this->start_time + this->delay > getMillis();
     }
 
-    uint32_t Timer::end()
+    TIME_MS_T Timer::end()
     {
     	return this->start_time + this->delay;
     }
 
-	void Timer::changeDelay(const time_ms_t delay_ms)
+	void Timer::changeDelay(const TIME_MS_T delay_ms)
     {
     	this->delay = delay_ms;
     }
