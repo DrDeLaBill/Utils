@@ -49,8 +49,11 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     option(UTILS_TEST "Enable Utils tests." ON)
 
     if (UTILS_TEST)
+        message(STATUS "Enable Utils testing")
         enable_testing()
         add_subdirectory(test)
+        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DUTILS_TEST")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DUTILS_TEST")
     endif()
 else()
 

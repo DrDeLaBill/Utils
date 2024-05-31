@@ -10,6 +10,13 @@ file(GLOB ${PROJECT_NAME}_C_SOURCES "./*.c")
 set(ALL_SRCS "${${PROJECT_NAME}_CPP_SOURCES};${${PROJECT_NAME}_C_SOURCES};${${PROJECT_NAME}_HEADERS}")
 add_executable(${PROJECT_NAME} ${ALL_SRCS})
 
+
+target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC
+    "."
+)
+
 # Link library
 target_link_libraries(
     ${PROJECT_NAME}
