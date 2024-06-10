@@ -2,6 +2,7 @@
 
 #include <iostream>
 
+#include "test_gc.h"
 
 #include "log.h"
 #include "CodeStopwatch.h"
@@ -94,6 +95,8 @@ int main()
 
 	printTagLog("MAIN", "OK");
 	printTagLog("LOG", "OK");
+
+	utils_test_gc();
 
     return 0;
 }
