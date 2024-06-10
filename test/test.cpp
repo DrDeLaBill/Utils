@@ -2,19 +2,21 @@
 
 #include <iostream>
 
-#include "test_gc.h"
-
 #include "log.h"
+#include "fsm_gc.h"
 #include "CodeStopwatch.h"
 
 #include "FiniteStateMachine.h"
 
 
+
+static const char TAG[] = "TEST";
+
 struct green_toggle {
 
 	void operator()(void) const
 	{
-		printTagLog("MAIN", "green_toggle");
+		printTagLog(TAG, "green_toggle");
 	}
 };
 
@@ -22,7 +24,7 @@ struct yellow_toggle {
 
 	void operator()(void) const
 	{
-		printTagLog("MAIN", "yellow_toggle");
+		printTagLog(TAG, "yellow_toggle");
 	}
 };
 
@@ -30,14 +32,14 @@ struct red_toggle {
 
 	void operator()(void) const
 	{
-		printTagLog("MAIN", "red_toggle");
+		printTagLog(TAG, "red_toggle");
 	}
 };
 
 struct green_on {
 	void operator()(void) const
 	{
-		printTagLog("MAIN", "green_on");
+		printTagLog(TAG, "green_on");
 	}
 };
 
@@ -45,7 +47,7 @@ struct yellow_on {
 
 	void operator()(void) const
 	{
-		printTagLog("MAIN", "yellow_on");
+		printTagLog(TAG, "yellow_on");
 	}
 };
 
@@ -53,7 +55,7 @@ struct red_on {
 
 	void operator()(void) const
 	{
-		printTagLog("MAIN", "red_on");
+		printTagLog(TAG, "red_on");
 	}
 };
 
@@ -73,10 +75,44 @@ using fsm_table = fsm::TransitionTable<
 	fsm::Transition<red_s,    green_e,    green_s,  green_on,  fsm::Guard::NO_GUARD>
 >;
 
+void _gc_state1(void) {
+	printTagLog(TAG, "gc_state1");
+}
+
+void _gc_state2(void) {
+	printTagLog(TAG, "gc_state2");
+}
+
+void _gc_state3(void) {
+	printTagLog(TAG, "gc_state3");
+}
+
+FSM_GC_CREATE(gc_fsm);
+
+FSM_GC_CREATE_STATE(gc_state1, _gc_state1);
+FSM_GC_CREATE_STATE(gc_state2, _gc_state2);
+FSM_GC_CREATE_STATE(gc_state3, _gc_state3);
+
+FSM_GC_CREATE_EVENT(gc_event1);
+FSM_GC_CREATE_EVENT(gc_event2);
+
+FSM_GC_CREATE_TABLE(
+    gc_fsm_table,
+    { &gc_state1, &gc_event1, &gc_state2 },
+    { &gc_state1, &gc_event2, &gc_state3 },
+    { &gc_state2, &gc_event2, &gc_state1 },
+    { &gc_state2, &gc_event1, &gc_state3 },
+    { &gc_state3, &gc_event1, &gc_state1 },
+    { &gc_state3, &gc_event2, &gc_state1 }
+);
+
+
 
 int main()
 {
-	utl::CodeStopwatch stopwatch("MAIN");
+	utl::CodeStopwatch stopwatch(TAG);
+
+	printTagLog(TAG, "C++ Test");
 
 	fsm::FiniteStateMachine<fsm_table> fsm;
 
@@ -93,10 +129,43 @@ int main()
 		fsm.proccess();
 	}
 
-	printTagLog("MAIN", "OK");
-	printTagLog("LOG", "OK");
+	printTagLog(TAG, "OK\n");
 
-	utils_test_gc();
+	printTagLog(TAG, "C Test");
+
+	fsm_gc_init(&gc_fsm, gc_fsm_table, __arr_len(gc_fsm_table));
+    
+    for (unsigned i = 0; i < 10; i++) {
+        fsm_gc_proccess(&gc_fsm);
+    }
+    
+    
+    printTagLog(TAG, "push event1");
+    fsm_gc_push_event(&gc_fsm, &gc_event1);
+    printTagLog(TAG, "push event1");
+    fsm_gc_push_event(&gc_fsm, &gc_event1);
+    printTagLog(TAG, "push event1");
+    fsm_gc_push_event(&gc_fsm, &gc_event1);
+
+
+    for (unsigned i = 0; i < 6; i++) {
+        fsm_gc_proccess(&gc_fsm);
+    }
+
+
+    printTagLog(TAG, "push event2");
+    fsm_gc_push_event(&gc_fsm, &gc_event2);
+    printTagLog(TAG, "push event1");
+    fsm_gc_push_event(&gc_fsm, &gc_event1);
+    printTagLog(TAG, "push event2");
+    fsm_gc_push_event(&gc_fsm, &gc_event2);
+    printTagLog(TAG, "push event1");
+    fsm_gc_push_event(&gc_fsm, &gc_event1);
+
+
+    for (unsigned i = 0; i < 6; i++) {
+        fsm_gc_proccess(&gc_fsm);
+    }
 
     return 0;
 }
