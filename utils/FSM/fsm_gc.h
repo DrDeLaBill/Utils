@@ -23,7 +23,7 @@ typedef struct _fsm_gc_event_t {
 } fsm_gc_event_t;
 
 typedef struct _fsm_gc_state_t {
-    void (*state) (void);
+    void (*state) ();
 } fsm_gc_state_t;
 
 typedef struct _fsm_gc_transition_t {
@@ -49,18 +49,15 @@ static size_t _fsm_gc_events_count = 1;
 
 #define FSM_GC_CREATE_EVENT(NAME)             fsm_gc_event_t NAME = { 0 };
                                               
-#define FSM_GC_CREATE_TRANSITION(NAME, SOURCE, EVENT, TARGET) \
-                                              fsm_gc_transition_t NAME { .source = SOURCE, .event = EVENT, .target = TARGET };
-                                              
 #define FSM_GC_CREATE_TABLE(NAME, ...)        fsm_gc_transition_t NAME[] = { __VA_ARGS__ };
 
 #define FSM_GC_CREATE(FSM_NAME)               fsm_gc_t FSM_NAME = { \
-                                                  ._initialized = false, \
-                                                  ._state = NULL, \
-                                                  ._events_count = 0, \
-                                                  ._events = {0}, \
-                                                  ._table = NULL, \
-                                                  ._table_size = 0 \
+                                                  /* ._initialized = */  false, \
+                                                  /* ._state = */        NULL, \
+                                                  /* ._events_count = */ 0, \
+                                                  /* ._events = */       {0}, \
+                                                  /* ._table = */        NULL, \
+                                                  /* ._table_size = */   0 \
                                               };
 
 
