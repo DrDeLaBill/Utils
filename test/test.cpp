@@ -87,6 +87,7 @@ void _gc_state3(void) {
 	printTagLog(TAG, "gc_state3");
 }
 
+
 FSM_GC_CREATE(gc_fsm);
 
 FSM_GC_CREATE_STATE(gc_state1, _gc_state1);
