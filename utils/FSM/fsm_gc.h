@@ -42,9 +42,6 @@ typedef struct _fsm_gc_t {
 } fsm_gc_t;
 
 
-static size_t _fsm_gc_events_count = 1;
-
-
 #define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { FUNC };
 
 #define FSM_GC_CREATE_EVENT(NAME)             fsm_gc_event_t NAME = { 0 };
@@ -64,6 +61,7 @@ static size_t _fsm_gc_events_count = 1;
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size);
 void fsm_gc_proccess(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
+void fsm_gc_clear(fsm_gc_t* fsm);
 
 
 
