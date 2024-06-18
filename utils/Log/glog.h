@@ -13,7 +13,6 @@ extern "C" {
 #include <string.h>
 
 #include "gtime.h"
-#include "bmacro.h"
 
 
 #if defined(_DEBUG) || defined(DEBUG)
@@ -25,7 +24,7 @@ extern "C" {
 #       	define printMessage(format, ...) printf(format __VA_OPT__(,) __VA_ARGS__);
 #   	else
 #       	define printMessage(format, ...) { }
-#       	pragma _WARNING("please check compiler")
+#       	pragma message("Please check compiler")
 #   	endif
 #	endif
 
