@@ -1,13 +1,13 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include <log.h>
 #include "CodeStopwatch.h"
 
 #include <memory>
 #include <cstring>
 #include <cstdint>
 
-#include "utils.h"
+#include "glog.h"
+#include "gutils.h"
 #include "gtime.h"
 
 

@@ -12,7 +12,7 @@ extern "C" {
 #include <stddef.h>
 #include <stdint.h>
 
-#include "utils.h"
+#include "gutils.h"
 
 
 void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode);

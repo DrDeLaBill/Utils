@@ -1,10 +1,11 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include <log.h>
-#include "utils.h"
+#include "gutils.h"
 
 #include <stdint.h>
 #include <stdbool.h>
+
+#include "glog.h"
 
 #ifdef USE_HAL_DRIVER
 #   include "hal_defs.h"

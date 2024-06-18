@@ -2,7 +2,7 @@
 
 #include <iostream>
 
-#include "log.h"
+#include "glog.h"
 #include "fsm_gc.h"
 #include "CodeStopwatch.h"
 

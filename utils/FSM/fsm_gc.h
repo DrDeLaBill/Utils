@@ -12,7 +12,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
-#include "utils.h"
+#include "gutils.h"
 
 
 #define _FSM_GC_EVENTS_COUNT (10)

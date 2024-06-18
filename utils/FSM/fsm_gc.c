@@ -4,7 +4,6 @@
 
 #include <string.h>
 
-#include "utils.h"
 #include "bmacro.h"
 
 
