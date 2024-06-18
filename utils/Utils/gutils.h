@@ -58,7 +58,11 @@ extern "C" {
 #endif
 
 #ifndef __concat
-#   define __concat(a,b) a##b 
+#   define __concat(a, b) a##b
+#endif
+
+#ifndef __percent
+#   define __percent(PART, MAX) (((PART) * 100) / (MAX))
 #endif
 
 

@@ -2,7 +2,7 @@
 
 #include "bedug.h"
 
-#include "log.h"
+#include "glog.h"
 
 
 #if defined(_DEBUG) || defined(DEBUG) || !defined(QT_NO_DEBUG)
