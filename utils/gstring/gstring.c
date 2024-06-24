@@ -20,6 +20,9 @@ void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len,
 	}
 
 	size_t symbols_count = need_len - len;
+	if (symbols_count % 2) {
+		symbols_count--;
+	}
 	switch (mode) {
 	case ALIGN_MODE_LEFT:
 		memset((void*)(phrase + len), symbol, symbols_count);
