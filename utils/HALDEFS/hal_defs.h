@@ -57,22 +57,31 @@ typedef struct _GPIO_PAIR {
 	uint16_t      pin;
 } GPIO_PAIR;
 
+
+#   define STM_REF_VOLTAGEx10        (12)
+#   define STM_MIN_VOLTAGEx10        (20)
+#   define STM_MAX_VOLTAGEx10        (36)
+
+#   define STM_ADC_MAX               ((uint32_t)0xFFF)
+
 #endif
 
-
-#define ADC_MAX                      ((uint32_t)0xFFF)
 
 #define TIMESTAMP2000_01_01_00_00_00 (946670400)
 
 #define SECOND_MS                    ((uint32_t)(1000))
 
-#define MINUTE_MS                    ((uint32_t)(60 * SECOND_MS))
+#define MINUTE_S                     ((uint32_t)(60))
+#define MINUTE_MS                    ((uint32_t)(MINUTE_S * SECOND_MS))
 
-#define HOUR_MS                      ((uint32_t)(60 * MINUTE_MS))
+#define HOUR_MIN                     ((uint32_t)(60))
+#define HOUR_MS                      ((uint32_t)(HOUR_MIN * MINUTE_MS))
 
-#define DAY_MS                       ((uint32_t)(24 * HOUR_MS))
+#define DAY_H                        ((uint32_t)(24))
+#define DAY_MS                       ((uint32_t)(DAY_H * HOUR_MS))
 
-#define WEEK_MS                      ((uint32_t)(7 * DAY_MS))
+#define WEEK_D                       ((uint32_t)(7))
+#define WEEK_MS                      ((uint32_t)(WEEK_D * DAY_MS))
 
 #define BITS_IN_BYTE                 ((uint8_t)8)
 
