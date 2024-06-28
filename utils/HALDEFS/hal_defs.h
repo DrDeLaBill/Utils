@@ -4,7 +4,13 @@
 #define _HAL_DEFS_H_
 
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+
 #include <stdint.h>
+#include <stdbool.h>
 
 
 #if defined(USE_HAL_DRIVER)
@@ -23,7 +29,11 @@
 		defined(STM32F105xC) || \
 		defined(STM32F107xC)
 #		include "stm32f1xx_hal.h"
-#	elif defined(STM32F405xx) || \
+#	elif defined(STM32F2)
+#		include "stm32f2xx_hal.h"
+#	elif defined(STM32F3)
+#		include "stm32f3xx_hal.h"
+#   elif defined(STM32F405xx) || \
 		defined(STM32F415xx) || \
 		defined(STM32F407xx) || \
 		defined(STM32F417xx) || \
@@ -46,10 +56,18 @@
 		defined(STM32F412Vx) || \
 		defined(STM32F413xx) || \
 		defined(STM32F423xx)
+
 #		include "stm32f4xx_hal.h"
 #	else
-#		error "Please select the target STM32xxxx used in your application"
+#		error "Please select the target STM32Fxxx used in your application"
 #	endif
+
+
+#   define STM_REF_VOLTAGEx10        (12)
+#   define STM_MIN_VOLTAGEx10        (20)
+#   define STM_MAX_VOLTAGEx10        (36)
+
+#   define STM_ADC_MAX               ((uint32_t)0xFFF)
 
 
 typedef struct _GPIO_PAIR {
@@ -58,11 +76,9 @@ typedef struct _GPIO_PAIR {
 } GPIO_PAIR;
 
 
-#   define STM_REF_VOLTAGEx10        (12)
-#   define STM_MIN_VOLTAGEx10        (20)
-#   define STM_MAX_VOLTAGEx10        (36)
+void SystemInfo(void);
+bool MCUcheck(void);
 
-#   define STM_ADC_MAX               ((uint32_t)0xFFF)
 
 #endif
 
@@ -84,5 +100,11 @@ typedef struct _GPIO_PAIR {
 #define WEEK_MS                      ((uint32_t)(WEEK_D * DAY_MS))
 
 #define BITS_IN_BYTE                 ((uint8_t)8)
+
+
+#ifdef __cplusplus
+}
+#endif
+
 
 #endif

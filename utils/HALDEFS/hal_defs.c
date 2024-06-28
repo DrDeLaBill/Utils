@@ -1,0 +1,222 @@
+#include "hal_defs.h"
+
+#ifdef USE_HAL_DRIVER
+
+#   include "glog.h"
+
+
+void COREInfo(void);
+void FPUInfo(void);
+void IDCODEInfo(void);
+
+
+static const char CORE_TAG[] = "CORE";
+
+
+void SystemInfo(void)
+{
+	printTagLog(CORE_TAG, "Core=%lu, %lu MHz", SystemCoreClock, SystemCoreClock / 1000000);
+	COREInfo();
+	IDCODEInfo();
+	FPUInfo();
+	printPretty("APB1=%lu\n", HAL_RCC_GetPCLK1Freq());
+	printPretty("APB2=%lu\n", HAL_RCC_GetPCLK2Freq());
+}
+
+bool MCUcheck(void)
+{
+	uint32_t idcode = DBGMCU->IDCODE & 0xFFF;
+#if defined(STM32F103x6) || \
+	defined(STM32F103xB) || \
+	defined(STM32F103xE) || \
+	defined(STM32F103xG)
+	return idcode == 0x410;
+#elif defined(STM32F401xC) || \
+	defined(STM32F401xE)
+	return idcode == 0x423 || idcode == 0x433;
+#else
+    (void)idcode;
+	return false;
+#endif
+}
+
+void COREInfo(void) // sourcer32@gmail.com
+{
+	uint32_t cpuid = SCB->CPUID;
+
+	printPretty(
+		"CPUID 0x%08X DEVID 0x%03X REVID 0x%04X\n",
+		(int)cpuid,
+		(int)(DBGMCU->IDCODE & 0xFFF),
+		(int)((DBGMCU->IDCODE >> 16) & 0xFFFF)
+	);
+
+	uint32_t pat = (cpuid & 0x0000000F);
+	uint32_t var = (cpuid & 0x00F00000) >> 20;
+
+	if ((cpuid & 0xFF000000) == 0x41000000) { // ARM
+		switch((cpuid & 0x0000FFF0) >> 4) {
+		case 0xC20:
+			printPretty("Cortex M0 r%lup%lu\n", var, pat);
+			break;
+		case 0xC60:
+			printPretty("Cortex M0+ r%lup%lu\n", var, pat);
+			break;
+		case 0xC21:
+			printPretty("Cortex M1 r%lup%lu\n", var, pat);
+			break;
+		case 0xC23:
+			printPretty("Cortex M3 r%lup%lu\n", var, pat);
+			break;
+		case 0xC24:
+			printPretty("Cortex M4 r%lup%lu\n", var, pat);
+			break;
+		case 0xC27:
+			printPretty("Cortex M7 r%lup%lu\n", var, pat);
+			break;
+		default:
+			printPretty("Unknown CORE\n");
+		}
+	} else {
+		printPretty("Unknown CORE IMPLEMENTER\n");
+	}
+}
+
+//****************************************************************************
+
+// FPU Programmer Model
+// http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0489b/Chdhfiah.html
+
+void FPUInfo(void) { // sourcer32@gmail.com
+
+	uint32_t mvfr0 = *(volatile uint32_t *)0xE000EF40;
+
+	if (mvfr0) {
+		printPretty(
+			"0x%08X 0x%08X 0x%08X\n",
+			(int)*(volatile uint32_t *)0xE000EF34,   // FPCCR  0xC0000000
+			(int)*(volatile uint32_t *)0xE000EF38,   // FPCAR
+			(int)*(volatile uint32_t *)0xE000EF3C    // FPDSCR
+		);  // MVFR2  0x00000040
+		printPretty(
+			"0x%08X 0x%08X 0x%08X\n",
+			(int)*(volatile uint32_t *)0xE000EF40,   // MVFR0  0x10110021 vs 0x10110221
+			(int)*(volatile uint32_t *)0xE000EF44,   // MVFR1  0x11000011 vs 0x12000011
+			(int)*(volatile uint32_t *)0xE000EF48
+		);
+	}
+
+	switch(mvfr0) {
+	case 0x00000000:
+		printPretty("No FPU\n");
+		break;
+	case 0x10110021:
+		printPretty("FPU-S Single-precision only\n");
+		break;
+	case 0x10110221:
+		printPretty("FPU-D Single-precision and Double-precision\n");
+		break;
+	default:
+		printPretty("Unknown FPU\n");
+		break;
+	}
+}
+
+//****************************************************************************
+
+void IDCODEInfo(void) { // sourcer32@gmail.com
+	uint32_t idcode = DBGMCU->IDCODE & 0xFFF;
+
+	switch(idcode) {
+	case 0x410:
+        printPretty("STM32F103\n");
+        break;
+	case 0x411:
+        printPretty("STM32F457\n");
+        break;
+	case 0x413:
+        printPretty("STM32F407\n");
+        break;
+	case 0x415:
+        printPretty("STM32L475xx, L476xx or L486xx\n");
+        break;
+	case 0x417:
+        printPretty("STM32L0 Cat 3\n");
+        break;
+	case 0x419:
+        printPretty("STM32F429 or F439\n");
+        break;
+	case 0x421:
+        printPretty("STM32F446\n");
+        break;
+	case 0x423:
+        printPretty("STM32F401\n");
+        break;
+	case 0x431:
+        printPretty("STM32F411\n");
+        break;
+	case 0x433:
+        printPretty("STM32F401\n");
+        break;
+	case 0x434:
+        printPretty("STM32F469\n");
+        break;
+	case 0x435:
+        printPretty("STM32L43xxx or L44xxx\n");
+        break;
+	case 0x440:
+        printPretty("STM32F030x8\n");
+        break;
+	case 0x441:
+        printPretty("STM32F412\n");
+        break;
+	case 0x442:
+        printPretty("STM32F030xC\n");
+        break;
+	case 0x444:
+        printPretty("STM32F030x4 or F030x6\n");
+        break;
+	case 0x445:
+        printPretty("STM32F070x6\n");
+        break;
+	case 0x447:
+        printPretty("STM32L0 Cat 5\n");
+        break;
+	case 0x448:
+        printPretty("STM32F070x8\n");
+        break;
+	case 0x449:
+        printPretty("STM32F74xxx or F75xxx\n");
+        break;
+	case 0x450:
+        printPretty("STM32H7xx\n");
+        break;
+	case 0x451:
+        printPretty("STM32F76xxx or F77xxx\n");
+        break;
+	case 0x452:
+        printPretty("STM32F72xxx or F73xxx\n");
+        break;
+	case 0x457:
+        printPretty("STM32L011xx\n");
+        break;
+	case 0x461:
+        printPretty("STM32L496xx or L4A6xx\n");
+        break;
+	case 0x462:
+        printPretty("STM32L45xxx or L46xxx\n");
+        break;
+	case 0x470:
+        printPretty("STM32L4Rxxx or L4Sxxx\n");
+        break;
+	case 0x480:
+        printPretty("STM32H7Ax or H7Bx\n");
+        break;
+	default:
+        printPretty("Unknown STM32 (IDCODE=0x%X)\n", idcode);
+		break;
+	}
+}
+
+
+#endif
