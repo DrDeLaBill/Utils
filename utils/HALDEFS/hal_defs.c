@@ -25,18 +25,16 @@ void SystemInfo(void)
 
 bool MCUcheck(void)
 {
-	uint32_t idcode = DBGMCU->IDCODE & 0xFFF;
-#if defined(STM32F103x6) || \
-	defined(STM32F103xB) || \
-	defined(STM32F103xE) || \
-	defined(STM32F103xG)
-	return idcode == 0x410;
-#elif defined(STM32F401xC) || \
-	defined(STM32F401xE)
-	return idcode == 0x423 || idcode == 0x433;
+	uint32_t cpuid = SCB->CPUID;
+	if ((cpuid & 0xFF000000) != 0x41000000) {
+		return false;
+	}
+#if defined(STM32F1)
+	return ((cpuid & 0x0000FFF0) >> 4) == 0xC23;
+#elif defined(STM32F2)
+#   error "Select MCU"
 #else
-    (void)idcode;
-	return false;
+#   error "Select MCU"
 #endif
 }
 
@@ -213,7 +211,7 @@ void IDCODEInfo(void) { // sourcer32@gmail.com
         printPretty("STM32H7Ax or H7Bx\n");
         break;
 	default:
-        printPretty("Unknown STM32 (IDCODE=0x%X)\n", idcode);
+        printPretty("Unknown STM32 (IDCODE=0x%X)\n", (int)idcode);
 		break;
 	}
 }
