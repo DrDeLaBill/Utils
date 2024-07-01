@@ -33,6 +33,8 @@ bool MCUcheck(void)
 	return ((cpuid & 0x0000FFF0) >> 4) == 0xC23;
 #elif defined(STM32F2)
 #   error "Select MCU"
+#elif defined(STM32F4)
+	return ((cpuid & 0x0000FFF0) >> 4) == 0xC24;
 #else
 #   error "Select MCU"
 #endif
