@@ -10,7 +10,9 @@ void FPUInfo(void);
 void IDCODEInfo(void);
 
 
+#ifdef DEBUG
 static const char CORE_TAG[] = "CORE";
+#endif
 
 
 void SystemInfo(void)
@@ -42,6 +44,7 @@ bool MCUcheck(void)
 
 void COREInfo(void) // sourcer32@gmail.com
 {
+#ifdef DEBUG
 	uint32_t cpuid = SCB->CPUID;
 
 	printPretty(
@@ -80,6 +83,7 @@ void COREInfo(void) // sourcer32@gmail.com
 	} else {
 		printPretty("Unknown CORE IMPLEMENTER\n");
 	}
+#endif
 }
 
 //****************************************************************************
@@ -87,8 +91,9 @@ void COREInfo(void) // sourcer32@gmail.com
 // FPU Programmer Model
 // http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0489b/Chdhfiah.html
 
-void FPUInfo(void) { // sourcer32@gmail.com
-
+void FPUInfo(void)
+{ // sourcer32@gmail.com
+#ifdef DEBUG
 	uint32_t mvfr0 = *(volatile uint32_t *)0xE000EF40;
 
 	if (mvfr0) {
@@ -120,11 +125,14 @@ void FPUInfo(void) { // sourcer32@gmail.com
 		printPretty("Unknown FPU\n");
 		break;
 	}
+#endif
 }
 
 //****************************************************************************
 
-void IDCODEInfo(void) { // sourcer32@gmail.com
+void IDCODEInfo(void)
+{ // sourcer32@gmail.com
+#ifdef DEBUG
 	uint32_t idcode = DBGMCU->IDCODE & 0xFFF;
 
 	switch(idcode) {
@@ -216,6 +224,7 @@ void IDCODEInfo(void) { // sourcer32@gmail.com
         printPretty("Unknown STM32 (IDCODE=0x%X)\n", (int)idcode);
 		break;
 	}
+#endif
 }
 
 
