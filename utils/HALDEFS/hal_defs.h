@@ -99,7 +99,7 @@ bool MCUcheck(void);
 #define WEEK_D                       ((uint32_t)(7))
 #define WEEK_MS                      ((uint32_t)(WEEK_D * DAY_MS))
 
-#define BITS_IN_BYTE                 ((uint8_t)8)
+#define BITS_IN_BYTE                 (8)
 
 
 #ifdef __cplusplus
