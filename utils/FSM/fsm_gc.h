@@ -23,7 +23,7 @@ typedef struct _fsm_gc_event_t {
 } fsm_gc_event_t;
 
 typedef struct _fsm_gc_state_t {
-    void (*state) ();
+    void (*state) (void);
 } fsm_gc_state_t;
 
 typedef struct _fsm_gc_transition_t {
@@ -62,6 +62,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size);
 void fsm_gc_proccess(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
 void fsm_gc_clear(fsm_gc_t* fsm);
+bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state);
 
 
 

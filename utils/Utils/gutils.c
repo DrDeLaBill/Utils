@@ -21,6 +21,11 @@ bool util_old_timer_wait(util_old_timer_t* tm) {
     return ((TIME_MS_T)((TIME_MS_T)getMillis() - (TIME_MS_T)tm->start)) < ((TIME_MS_T)tm->delay);
 }
 
+void util_old_timer_reset(util_old_timer_t* tm)
+{
+	tm->delay = 0;
+	tm->start = 0;
+}
 
 #if defined(_DEBUG) || defined(DEBUG)
 void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) {
