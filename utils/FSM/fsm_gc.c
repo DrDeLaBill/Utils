@@ -87,4 +87,10 @@ void fsm_gc_clear(fsm_gc_t* fsm)
     }
     BEDUG_ASSERT(fsm->_initialized, "FSM has not initialized");
 	memset(fsm->_events, 0, sizeof(fsm->_events));
+	fsm->_events_count = 0;
+}
+
+bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
+{
+	return fsm->_state->state == state->state;
 }
