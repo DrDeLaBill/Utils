@@ -9,6 +9,8 @@
 
 #if defined(USE_HAL_DRIVER)
 #	include "hal_defs.h"
+#elif defined(ARDUINO)
+#   include <Arduino.h>
 #elif defined(__GNUC__)
 #   include <sys/time.h>
 #elif defined(_MSC_VER)
@@ -22,6 +24,8 @@ TIME_MS_T getMillis()
 {
 #if defined(USE_HAL_DRIVER)
     return HAL_GetTick();
+#elif defined(ARDUINO)
+    return millis();
 #elif defined(__GNUC__)
     struct timeval time;
     gettimeofday(&time, NULL);
