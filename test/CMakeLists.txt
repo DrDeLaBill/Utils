@@ -2,6 +2,7 @@ cmake_minimum_required(VERSION 3.5.0)
 
 project(utilstest VERSION 0.0.1)
 
+message(STATUS "Adding Utils tests")
 
 # Add project files
 file(GLOB ${PROJECT_NAME}_HEADERS "./*.h")

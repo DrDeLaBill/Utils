@@ -13,12 +13,16 @@ static size_t _fsm_gc_events_count = 1;
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 {
     if (!fsm) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
+#endif
         return;
     }
     if (!size || !table) {
+#ifdef DEBUG
         BEDUG_ASSERT(!fsm->_e_fsm_tt, "Empty FSM transition table");
         fsm->_e_fsm_tt = true;
+#endif
         return;
     }
     fsm->_initialized = true;
@@ -33,13 +37,17 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 void fsm_gc_proccess(fsm_gc_t* fsm) 
 {
     if (!fsm) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
+#endif
         return;
     }
     if (!fsm->_initialized) {
+#ifdef DEBUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state and event must not be NULL");
         fsm->_fsm_not_i = true;
+#endif
     	return;
     }
 
@@ -87,16 +95,22 @@ void fsm_gc_proccess(fsm_gc_t* fsm)
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 {
     if (!fsm) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
+#endif
         return;
     }
     if (!event) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM event pointer");
+#endif
         return;
     }
     if (!fsm->_initialized) {
+#ifdef DEBUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
+#endif
     	return;
     }
     if (fsm->_events_count >= __arr_len(fsm->_events) - 1) {
@@ -111,12 +125,16 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 void fsm_gc_clear(fsm_gc_t* fsm)
 {
     if (!fsm) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
+#endif
         return;
     }
     if (!fsm->_initialized) {
+#ifdef DEBUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
+#endif
     	return;
     }
 	memset(fsm->_events, 0, sizeof(fsm->_events));
@@ -126,16 +144,22 @@ void fsm_gc_clear(fsm_gc_t* fsm)
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 {
     if (!fsm) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
+#endif
         return false;
     }
     if (!state) {
+#ifdef DEBUG
         BEDUG_ASSERT(false, "Empty FSM state pointer");
+#endif
         return false;
     }
     if (!fsm->_initialized) {
+#ifdef DEBUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
+#endif
     	return false;
     }
 	return fsm->_state->state == state->state;
