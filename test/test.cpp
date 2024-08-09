@@ -63,9 +63,9 @@ FSM_CREATE_STATE(green_s,  green_toggle);
 FSM_CREATE_STATE(yellow_s, yellow_toggle);
 FSM_CREATE_STATE(red_s,    red_toggle);
 
-FSM_CREATE_EVENT(green_e, 0);
-FSM_CREATE_EVENT(yellow_e, 0);
-FSM_CREATE_EVENT(red_e, 0);
+FSM_CREATE_EVENT(green_e,    0);
+FSM_CREATE_EVENT(yellow_e,   0);
+FSM_CREATE_EVENT(red_e,      0);
 FSM_CREATE_EVENT(priority_e, 1);
 
 using fsm_table = fsm::TransitionTable<
@@ -94,17 +94,17 @@ FSM_GC_CREATE_STATE(gc_state1, _gc_state1);
 FSM_GC_CREATE_STATE(gc_state2, _gc_state2);
 FSM_GC_CREATE_STATE(gc_state3, _gc_state3);
 
-FSM_GC_CREATE_EVENT(gc_event1);
-FSM_GC_CREATE_EVENT(gc_event2);
+FSM_GC_CREATE_EVENT(gc_event1, 0);
+FSM_GC_CREATE_EVENT(gc_event2, 0);
 
 FSM_GC_CREATE_TABLE(
     gc_fsm_table,
-    { &gc_state1, &gc_event1, &gc_state2 },
-    { &gc_state1, &gc_event2, &gc_state3 },
-    { &gc_state2, &gc_event2, &gc_state1 },
-    { &gc_state2, &gc_event1, &gc_state3 },
-    { &gc_state3, &gc_event1, &gc_state1 },
-    { &gc_state3, &gc_event2, &gc_state1 }
+    { &gc_state1, &gc_event1, &gc_state2, NULL },
+    { &gc_state1, &gc_event2, &gc_state3, NULL },
+    { &gc_state2, &gc_event2, &gc_state1, NULL },
+    { &gc_state2, &gc_event1, &gc_state3, NULL },
+    { &gc_state3, &gc_event1, &gc_state1, NULL },
+    { &gc_state3, &gc_event2, &gc_state1, NULL }
 );
 
 
