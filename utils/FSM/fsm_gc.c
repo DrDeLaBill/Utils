@@ -4,10 +4,18 @@
 
 #include <string.h>
 
+#include "glog.h"
 #include "bmacro.h"
 
 
-static size_t _fsm_gc_events_count = 1;
+
+#ifdef DEBUG
+
+const char FSM_GC_TAG[] = "FSMc";
+
+#endif
+
+size_t _fsm_gc_events_iterator = 1;
 
 
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
@@ -30,8 +38,12 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     fsm->_table_size  = size;
     fsm->_state       = fsm->_table[0].source;
     for (unsigned i = 0; i < fsm->_table_size; i++) {
-        fsm->_table[i].event->index = ++_fsm_gc_events_count;
-    }
+		fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
+	}
+
+#ifdef DEBUG
+    printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
+#endif
 }
 
 void fsm_gc_proccess(fsm_gc_t* fsm) 
@@ -79,6 +91,17 @@ void fsm_gc_proccess(fsm_gc_t* fsm)
         	return;
         }
 
+#ifdef DEBUG
+		printTagLog(
+			FSM_GC_TAG, \
+			"\"%s\" transition: %s{%s} -> %s",
+			fsm->_name,
+			fsm->_table[table_idx].source->_name,
+			fsm->_table[table_idx].event->_name,
+			fsm->_table[table_idx].target->_name
+		);
+#endif
+
 		fsm->_state = fsm->_table[table_idx].target;
 		fsm->_events_count--;
 		memset((void*)&fsm->_events[event_idx], 0, sizeof(fsm->_events[event_idx]));
@@ -120,6 +143,16 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
         fsm->_events_count = __arr_len(fsm->_events) - 1;
     }
     fsm->_events[fsm->_events_count++] = *event;
+
+
+#ifdef DEBUG
+	printTagLog(
+		FSM_GC_TAG, \
+		"\"%s\" push event: %s",
+		fsm->_name,
+		fsm->_events[fsm->_events_count++]._name
+	);
+#endif
 }
 
 void fsm_gc_clear(fsm_gc_t* fsm)
@@ -139,6 +172,14 @@ void fsm_gc_clear(fsm_gc_t* fsm)
     }
 	memset(fsm->_events, 0, sizeof(fsm->_events));
 	fsm->_events_count = 0;
+
+#ifdef DEBUG
+	printTagLog(
+		FSM_GC_TAG, \
+		"\"%s\" clear",
+		fsm->_name
+	);
+#endif
 }
 
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)

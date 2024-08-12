@@ -1,5 +1,3 @@
-#ifdef UTILS_TEST
-
 #include <iostream>
 
 #include "glog.h"
@@ -170,5 +168,3 @@ int main()
 
     return 0;
 }
-
-#endif

@@ -18,13 +18,38 @@ extern "C" {
 #define _FSM_GC_EVENTS_COUNT (10)
 
 
+#ifdef DEBUG
+
+#   ifndef FSM_GC_EVENT_NAME_SIZE
+#      define FSM_GC_EVENT_NAME_SIZE  (32)
+#   endif
+
+
+#   ifndef FSM_GC_STATE_NAME_SIZE
+#      define FSM_GC_STATE_NAME_SIZE  (32)
+#   endif
+
+
+#   ifndef FSM_GC_NAME_SIZE
+#      define FSM_GC_NAME_SIZE        (32)
+#   endif
+
+#endif
+
+
 typedef struct _fsm_gc_event_t {
     size_t index;
     size_t priority;
+#ifdef DEBUG
+    char   _name[FSM_GC_EVENT_NAME_SIZE];
+#endif
 } fsm_gc_event_t;
 
 typedef struct _fsm_gc_state_t {
     void (*state) (void);
+#ifdef DEBUG
+    char   _name[FSM_GC_STATE_NAME_SIZE];
+#endif
 } fsm_gc_state_t;
 
 typedef struct _fsm_gc_transition_t {
@@ -44,13 +69,37 @@ typedef struct _fsm_gc_t {
 #ifdef DEBUG
     bool                 _e_fsm_tt;
     bool                 _fsm_not_i;
+    char                 _name[FSM_GC_NAME_SIZE];
 #endif
 } fsm_gc_t;
 
 
-#define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { FUNC };
+extern size_t _fsm_gc_events_iterator;
 
-#define FSM_GC_CREATE_EVENT(NAME, PRIO)       fsm_gc_event_t NAME = { 0, PRIO };
+
+#ifdef DEBUG
+#   define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { \
+                                                     FUNC, \
+													 __STR_DEF2__(NAME) \
+                                                 };
+#else
+#   define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { \
+                                                     FUNC \
+                                                 };
+#endif
+
+#ifdef DEBUG
+#   define FSM_GC_CREATE_EVENT(NAME, PRIO)       fsm_gc_event_t NAME = { \
+                                                     0, \
+													 PRIO, \
+													 __STR_DEF2__(NAME) \
+	                                             };
+#else
+#   define FSM_GC_CREATE_EVENT(NAME, PRIO)       fsm_gc_event_t NAME = { \
+                                                     0, \
+		                                             PRIO, \
+                                                 };
+#endif
                                               
 #define FSM_GC_CREATE_TABLE(NAME, ...)        fsm_gc_transition_t NAME[] = { __VA_ARGS__ };
 
@@ -63,7 +112,8 @@ typedef struct _fsm_gc_t {
                                                   /* ._table = */        NULL, \
                                                   /* ._table_size = */   0, \
 	                                              /* _e_fsm_tt = */      false, \
-	                                              /* _fsm_not_i = */     false \
+	                                              /* _fsm_not_i = */     false, \
+												  /* _name = */          __STR_DEF2__(FSM_NAME) \
                                               };
 #else
 #   define FSM_GC_CREATE(FSM_NAME)            fsm_gc_t FSM_NAME = { \
@@ -82,6 +132,11 @@ void fsm_gc_proccess(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
 void fsm_gc_clear(fsm_gc_t* fsm);
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state);
+
+#ifdef DEBUG
+unsigned _fsm_gc_get_state_debug_number(const char* name);
+unsigned _fsm_gc_get_event_debug_number(const char* name);
+#endif
 
 
 

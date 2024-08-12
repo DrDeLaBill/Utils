@@ -47,13 +47,10 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     endif()
 
     option(UTILS_BEDUG "Enable extended warnings output" OFF)
-    option(UTILS_TEST "Enable Utils tests." ON)
 
-    if (UTILS_TEST)
-        message(STATUS "Enable Utils testing")
-        enable_testing()
-        add_subdirectory(test)
-    endif()
+    message(STATUS "Enable Utils testing")
+    enable_testing()
+    add_subdirectory(test)
 else()
 
     message(STATUS "Utils added as a library")
