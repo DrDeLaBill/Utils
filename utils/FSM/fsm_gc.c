@@ -150,7 +150,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 		FSM_GC_TAG, \
 		"\"%s\" push event: %s",
 		fsm->_name,
-		fsm->_events[fsm->_events_count++]._name
+		event->_name
 	);
 #endif
 }

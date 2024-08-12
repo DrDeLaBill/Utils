@@ -62,7 +62,7 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
 #else
 void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) 
 {
-    (void*)buf;
+    (void)buf;
     (void)start_counter;
     (void)len;
 }
