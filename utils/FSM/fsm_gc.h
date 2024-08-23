@@ -78,45 +78,45 @@ extern size_t _fsm_gc_events_iterator;
 
 
 #ifdef DEBUG
-#   define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { \
-                                                     FUNC, \
-													 __STR_DEF2__(NAME) \
-                                                 };
+#   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
+                                                   FUNC, \
+                                                   __STR_DEF2__(NAME) \
+                                               };
 #else
-#   define FSM_GC_CREATE_STATE(NAME, FUNC)       fsm_gc_state_t NAME = { \
-                                                     FUNC \
-                                                 };
+#   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
+                                                   FUNC \
+                                               };
 #endif
 
 #ifdef DEBUG
-#   define FSM_GC_CREATE_EVENT(NAME, PRIO)       fsm_gc_event_t NAME = { \
-                                                     0, \
-													 PRIO, \
-													 __STR_DEF2__(NAME) \
-	                                             };
+#   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
+                                                   0, \
+                                                   PRIO, \
+                                                   __STR_DEF2__(NAME) \
+                                               };
 #else
-#   define FSM_GC_CREATE_EVENT(NAME, PRIO)       fsm_gc_event_t NAME = { \
-                                                     0, \
-		                                             PRIO, \
-                                                 };
+#   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
+                                                   0, \
+                                                   PRIO, \
+                                               };
 #endif
                                               
-#define FSM_GC_CREATE_TABLE(NAME, ...)        fsm_gc_transition_t NAME[] = { __VA_ARGS__ };
+#define FSM_GC_CREATE_TABLE(NAME, ...)        static fsm_gc_transition_t NAME[] = { __VA_ARGS__ };
 
 #ifdef DEBUG
-#   define FSM_GC_CREATE(FSM_NAME)            fsm_gc_t FSM_NAME = { \
+#   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */  false, \
                                                   /* ._state = */        NULL, \
                                                   /* ._events_count = */ 0, \
                                                   /* ._events = */       {0}, \
                                                   /* ._table = */        NULL, \
                                                   /* ._table_size = */   0, \
-	                                              /* _e_fsm_tt = */      false, \
-	                                              /* _fsm_not_i = */     false, \
-												  /* _name = */          __STR_DEF2__(FSM_NAME) \
+                                                  /* _e_fsm_tt = */      false, \
+                                                  /* _fsm_not_i = */     false, \
+                                                  /* _name = */          __STR_DEF2__(FSM_NAME) \
                                               };
 #else
-#   define FSM_GC_CREATE(FSM_NAME)            fsm_gc_t FSM_NAME = { \
+#   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */  false, \
                                                   /* ._state = */        NULL, \
                                                   /* ._events_count = */ 0, \
