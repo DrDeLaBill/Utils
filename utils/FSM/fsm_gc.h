@@ -108,19 +108,19 @@ extern size_t _fsm_gc_events_iterator;
                                                   /* ._initialized = */  false, \
                                                   /* ._state = */        NULL, \
                                                   /* ._events_count = */ 0, \
-                                                  /* ._events = */       {0}, \
+                                                  /* ._events = */       {{0,0,""},}, \
                                                   /* ._table = */        NULL, \
                                                   /* ._table_size = */   0, \
                                                   /* _e_fsm_tt = */      false, \
                                                   /* _fsm_not_i = */     false, \
-                                                  /* _name = */          __STR_DEF2__(FSM_NAME) \
+                                                  /* _name = */          __STR_DEF1__(FSM_NAME) \
                                               };
 #else
 #   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */  false, \
                                                   /* ._state = */        NULL, \
                                                   /* ._events_count = */ 0, \
-                                                  /* ._events = */       {0}, \
+                                                  /* ._events = */       {{0,0},}, \
                                                   /* ._table = */        NULL, \
                                                   /* ._table_size = */   0 \
                                               };
