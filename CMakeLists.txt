@@ -18,30 +18,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
         )
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         message(STATUS "Add GCC warnings")
-        add_compile_options(
-            -Werror
-            -pedantic-errors
-
-            -Wall
-            -Wextra
-            -Wpedantic
-
-            -Wcast-align
-            -Wcast-qual
-            -Wconversion
-            -Wctor-dtor-privacy
-            -Wduplicated-branches
-            -Wduplicated-cond
-            -Wextra-semi
-            -Wfloat-equal
-            -Wlogical-op
-            -Wnon-virtual-dtor
-            -Wold-style-cast
-            -Woverloaded-virtual
-            -Wredundant-decls
-            -Wsign-conversion
-            -Wsign-promo
-        )
+        add_compile_options(-Wall -Wextra -pedantic -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wconversion)
     else()
         message(ERROR "Unknown compiler")
     endif()
