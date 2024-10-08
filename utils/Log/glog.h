@@ -15,7 +15,7 @@ extern "C" {
 #include "gtime.h"
 
 
-#if defined(_DEBUG) || defined(DEBUG)
+#if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
 
 #	ifndef printMessage
 #       if defined(__MINGW32__) || defined(_MSC_VER)

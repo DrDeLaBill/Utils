@@ -17,12 +17,14 @@ static const char CORE_TAG[] = "CORE";
 
 void SystemInfo(void)
 {
+#ifdef DEBUG
 	printTagLog(CORE_TAG, "Core=%lu, %lu MHz", SystemCoreClock, SystemCoreClock / 1000000);
 	COREInfo();
 	IDCODEInfo();
 	FPUInfo();
 	printPretty("APB1=%lu\n", HAL_RCC_GetPCLK1Freq());
 	printPretty("APB2=%lu\n", HAL_RCC_GetPCLK2Freq());
+#endif
 }
 
 bool MCUcheck(void)
