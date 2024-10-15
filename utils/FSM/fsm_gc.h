@@ -80,7 +80,7 @@ extern size_t _fsm_gc_events_iterator;
 #ifdef DEBUG
 #   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
                                                    FUNC, \
-                                                   __STR_DEF2__(NAME) \
+                                                   __STR_DEF__(NAME) \
                                                };
 #else
 #   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
@@ -92,7 +92,7 @@ extern size_t _fsm_gc_events_iterator;
 #   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
                                                    0, \
                                                    PRIO, \
-                                                   __STR_DEF2__(NAME) \
+                                                   __STR_DEF__(NAME) \
                                                };
 #else
 #   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
@@ -113,7 +113,7 @@ extern size_t _fsm_gc_events_iterator;
                                                   /* ._table_size = */   0, \
                                                   /* _e_fsm_tt = */      false, \
                                                   /* _fsm_not_i = */     false, \
-                                                  /* _name = */          __STR_DEF1__(FSM_NAME) \
+                                                  /* _name = */          __STR_DEF__(FSM_NAME) \
                                               };
 #else
 #   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \

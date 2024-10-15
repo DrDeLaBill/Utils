@@ -47,15 +47,15 @@ extern "C" {
 #endif
 
 #ifndef __get_bit
-#	define __get_bit(REG, NUM) (((REG) >> (NUM)) & (uint64_t)1)
+#	define __get_bit(REG, NUM) (((REG) >> (NUM)) & 0x1UL)
 #endif
 
 #ifndef __set_bit
-#	define __set_bit(REG, NUM) ((REG) |= ((uint64_t)1 << (NUM)))
+#	define __set_bit(REG, NUM) ((REG) |= (0x1UL << (NUM)))
 #endif
 
 #ifndef __reset_bit
-#	define __reset_bit(REG, NUM) ((REG) &= ~((uint64_t)1 << (NUM)))
+#	define __reset_bit(REG, NUM) ((REG) &= ~(0x1UL << (NUM)))
 #endif
 
 #ifndef __concat
