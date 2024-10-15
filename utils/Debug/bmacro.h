@@ -16,16 +16,12 @@ extern "C" {
 #   define BEDUG_ASSERT(condition, message) if (!(condition)) { b_assert(__FILE__, __LINE__, message); }
 #endif
 
-#ifndef __STR_DEF2__
-#   define __STR_DEF2__(x) #x
-#endif
-
-#ifndef __STR_DEF1__
-#   define __STR_DEF1__(x) __STR_DEF2__(x)
+#ifndef __STR_DEF__
+#   define __STR_DEF__(x) #x
 #endif
 
 #ifndef __LOC__
-#   define __LOC__ __FILE__ "(" __STR_DEF1__(__LINE__) ")"
+#   define __LOC__ __FILE__ "(" __STR_DEF__(__LINE__) ")"
 #endif
 
 #ifndef _WARNING
