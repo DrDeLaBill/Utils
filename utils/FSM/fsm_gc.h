@@ -9,6 +9,13 @@ extern "C" {
 #endif
 
 
+#ifndef FSM_GC_NO_DEBUG
+#   ifdef DEBUG
+#       define FSM_GC_BEDUG
+#   endif
+#endif
+
+
 #include <stdint.h>
 #include <stdbool.h>
 
@@ -18,7 +25,7 @@ extern "C" {
 #define _FSM_GC_EVENTS_COUNT (10)
 
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 
 #   ifndef FSM_GC_EVENT_NAME_SIZE
 #      define FSM_GC_EVENT_NAME_SIZE  (32)
@@ -40,14 +47,14 @@ extern "C" {
 typedef struct _fsm_gc_event_t {
     size_t index;
     size_t priority;
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     char   _name[FSM_GC_EVENT_NAME_SIZE];
 #endif
 } fsm_gc_event_t;
 
 typedef struct _fsm_gc_state_t {
     void (*state) (void);
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     char   _name[FSM_GC_STATE_NAME_SIZE];
 #endif
 } fsm_gc_state_t;
@@ -66,7 +73,7 @@ typedef struct _fsm_gc_t {
     fsm_gc_event_t       _events[_FSM_GC_EVENTS_COUNT];
     fsm_gc_transition_t* _table;
     size_t               _table_size;
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     bool                 _e_fsm_tt;
     bool                 _fsm_not_i;
     char                 _name[FSM_GC_NAME_SIZE];
@@ -77,7 +84,7 @@ typedef struct _fsm_gc_t {
 extern size_t _fsm_gc_events_iterator;
 
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
                                                    FUNC, \
                                                    __STR_DEF__(NAME) \
@@ -88,7 +95,7 @@ extern size_t _fsm_gc_events_iterator;
                                                };
 #endif
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
                                                    0, \
                                                    PRIO, \
@@ -103,7 +110,7 @@ extern size_t _fsm_gc_events_iterator;
                                               
 #define FSM_GC_CREATE_TABLE(NAME, ...)        static fsm_gc_transition_t NAME[] = { __VA_ARGS__ };
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */  false, \
                                                   /* ._state = */        NULL, \
@@ -133,7 +140,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
 void fsm_gc_clear(fsm_gc_t* fsm);
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state);
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 unsigned _fsm_gc_get_state_debug_number(const char* name);
 unsigned _fsm_gc_get_event_debug_number(const char* name);
 #endif
