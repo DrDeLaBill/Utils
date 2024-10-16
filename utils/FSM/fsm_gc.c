@@ -9,7 +9,7 @@
 
 
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 
 const char FSM_GC_TAG[] = "FSMc";
 
@@ -21,13 +21,13 @@ size_t _fsm_gc_events_iterator = 1;
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 {
     if (!fsm) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
 #endif
         return;
     }
     if (!size || !table) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(!fsm->_e_fsm_tt, "Empty FSM transition table");
         fsm->_e_fsm_tt = true;
 #endif
@@ -41,7 +41,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 		fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
 	}
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
 #endif
 }
@@ -49,13 +49,13 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 void fsm_gc_proccess(fsm_gc_t* fsm) 
 {
     if (!fsm) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
 #endif
         return;
     }
     if (!fsm->_initialized) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state and event must not be NULL");
         fsm->_fsm_not_i = true;
@@ -91,7 +91,7 @@ void fsm_gc_proccess(fsm_gc_t* fsm)
         	return;
         }
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 		printTagLog(
 			FSM_GC_TAG, \
 			"\"%s\" transition: %s{%s} -> %s",
@@ -118,19 +118,19 @@ void fsm_gc_proccess(fsm_gc_t* fsm)
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 {
     if (!fsm) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
 #endif
         return;
     }
     if (!event) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM event pointer");
 #endif
         return;
     }
     if (!fsm->_initialized) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
@@ -145,7 +145,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     fsm->_events[fsm->_events_count++] = *event;
 
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 	printTagLog(
 		FSM_GC_TAG, \
 		"\"%s\" push event: %s",
@@ -158,13 +158,13 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 void fsm_gc_clear(fsm_gc_t* fsm)
 {
     if (!fsm) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
 #endif
         return;
     }
     if (!fsm->_initialized) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
@@ -173,7 +173,7 @@ void fsm_gc_clear(fsm_gc_t* fsm)
 	memset(fsm->_events, 0, sizeof(fsm->_events));
 	fsm->_events_count = 0;
 
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
 	printTagLog(
 		FSM_GC_TAG, \
 		"\"%s\" clear",
@@ -185,19 +185,19 @@ void fsm_gc_clear(fsm_gc_t* fsm)
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 {
     if (!fsm) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM pointer");
 #endif
         return false;
     }
     if (!state) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(false, "Empty FSM state pointer");
 #endif
         return false;
     }
     if (!fsm->_initialized) {
-#ifdef DEBUG
+#ifdef FSM_GC_BEDUG
     	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
