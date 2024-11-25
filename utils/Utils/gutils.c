@@ -12,16 +12,16 @@
 #endif
 
 
-void util_old_timer_start(util_old_timer_t* timer, TIME_MS_T delay) {
+void gtimer_start(gtimer_t* timer, TIME_MS_T delay) {
     timer->start = getMillis();
     timer->delay = delay;
 }
 
-bool util_old_timer_wait(util_old_timer_t* tm) {
+bool gtimer_wait(gtimer_t* tm) {
     return ((TIME_MS_T)((TIME_MS_T)getMillis() - (TIME_MS_T)tm->start)) < ((TIME_MS_T)tm->delay);
 }
 
-void util_old_timer_reset(util_old_timer_t* tm)
+void gtimer_reset(gtimer_t* tm)
 {
 	tm->delay = 0;
 	tm->start = 0;

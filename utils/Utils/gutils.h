@@ -78,15 +78,15 @@ extern "C" {
 #endif
 
 
-typedef struct _util_timer_t {
+typedef struct _gtimer_t {
     TIME_MS_T start;
     TIME_MS_T delay;
-} util_old_timer_t;
+} gtimer_t;
 
 
-void util_old_timer_start(util_old_timer_t* tm, TIME_MS_T waitMs);
-bool util_old_timer_wait(util_old_timer_t* tm);
-void util_old_timer_reset(util_old_timer_t* tm);
+void gtimer_start(gtimer_t* tm, TIME_MS_T waitMs);
+bool gtimer_wait(gtimer_t* tm);
+void gtimer_reset(gtimer_t* tm);
 
 
 #ifdef USE_HAL_DRIVER
