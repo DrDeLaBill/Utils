@@ -28,6 +28,15 @@ namespace utl
     {
         return this->start_time + this->delay > getMillis();
     }
+    
+    TIME_MS_T Timer::deadline()
+    {
+        TIME_MS_T end = end();
+        if (getMillis() > end) {
+            return 0;
+        }
+        return end - getMillis();
+    }
 
     TIME_MS_T Timer::end()
     {

@@ -135,7 +135,7 @@ int main()
 	fsm_gc_init(&gc_fsm, gc_fsm_table, __arr_len(gc_fsm_table));
     
     for (unsigned i = 0; i < 10; i++) {
-        fsm_gc_proccess(&gc_fsm);
+        fsm_gc_process(&gc_fsm);
     }
     
     
@@ -148,7 +148,7 @@ int main()
 
 
     for (unsigned i = 0; i < 6; i++) {
-        fsm_gc_proccess(&gc_fsm);
+        fsm_gc_process(&gc_fsm);
     }
 
 
@@ -163,7 +163,7 @@ int main()
 
 
     for (unsigned i = 0; i < 6; i++) {
-        fsm_gc_proccess(&gc_fsm);
+        fsm_gc_process(&gc_fsm);
     }
 
     return 0;

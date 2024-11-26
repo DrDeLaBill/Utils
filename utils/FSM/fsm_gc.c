@@ -46,7 +46,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 #endif
 }
 
-void fsm_gc_proccess(fsm_gc_t* fsm) 
+void fsm_gc_process(fsm_gc_t* fsm) 
 {
     if (!fsm) {
 #ifdef FSM_GC_BEDUG
@@ -54,64 +54,62 @@ void fsm_gc_proccess(fsm_gc_t* fsm)
 #endif
         return;
     }
-    if (!fsm->_initialized) {
+    if (!fsm->_initialized || !fsm->_state || !fsm->_table) {
 #ifdef FSM_GC_BEDUG
-    	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state and event must not be NULL");
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state, table and event must not be NULL");
         fsm->_fsm_not_i = true;
 #endif
-    	return;
+        return;
     }
 
-    bool is_transition = false;
-	uint32_t table_idx = 0;
-	size_t event_idx   = 0;
-	size_t event_prio  = 0;
-    if (fsm->_initialized && fsm->_state && fsm->_table) {
-        fsm->_state->state();
-        for (unsigned i = 0; i < fsm->_events_count; i++) {
-            fsm_gc_event_t event = fsm->_events[i];
-            for (unsigned j = 0; j < fsm->_table_size; j++) {
-                fsm_gc_transition_t tr = fsm->_table[j]; \
-                if (!(fsm->_state->state == tr.source->state && event.index == tr.event->index)) {
-                	continue;
-                }
-				if (!is_transition ||
-					event_prio < event.priority
-				) {
-					event_idx  = i;
-					table_idx  = j;
-					event_prio = event.priority;
-				}
-				is_transition = true;
-            }
-        } 
+    fsm->_state->state();
 
-        if (!is_transition) {
-        	return;
+    bool is_transition = false;
+    uint32_t table_idx = 0;
+    size_t event_idx = 0;
+    size_t event_prio = 0;
+
+    for (unsigned i = 0; i < fsm->_events_count; i++) {
+        fsm_gc_event_t event = fsm->_events[i];
+        for (unsigned j = 0; j < fsm->_table_size; j++) {
+            fsm_gc_transition_t tr = fsm->_table[j];
+            if (fsm->_state->state == tr.source->state && event.index == tr.event->index) {
+                if (!is_transition || event_prio < event.priority) {
+                    event_idx = i;
+                    table_idx = j;
+                    event_prio = event.priority;
+                }
+                is_transition = true;
+            }
         }
+    }
+
+    if (!is_transition) {
+        return;
+    }
 
 #ifdef FSM_GC_BEDUG
-		printTagLog(
-			FSM_GC_TAG, \
-			"\"%s\" transition: %s{%s} -> %s",
-			fsm->_name,
-			fsm->_table[table_idx].source->_name,
-			fsm->_table[table_idx].event->_name,
-			fsm->_table[table_idx].target->_name
-		);
+    printTagLog(
+        FSM_GC_TAG,
+        "\"%s\" transition: %s{%s} -> %s",
+        fsm->_name,
+        fsm->_table[table_idx].source->_name,
+        fsm->_table[table_idx].event->_name,
+        fsm->_table[table_idx].target->_name
+    );
 #endif
 
-		fsm->_state = fsm->_table[table_idx].target;
-		fsm->_events_count--;
+    fsm->_state = fsm->_table[table_idx].target;
+    fsm->_events_count--;
 		memset((void*)&fsm->_events[event_idx], 0, sizeof(fsm->_events[event_idx]));
 
-		for (unsigned i = event_idx; i < fsm->_events_count; i++) {
-			fsm->_events[i] = fsm->_events[i + 1];
-		}
-		if (fsm->_table[table_idx].action) {
-			fsm->_table[table_idx].action();
-		}
+    for (unsigned i = event_idx; i < fsm->_events_count; i++) {
+        fsm->_events[i] = fsm->_events[i + 1];
+    }
+
+    if (fsm->_table[table_idx].action) {
+        fsm->_table[table_idx].action();
     }
 }
 
