@@ -31,11 +31,11 @@ namespace utl
     
     TIME_MS_T Timer::deadline()
     {
-        TIME_MS_T end = end();
-        if (getMillis() > end) {
+        TIME_MS_T end_ms = end();
+        if (getMillis() > end_ms) {
             return 0;
         }
-        return end - getMillis();
+        return end_ms - getMillis();
     }
 
     TIME_MS_T Timer::end()
