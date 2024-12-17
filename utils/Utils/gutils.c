@@ -91,6 +91,9 @@ uint8_t util_get_number_len(int number)
 
 uint32_t util_small_pow(const uint32_t number, uint32_t degree)
 {
+	if (!degree) {
+		return 1;
+	}
 	uint32_t res = number;
 	while (--degree) {
 		res *= number;
