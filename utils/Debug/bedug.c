@@ -8,7 +8,7 @@
 #if defined(_DEBUG) || defined(DEBUG)
 void b_assert(const char* file, int line, const char* message)
 {
-    gprint("%s (%d) : THERE IS NO REASON TO PANIC : %s\n", file, line, message);
+    gprint("%s (%d) : (pu-pu-pu...) %s\n", file, line, message);
 }
 #else
 void b_assert(const char* file, int line, const char* message)
