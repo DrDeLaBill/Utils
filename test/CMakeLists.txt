@@ -1,8 +1,17 @@
-cmake_minimum_required(VERSION 3.5.0)
+cmake_minimum_required(VERSION 3.26)
 
-project(utilstest VERSION 0.0.1)
+project(utilstest VERSION 0.1.0)
 
 message(STATUS "Adding Utils tests")
+
+include(FetchContent)
+FetchContent_Declare(
+    googletest
+    URL https://github.com/google/googletest/archive/f8d7d77c06936315286eb55f8de22cd23c188571.zip
+)
+# For Windows: Prevent overriding the parent project's compiler/linker settings
+set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
+FetchContent_MakeAvailable(googletest)
 
 # Add project files
 file(GLOB ${PROJECT_NAME}_HEADERS "./*.h")
@@ -18,18 +27,15 @@ set(CMAKE_SYSTEM_NAME Windows)
 # Create project
 add_executable(${PROJECT_NAME} ${ALL_SRCS})
 
-
-target_include_directories(
-    ${PROJECT_NAME}
-    PUBLIC
-    "."
-)
-
-# Link library
 target_link_libraries(
-    ${PROJECT_NAME}
+    utilstest
+    GTest::gtest_main
+    gmock_main
     utilslib
 )
+
+include(GoogleTest)
+gtest_discover_tests(utilstest)
 
 # Set project properties
 set_target_properties(
