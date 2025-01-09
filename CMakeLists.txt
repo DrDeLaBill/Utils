@@ -14,7 +14,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     if(MSVC)
         message(STATUS "Add MSVC warnings")
         add_compile_options(
-            /WX /Wall /W4 /we5240 /we4649 /we4330 /we4926
+            /Wall /W4 /we5240 /we4649 /we4330 /we4926
         )
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         message(STATUS "Add GCC warnings")
