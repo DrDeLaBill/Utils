@@ -7,7 +7,7 @@
 #include "bmacro.h"
 
 
-static unsigned _ptr_index_fom_read(const circle_buf_gc_t* p, const unsigned index);
+static unsigned _ptr_index_from_read(const circle_buf_gc_t* p, unsigned index);
 
 
 void circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length)
