@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 3.26)
 
-project(Utils VERSION 0.0.1)
+project(utilslib VERSION 0.0.1)
 
 message(STATUS "Utils C compiler: ${CMAKE_C_COMPILER}")
 message(STATUS "Utils C++ compiler: ${CMAKE_CXX_COMPILER}")
@@ -31,5 +31,6 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
 else()
 
     message(STATUS "Utils added as a library")
+    target_link_libraries(${CMAKE_PROJECT_NAME} utilslib)
 
 endif()

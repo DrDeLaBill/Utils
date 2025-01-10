@@ -1,6 +1,4 @@
-cmake_minimum_required(VERSION 3.5.0)
-
-project(utilslib VERSION 1.0.0)
+cmake_minimum_required(VERSION 3.26)
 
 
 option(DEBUG "Enable DEBUG output" OFF)

@@ -3,6 +3,7 @@
 #include "gversion.h"
 
 #include <stdio.h>
+#include <string.h>
 
 
 int gversion_compare(const gversion_t* v1, const gversion_t* v2)
