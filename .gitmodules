@@ -1,0 +1,3 @@
+[submodule "stm_cmake"]
+	path = stm_cmake
+	url = https://github.com/DrDeLaBill/stm_cmake.git

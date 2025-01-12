@@ -2,14 +2,57 @@ cmake_minimum_required(VERSION 3.26)
 
 project(utilslib VERSION 0.0.1)
 
+
 message(STATUS "Utils C compiler: ${CMAKE_C_COMPILER}")
 message(STATUS "Utils C++ compiler: ${CMAKE_CXX_COMPILER}")
 
-add_subdirectory(utils)
+
+option(DEBUG "Enable DEBUG output" OFF)
+
+
+file(GLOB_RECURSE _files "${CMAKE_SOURCE_DIR}/*search.cmake")
+list(LENGTH _files _file_exists)
+if (${_file_exists} EQUAL 0)
+    message(FATAL_ERROR "Unable to find macros search.cmake")
+endif()
+list(GET _files 0 _file)
+include(${_file})
+unset(_file)
+unset(_files)
+unset(_file_exists)
+
+
+# Указываем исходные файлы проекта
+FILE_PATHS_EXT(c_paths   "${CMAKE_CURRENT_SOURCE_DIR}/utils" "c")
+FILE_PATHS_EXT(cpp_paths "${CMAKE_CURRENT_SOURCE_DIR}/utils" "cpp")
+FILE_PATHS_EXT(s_paths   "${CMAKE_CURRENT_SOURCE_DIR}/utils" "s")
+set(${PROJECT_NAME}_SOURCES "${c_paths};${cpp_paths};${s_paths}")
+add_library(
+    ${PROJECT_NAME} 
+    STATIC 
+    ${${PROJECT_NAME}_SOURCES}
+)
+
+# Указываем директории с заголовочными файлами
+FILE_DIRECTORIES_EXT(h_dirs   "${CMAKE_CURRENT_SOURCE_DIR}/utils" "h")
+FILE_DIRECTORIES_EXT(hpp_dirs "${CMAKE_CURRENT_SOURCE_DIR}/utils" "hpp")
+set(${PROJECT_NAME}_INCLUDES "${h_dirs};${hpp_dirs}")
+target_include_directories(
+    ${PROJECT_NAME}
+    PUBLIC
+    ${${PROJECT_NAME}_INCLUDES}
+)
+
 
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     
     message(STATUS "Utils generated as current project")    
+
+    if (DEBUG)
+        message(STATUS "Build gsystem with DEBUG")
+        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+    endif()
 
     if(MSVC)
         message(STATUS "Add MSVC warnings")
@@ -28,9 +71,28 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     message(STATUS "Enable Utils testing")
     enable_testing()
     add_subdirectory(test)
+
 else()
 
     message(STATUS "Utils added as a library")
-    target_link_libraries(${CMAKE_PROJECT_NAME} utilslib)
+
+    message(STATUS "${PROJECT_NAME} includes:")
+    foreach(dir ${${PROJECT_NAME}_INCLUDES})
+        message(STATUS "${dir}")
+    endforeach()
+    message(STATUS "${PROJECT_NAME} sources:")
+    foreach(src ${${PROJECT_NAME}_SOURCES})
+        message(STATUS "${src}")
+    endforeach()
+    
+    target_include_directories(
+        ${PROJECT_NAME}
+        PUBLIC
+        ${${PROJECT_NAME}_INCLUDES}
+    )
+    target_link_libraries(
+        ${CMAKE_PROJECT_NAME}
+        ${PROJECT_NAME}
+    )
 
 endif()
