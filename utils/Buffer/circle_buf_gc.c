@@ -6,6 +6,8 @@
 
 #include "bmacro.h"
 
+#define BEDACODE (0xBEDAC2DE)
+
 
 static unsigned _ptr_index_from_read(const circle_buf_gc_t* p, unsigned index);
 
@@ -19,14 +21,15 @@ void circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, un
     if (!ptr) {
         return;
     }
-    p->m_data = ptr;
+    p->m_bedacode  = BEDACODE;
+    p->m_data      = ptr;
     p->m_unit_size = unit_size;
-    p->m_length = length;
+    p->m_length    = length;
 }
 
 unsigned circle_buf_gc_count(const circle_buf_gc_t* p) 
 {
-    if (!p) {
+    if (!p || p->m_bedacode != BEDACODE) {
         return 0;
     }
     return p->m_write_cnt;
@@ -34,7 +37,7 @@ unsigned circle_buf_gc_count(const circle_buf_gc_t* p)
 
 void circle_buf_gc_free(circle_buf_gc_t* p)
 {
-    if (!p) {
+    if (!p || p->m_bedacode != BEDACODE) {
         return;
     }
     p->m_read_idx = 0;
@@ -43,17 +46,17 @@ void circle_buf_gc_free(circle_buf_gc_t* p)
 
 bool circle_buf_gc_empty(const circle_buf_gc_t* p) 
 {
-    return p ? (circle_buf_gc_count(p) == 0) : true;
+    return (p && p->m_bedacode == BEDACODE) ? (circle_buf_gc_count(p) == 0) : true;
 }
 
 bool circle_buf_gc_full(const circle_buf_gc_t* p) 
 {
-    return p ? (circle_buf_gc_count(p) == p->m_length) : false;
+    return (p && p->m_bedacode == BEDACODE) ? (circle_buf_gc_count(p) == p->m_length) : false;
 }
 
 void circle_buf_gc_push_back(circle_buf_gc_t* p, const uint8_t* data) 
 {
-    if (!p || !data) {
+    if (!p || !data || p->m_bedacode != BEDACODE) {
         return;
     }
     if (circle_buf_gc_full(p)) {
@@ -64,7 +67,7 @@ void circle_buf_gc_push_back(circle_buf_gc_t* p, const uint8_t* data)
 
 void circle_buf_gc_push_front(circle_buf_gc_t* p, const uint8_t* data) 
 {
-    if (!p || !data) {
+    if (!p || !data || p->m_bedacode != BEDACODE) {
         return;
     }
     if (circle_buf_gc_full(p)) {

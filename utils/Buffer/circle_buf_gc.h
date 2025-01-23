@@ -14,6 +14,7 @@ extern "C" {
 
 
 typedef struct _circle_buf_gc_t {
+	uint32_t m_bedacode;
     uint8_t* m_data;
     unsigned m_unit_size;
     unsigned m_length;
