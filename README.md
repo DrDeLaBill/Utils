@@ -1,8 +1,14 @@
-# Utils
+# Utils Library
 
 Utils pack for STM32xxxx
 
-# References
+## Compile tests
+
+```
+docker build --no-cache --progress=plain .
+```
+
+## References
 
 ## FSM
 

@@ -1,2 +1,58 @@
-.vscode/*
-build/*
+# Prerequisites
+*.d
+
+# Compiled Object files
+*.slo
+*.lo
+*.o
+*.obj
+
+# Precompiled Headers
+*.gch
+*.pch
+
+# Compiled Dynamic libraries
+*.so
+*.dylib
+*.dll
+
+# Fortran module files
+*.mod
+*.smod
+
+# Compiled Static libraries
+*.lai
+*.la
+*.a
+*.lib
+
+# Executables
+*.exe
+*.out
+*.app
+
+# STM32CubeIDE
+Debug/*
+Release/*
+*language.settings.xml
+*Backup*
+build*
+.vscode*
+*.o
+*.su
+*.obj
+*.mk
+*.map
+*.bin
+*.hex
+*.elf
+*.list
+*.cyclo
+*.launch
+backup_*.ioc
+makefile
+
+# For current project
+search.cmake
+*.jl
+.qodo/*

@@ -38,7 +38,13 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     fsm->_table_size  = size;
     fsm->_state       = fsm->_table[0].source;
     for (unsigned i = 0; i < fsm->_table_size; i++) {
-		fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
+        if (fsm->_table[i].event) {
+            fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
+        } else {
+#ifdef FSM_GC_BEDUG
+            printTagLog(FSM_GC_TAG, "\"%s\" empty event", fsm->_name);
+#endif
+        }
 	}
 
 #ifdef FSM_GC_BEDUG
@@ -74,7 +80,12 @@ void fsm_gc_process(fsm_gc_t* fsm)
         fsm_gc_event_t event = fsm->_events[i];
         for (unsigned j = 0; j < fsm->_table_size; j++) {
             fsm_gc_transition_t tr = fsm->_table[j];
-            if (fsm->_state->state == tr.source->state && event.index == tr.event->index) {
+            if (!tr.source || !tr.event || !tr.target) {
+                continue;
+            }
+            if (fsm->_state->state == tr.source->state && 
+                event.index == tr.event->index
+            ) {
                 if (!is_transition || event_prio < event.priority) {
                     event_idx = i;
                     table_idx = j;
@@ -92,10 +103,11 @@ void fsm_gc_process(fsm_gc_t* fsm)
 #ifdef FSM_GC_BEDUG
     printTagLog(
         FSM_GC_TAG,
-        "\"%s\" transition: %s{%s} -> %s",
+        "\"%s\" transition: %s{%s} -> %s -> %s",
         fsm->_name,
         fsm->_table[table_idx].source->_name,
         fsm->_table[table_idx].event->_name,
+        fsm->_table[table_idx].action->_name ? fsm->_table[table_idx].action->_name : "NULL",
         fsm->_table[table_idx].target->_name
     );
 #endif
@@ -109,7 +121,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
     }
 
     if (fsm->_table[table_idx].action) {
-        fsm->_table[table_idx].action();
+        fsm->_table[table_idx].action->action();
     }
 }
 
@@ -200,6 +212,13 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
         fsm->_fsm_not_i = true;
 #endif
     	return false;
+    }
+    if (!fsm->_state) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM bad state");
+        fsm->_fsm_not_i = true;
+#endif
+        return false;
     }
 	return fsm->_state->state == state->state;
 }

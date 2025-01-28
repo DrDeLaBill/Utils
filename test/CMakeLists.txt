@@ -14,9 +14,9 @@ set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
 FetchContent_MakeAvailable(googletest)
 
 # Add project files
-file(GLOB ${PROJECT_NAME}_HEADERS "./*.h")
+file(GLOB ${PROJECT_NAME}_HEADERS     "./*.h")
 file(GLOB ${PROJECT_NAME}_CPP_SOURCES "./*.cpp")
-file(GLOB ${PROJECT_NAME}_C_SOURCES "./*.c")
+file(GLOB ${PROJECT_NAME}_C_SOURCES   "./*.c")
 set(ALL_SRCS "${${PROJECT_NAME}_CPP_SOURCES};${${PROJECT_NAME}_C_SOURCES};${${PROJECT_NAME}_HEADERS}")
 
 set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DUTILS_TEST -DDEBUG")

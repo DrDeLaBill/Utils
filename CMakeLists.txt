@@ -10,16 +10,7 @@ message(STATUS "Utils C++ compiler: ${CMAKE_CXX_COMPILER}")
 option(DEBUG "Enable DEBUG output" OFF)
 
 
-file(GLOB_RECURSE _files "${CMAKE_SOURCE_DIR}/*search.cmake")
-list(LENGTH _files _file_exists)
-if (${_file_exists} EQUAL 0)
-    message(FATAL_ERROR "Unable to find macros search.cmake")
-endif()
-list(GET _files 0 _file)
-include(${_file})
-unset(_file)
-unset(_files)
-unset(_file_exists)
+include("search.cmake")
 
 
 # Указываем исходные файлы проекта
@@ -61,7 +52,7 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
         )
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         message(STATUS "Add GCC warnings")
-        add_compile_options(-Wall -Wextra -pedantic -Wmissing-include-dirs -Wswitch-default -Wswitch-enum -Wconversion)
+        add_compile_options(-Wall -Wextra -pedantic -Wmissing-include-dirs)
     else()
         message(ERROR "Unknown compiler")
     endif()

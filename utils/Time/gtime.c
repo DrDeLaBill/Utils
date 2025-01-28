@@ -12,6 +12,7 @@
 #elif defined(ARDUINO)
 #   include <Arduino.h>
 #elif defined(__GNUC__)
+#   include <stddef.h>
 #   include <sys/time.h>
 #elif defined(_MSC_VER)
 #   include <time.h>

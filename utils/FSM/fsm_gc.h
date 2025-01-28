@@ -55,15 +55,22 @@ typedef struct _fsm_gc_event_t {
 typedef struct _fsm_gc_state_t {
     void (*state) (void);
 #ifdef FSM_GC_BEDUG
-    char   _name[FSM_GC_STATE_NAME_SIZE];
+    char _name[FSM_GC_STATE_NAME_SIZE];
 #endif
 } fsm_gc_state_t;
 
-typedef struct _fsm_gc_transition_t {
-    fsm_gc_state_t* source;
-    fsm_gc_event_t* event;
-    fsm_gc_state_t* target;
+typedef struct _fsm_gc_action_t {
     void (*action) (void);
+#ifdef FSM_GC_BEDUG
+    char _name[FSM_GC_STATE_NAME_SIZE];
+#endif
+} fsm_gc_action_t;
+
+typedef struct _fsm_gc_transition_t {
+    fsm_gc_state_t*  source;
+    fsm_gc_event_t*  event;
+    fsm_gc_state_t*  target;
+    fsm_gc_action_t* action;
 } fsm_gc_transition_t;
 
 typedef struct _fsm_gc_t {
@@ -85,27 +92,42 @@ extern size_t _fsm_gc_events_iterator;
 
 
 #ifdef FSM_GC_BEDUG
-#   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
-                                                   FUNC, \
-                                                   __STR_DEF__(NAME) \
-                                               };
+#   define FSM_GC_CREATE_STATE(NAME, FUNC)      static void FUNC(void); \
+                                                static fsm_gc_state_t NAME = { \
+                                                    FUNC, \
+                                                    __STR_DEF__(NAME) \
+                                                };
 #else
-#   define FSM_GC_CREATE_STATE(NAME, FUNC)     static fsm_gc_state_t NAME = { \
-                                                   FUNC \
-                                               };
+#   define FSM_GC_CREATE_STATE(NAME, FUNC)      static void FUNC(void); \
+                                                static fsm_gc_state_t NAME = { \
+                                                    FUNC \
+                                                };
 #endif
 
 #ifdef FSM_GC_BEDUG
-#   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
-                                                   0, \
-                                                   PRIO, \
-                                                   __STR_DEF__(NAME) \
-                                               };
+#   define FSM_GC_CREATE_EVENT(NAME, PRIO)      static fsm_gc_event_t NAME = { \
+                                                    0, \
+                                                    PRIO, \
+                                                    __STR_DEF__(NAME) \
+                                                };
 #else
-#   define FSM_GC_CREATE_EVENT(NAME, PRIO)     static fsm_gc_event_t NAME = { \
-                                                   0, \
-                                                   PRIO, \
-                                               };
+#   define FSM_GC_CREATE_EVENT(NAME, PRIO)      static fsm_gc_event_t NAME = { \
+                                                    0, \
+                                                    PRIO, \
+                                                };
+#endif
+
+#ifdef FSM_GC_BEDUG
+#   define FSM_GC_CREATE_ACTION(NAME, FUNC)     static void FUNC(void); \
+                                                static fsm_gc_action_t NAME = { \
+                                                    FUNC, \
+                                                    __STR_DEF__(NAME) \
+                                                };
+#else
+#   define FSM_GC_CREATE_ACTION(NAME, FUNC)     static void FUNC(void); \
+                                                static fsm_gc_action_t NAME = { \
+                                                    FUNC, \
+                                                };
 #endif
                                               
 #define FSM_GC_CREATE_TABLE(NAME, ...)        static fsm_gc_transition_t NAME[] = { __VA_ARGS__ };
