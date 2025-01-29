@@ -1,17 +1,25 @@
-ARG CI_REGISTRY=registry.izhpt.com:443
+ARG CI_REGISTRY
 
 FROM $CI_REGISTRY/ayratproject/stm_builder:main AS builder
 
 ENV APP_ROOT=/app
 ENV SRC_ROOT=$APP_ROOT/src
-ENV BUILD_ROOT=$APP_ROOT/build
+ENV DEBUG_ROOT=$APP_ROOT/Debug
+ENV RELEASE_ROOT=$APP_ROOT/Release
 
 ADD . $SRC_ROOT
-RUN mkdir -p $BUILD_ROOT \
+RUN mkdir -p $DEBUG_ROOT \
+ && mkdir -p $RELEASE_ROOT \
  && cp -f $APP_ROOT/search.cmake $SRC_ROOT/search.cmake
 
-RUN cd $BUILD_ROOT \
- && cmake -G"Unix Makefiles" $SRC_ROOT -DCMAKE_BUILD_TYPE=Debug -DDEBUG=1 \
- && cmake --build $BUILD_ROOT
+RUN cd $DEBUG_ROOT \
+ && cmake $SRC_ROOT -DCMAKE_BUILD_TYPE=DEBUG -DDEBUG=1 \
+ && cmake --build $DEBUG_ROOT
 
-RUN $BUILD_ROOT/test/utilstest
+RUN cd $RELEASE_ROOT \
+ && cmake $SRC_ROOT \
+ && cmake --build $RELEASE_ROOT
+
+RUN $DEBUG_ROOT/test/utilstest
+
+RUN $RELEASE_ROOT/test/utilstest

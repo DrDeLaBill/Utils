@@ -1,10 +1,12 @@
+/* Copyright � 2025 Georgy E. All rights reserved. */
+
+#define FSM_GC_EVENTS_COUNT 15
+
 #include <gtest/gtest.h>
 
-#define FSM_GC_EVENT_NAME_SIZE 100
-#define FSM_GC_STATE_NAME_SIZE 100
-#define FSM_GC_NAME_SIZE       100
-
 #include "fsm_gc.h"
+#include "gutils.h"
+
 
 // Test 1: Initialization with valid parameters
 FSM_GC_CREATE(FSM_GC_SUITE_ValidInit_fsm)
@@ -65,10 +67,10 @@ void _FSM_GC_SUITE_EventOverflow_state1(void) {}
 GTEST_TEST(FSM_GC_SUITE, EventOverflow)
 {
   fsm_gc_init(&FSM_GC_SUITE_EventOverflow_fsm, FSM_GC_SUITE_EventOverflow_fsm_table, 1);
-  for (int i = 0; i < _FSM_GC_EVENTS_COUNT + 1; i++) {
+  for (int i = 0; i < FSM_GC_EVENTS_COUNT + 1; i++) {
     fsm_gc_push_event(&FSM_GC_SUITE_EventOverflow_fsm, &FSM_GC_SUITE_EventOverflow_event1);
   }
-  ASSERT_EQ(FSM_GC_SUITE_EventOverflow_fsm._events_count, _FSM_GC_EVENTS_COUNT);
+  ASSERT_EQ(FSM_GC_SUITE_EventOverflow_fsm._events_count, FSM_GC_EVENTS_COUNT);
 }
 
 // Test 5: Clear event queue
@@ -371,4 +373,19 @@ GTEST_TEST(FSM_GC_SUITE, TerminationCondition)
   ASSERT_TRUE(target_reached);
   // Ensure remaining events were cleared
   ASSERT_EQ(FSM_GC_SUITE_TerminationCondition_fsm._events_count, 4);
+}
+
+// Test 18: Check events count
+FSM_GC_CREATE(FSM_GC_SUITE_CheckEventsCount_fsm)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckEventsCount_state1, _FSM_GC_SUITE_CheckEventsCount_state1)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_CheckEventsCount_event1, 0)
+FSM_GC_CREATE_TABLE(
+    FSM_GC_SUITE_CheckEventsCount_fsm_table,
+    { &FSM_GC_SUITE_CheckEventsCount_state1, &FSM_GC_SUITE_CheckEventsCount_event1, &FSM_GC_SUITE_CheckEventsCount_state1, NULL }
+)
+void _FSM_GC_SUITE_CheckEventsCount_state1(void) {}
+GTEST_TEST(FSM_GC_SUITE, CheckEventsCount)
+{
+    fsm_gc_init(&FSM_GC_SUITE_CheckEventsCount_fsm, FSM_GC_SUITE_CheckEventsCount_fsm_table, 1);
+    ASSERT_EQ(__arr_len(__concat(__events_, FSM_GC_SUITE_CheckEventsCount_fsm)), FSM_GC_EVENTS_COUNT);
 }

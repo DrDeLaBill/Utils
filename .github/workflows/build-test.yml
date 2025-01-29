@@ -1,4 +1,4 @@
-name: test
+name: Run tests
 
 on:
   push:
@@ -8,8 +8,8 @@ on:
 
 jobs:
   test:
-    runs-on: debian:trixie-20250113-slim
+    runs-on: gcc
     steps:
     - uses: actions/checkout@v3
     - name: Testing
-      run: docker build --no-cache --progress=plain .
+      run: docker build --no-cache --progress=plain . --build-arg CI_REGISTRY="${{secrets.BUILD_CI_REGISTRY}}"

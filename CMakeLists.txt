@@ -13,11 +13,15 @@ option(DEBUG "Enable DEBUG output" OFF)
 include("search.cmake")
 
 
+# Ищем заголовочные файлы
+FILE_PATHS_EXT(h_paths   "${CMAKE_CURRENT_SOURCE_DIR}/utils" "h")
+FILE_PATHS_EXT(hpp_paths "${CMAKE_CURRENT_SOURCE_DIR}/utils" "hpp")
+
 # Указываем исходные файлы проекта
 FILE_PATHS_EXT(c_paths   "${CMAKE_CURRENT_SOURCE_DIR}/utils" "c")
 FILE_PATHS_EXT(cpp_paths "${CMAKE_CURRENT_SOURCE_DIR}/utils" "cpp")
 FILE_PATHS_EXT(s_paths   "${CMAKE_CURRENT_SOURCE_DIR}/utils" "s")
-set(${PROJECT_NAME}_SOURCES "${c_paths};${cpp_paths};${s_paths}")
+set(${PROJECT_NAME}_SOURCES "${h_paths};${hpp_paths};${c_paths};${cpp_paths};${s_paths}")
 add_library(
     ${PROJECT_NAME} 
     STATIC 
@@ -37,13 +41,7 @@ target_include_directories(
 
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     
-    message(STATUS "Utils generated as current project")    
-
-    if (DEBUG)
-        message(STATUS "Build gsystem with DEBUG")
-        set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
-    endif()
+    message(STATUS "Utils generated as current project")
 
     if(MSVC)
         message(STATUS "Add MSVC warnings")
@@ -53,6 +51,11 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         message(STATUS "Add GCC warnings")
         add_compile_options(-Wall -Wextra -pedantic -Wmissing-include-dirs)
+        if (DEBUG)
+            message(STATUS "Build gsystem with DEBUG")
+            set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
+        endif()
     else()
         message(ERROR "Unknown compiler")
     endif()
@@ -62,6 +65,15 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     message(STATUS "Enable Utils testing")
     enable_testing()
     add_subdirectory(test)
+
+    message(STATUS "C compiler   : ${CMAKE_C_COMPILER}")
+    message(STATUS "C++ compiler : ${CMAKE_CXX_COMPILER}")
+    message(STATUS "Linker       : ${LINKER_SCRIPT_PATH}")
+    message(STATUS "Building     : ${PROJECT_NAME}")
+    message(STATUS "C FLAGS      : ${CMAKE_C_FLAGS}")
+    message(STATUS "C++ FLAGS    : ${CMAKE_CXX_FLAGS}")
+    message(STATUS "ASM FLAGS    : ${CMAKE_ASM_FLAGS}")
+    message(STATUS "Linker FLAGS : ${CMAKE_LINKER_FLAGS}")
 
 else()
 

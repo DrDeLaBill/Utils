@@ -1,4 +1,4 @@
-/* Copyright © 2024 Georgy E. All rights reserved. */
+/* Copyright © 2025 Georgy E. All rights reserved. */
 
 #include "fsm_gc.h"
 
@@ -107,7 +107,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
         fsm->_name,
         fsm->_table[table_idx].source->_name,
         fsm->_table[table_idx].event->_name,
-        fsm->_table[table_idx].action->_name ? fsm->_table[table_idx].action->_name : "NULL",
+        fsm->_table[table_idx].action ? fsm->_table[table_idx].action->_name : "NULL",
         fsm->_table[table_idx].target->_name
     );
 #endif
@@ -146,11 +146,11 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 #endif
     	return;
     }
-    if (fsm->_events_count >= __arr_len(fsm->_events) - 1) {
-        for (unsigned i = 0; i < __arr_len(fsm->_events) - 1; i++) {
+    if (fsm->_events_count >= fsm->_events_length) {
+        for (unsigned i = 0; i < fsm->_events_length - 1; i++) {
             fsm->_events[i] = fsm->_events[i + 1];
         }
-        fsm->_events_count = __arr_len(fsm->_events) - 1;
+        fsm->_events_count = fsm->_events_length - 1;
     }
     fsm->_events[fsm->_events_count++] = *event;
 
@@ -158,8 +158,9 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 #ifdef FSM_GC_BEDUG
 	printTagLog(
 		FSM_GC_TAG, \
-		"\"%s\" push event: %s",
+		"\"%s\" push %02u event: %s",
 		fsm->_name,
+        fsm->_events_count,
 		event->_name
 	);
 #endif
@@ -180,7 +181,7 @@ void fsm_gc_clear(fsm_gc_t* fsm)
 #endif
     	return;
     }
-	memset(fsm->_events, 0, sizeof(fsm->_events));
+
 	fsm->_events_count = 0;
 
 #ifdef FSM_GC_BEDUG
