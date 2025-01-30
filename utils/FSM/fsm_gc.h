@@ -121,7 +121,7 @@ extern size_t _fsm_gc_events_iterator;
 
 #ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE(FSM_NAME)            static const char __concat(__bedug_fsm_name_, FSM_NAME)[] = __STR_DEF__(FSM_NAME); \
-                                              static fsm_gc_event_t  __concat(__events_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0}}; \
+                                              static fsm_gc_event_t  __concat(__events_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0,""}}; \
                                               static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \

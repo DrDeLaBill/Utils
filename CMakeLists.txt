@@ -10,7 +10,16 @@ message(STATUS "Utils C++ compiler: ${CMAKE_CXX_COMPILER}")
 option(DEBUG "Enable DEBUG output" OFF)
 
 
-include("search.cmake")
+file(GLOB_RECURSE _files "${CMAKE_SOURCE_DIR}/*search.cmake")
+list(LENGTH _files _file_exists)
+if (${_file_exists} EQUAL 0)
+    message(FATAL_ERROR "Unable to find macros search.cmake")
+endif()
+list(GET _files 0 _file)
+include(${_file})
+unset(_file)
+unset(_files)
+unset(_file_exists)
 
 
 # Ищем заголовочные файлы
