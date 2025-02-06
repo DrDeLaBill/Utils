@@ -2,7 +2,8 @@
 
 #ifdef USE_HAL_DRIVER
 
-#   include "glog.h"
+#include "glog.h"
+#include "gconfig.h"
 
 
 void COREInfo(void);
@@ -17,7 +18,7 @@ static const char CORE_TAG[] = "CORE";
 
 void SystemInfo(void)
 {
-#ifdef DEBUG
+#ifndef NO_CPU_INFO
 	printTagLog(CORE_TAG, "Core=%lu, %lu MHz", SystemCoreClock, SystemCoreClock / 1000000);
 	COREInfo();
 	IDCODEInfo();
@@ -29,24 +30,26 @@ void SystemInfo(void)
 
 bool MCUcheck(void)
 {
+#ifndef NO_CPU_INFO
 	uint32_t cpuid = SCB->CPUID;
 	if ((cpuid & 0xFF000000) != 0x41000000) {
 		return false;
 	}
-#if defined(STM32F1)
+#   if defined(STM32F1)
 	return ((cpuid & 0x0000FFF0) >> 4) == 0xC23;
-#elif defined(STM32F2)
-#   error "Select MCU"
-#elif defined(STM32F4)
+#   elif defined(STM32F2)
+#       error "Select MCU"
+#   elif defined(STM32F4)
 	return ((cpuid & 0x0000FFF0) >> 4) == 0xC24;
-#else
-#   error "Select MCU"
+#   else
+#       error "Select MCU"
+#   endif
 #endif
 }
 
-void COREInfo(void) // sourcer32@gmail.com
+void COREInfo(void)
 {
-#ifdef DEBUG
+#ifndef NO_CPU_INFO
 	uint32_t cpuid = SCB->CPUID;
 
 	printPretty(
@@ -88,14 +91,9 @@ void COREInfo(void) // sourcer32@gmail.com
 #endif
 }
 
-//****************************************************************************
-
-// FPU Programmer Model
-// http://infocenter.arm.com/help/index.jsp?topic=/com.arm.doc.ddi0489b/Chdhfiah.html
-
 void FPUInfo(void)
-{ // sourcer32@gmail.com
-#ifdef DEBUG
+{
+#ifndef NO_CPU_INFO
 	uint32_t mvfr0 = *(volatile uint32_t *)0xE000EF40;
 
 	if (mvfr0) {
@@ -130,11 +128,9 @@ void FPUInfo(void)
 #endif
 }
 
-//****************************************************************************
-
 void IDCODEInfo(void)
-{ // sourcer32@gmail.com
-#ifdef DEBUG
+{
+#ifndef NO_CPU_INFO
 	uint32_t idcode = DBGMCU->IDCODE & 0xFFF;
 
 	switch(idcode) {
