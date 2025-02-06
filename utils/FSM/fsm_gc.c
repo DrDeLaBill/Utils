@@ -45,6 +45,49 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             printTagLog(FSM_GC_TAG, "\"%s\" empty event", fsm->_name);
 #endif
         }
+#ifdef FSM_GC_BEDUG
+        for (unsigned j = i + 1; j < fsm->_table_size; j++) {
+            if (fsm->_table[i].source != fsm->_table[j].source &&
+                fsm->_table[i].source->state == fsm->_table[j].source->state
+            ) {
+                printTagLog(
+                    FSM_GC_TAG, 
+                    "WARNING! \"%s\" has matches functions states %s{0x%08X} = %s{0x%08X}",
+                    fsm->_name,
+                    fsm->_table[i].source->_name,
+                    fsm->_table[i].source,
+                    fsm->_table[j].source->_name,
+                    fsm->_table[j].source
+                );
+            }
+            if (fsm->_table[i].source != fsm->_table[j].target &&
+                fsm->_table[i].target->state == fsm->_table[j].target->state
+            ) {
+                printTagLog(
+                    FSM_GC_TAG, 
+                    "WARNING! \"%s\" has matches functions states  %s{0x%08X} = %s{0x%08X}",
+                    fsm->_name,
+                    fsm->_table[i].source->_name,
+                    fsm->_table[i].source,
+                    fsm->_table[j].target->_name,
+                    fsm->_table[j].target
+                );
+            }
+            if (fsm->_table[i].action != fsm->_table[j].action &&
+                fsm->_table[i].action->action == fsm->_table[j].action->action
+            ) {
+                printTagLog(
+                    FSM_GC_TAG, 
+                    "WARNING! \"%s\" has matches functions actions %s{0x%08X} = %s{0x%08X}",
+                    fsm->_name,
+                    fsm->_table[i].action->action,
+                    fsm->_table[i].action,
+                    fsm->_table[j].action->action,
+                    fsm->_table[j].action
+                );
+            }
+        }
+#endif
 	}
 
 #ifdef FSM_GC_BEDUG

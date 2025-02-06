@@ -2,6 +2,7 @@
 
 #define FSM_GC_EVENTS_COUNT 15
 
+#include <string>
 #include <gtest/gtest.h>
 
 #include "fsm_gc.h"
@@ -289,23 +290,23 @@ GTEST_TEST(FSM_GC_SUITE, StateDrivenEvents)
 FSM_GC_CREATE(FSM_GC_SUITE_EmptyQueueProcessing_fsm)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_EmptyQueueProcessing_state1, _FSM_GC_SUITE_EmptyQueueProcessing_state1)
 FSM_GC_CREATE_TABLE(
-  FSM_GC_SUITE_EmptyQueueProcessing_fsm_table,
-  {&FSM_GC_SUITE_EmptyQueueProcessing_state1, nullptr, &FSM_GC_SUITE_EmptyQueueProcessing_state1, NULL}
+    FSM_GC_SUITE_EmptyQueueProcessing_fsm_table,
+    {&FSM_GC_SUITE_EmptyQueueProcessing_state1, nullptr, &FSM_GC_SUITE_EmptyQueueProcessing_state1, NULL}
 )
 static int state_exec_count = 0;
 void _FSM_GC_SUITE_EmptyQueueProcessing_state1(void) { state_exec_count++; }
 GTEST_TEST(FSM_GC_SUITE, EmptyQueueProcessing)
 {
-  state_exec_count = 0;
-  fsm_gc_init(&FSM_GC_SUITE_EmptyQueueProcessing_fsm, FSM_GC_SUITE_EmptyQueueProcessing_fsm_table, 1);
-  
-  // Process multiple times with empty queue
-  for (int i = 0; i < 5; i++) {
-    fsm_gc_process(&FSM_GC_SUITE_EmptyQueueProcessing_fsm);
-  }
-  
-  // State function should execute every process call
-  ASSERT_EQ(state_exec_count, 5);
+    state_exec_count = 0;
+    fsm_gc_init(&FSM_GC_SUITE_EmptyQueueProcessing_fsm, FSM_GC_SUITE_EmptyQueueProcessing_fsm_table, 1);
+    
+    // Process multiple times with empty queue
+    for (int i = 0; i < 5; i++) {
+        fsm_gc_process(&FSM_GC_SUITE_EmptyQueueProcessing_fsm);
+    }
+    
+    // State function should execute every process call
+    ASSERT_EQ(state_exec_count, 5);
 }
 
 // Test 16: Priority-based processing in loop
@@ -325,20 +326,20 @@ void _FSM_GC_SUITE_PriorityLoop_state1(void) {}
 void _FSM_GC_SUITE_PriorityLoop_state2(void) {}
 GTEST_TEST(FSM_GC_SUITE, PriorityLoop)
 {
-  fsm_gc_init(&FSM_GC_SUITE_PriorityLoop_fsm, FSM_GC_SUITE_PriorityLoop_fsm_table, 4);
-  
-  // Push mixed-priority events
-  fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_lowPrio);
-  fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_highPrio);
-  fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_lowPrio);
+    fsm_gc_init(&FSM_GC_SUITE_PriorityLoop_fsm, FSM_GC_SUITE_PriorityLoop_fsm_table, 4);
+    
+    // Push mixed-priority events
+    fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_lowPrio);
+    fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_highPrio);
+    fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_lowPrio);
 
-  // Process until queue empty
-  while (FSM_GC_SUITE_PriorityLoop_fsm._events_count > 0) {
-    fsm_gc_process(&FSM_GC_SUITE_PriorityLoop_fsm);
-  }
-  
-  // High-priority event should be processed first, then remaining low-prio
-  ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_state2));
+    // Process until queue empty
+    while (FSM_GC_SUITE_PriorityLoop_fsm._events_count > 0) {
+        fsm_gc_process(&FSM_GC_SUITE_PriorityLoop_fsm);
+    }
+    
+    // High-priority event should be processed first, then remaining low-prio
+    ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_state2));
 }
 
 // Test 17: Terminating loop on target state
@@ -347,32 +348,32 @@ FSM_GC_CREATE_STATE(FSM_GC_SUITE_TerminationCondition_state1, _FSM_GC_SUITE_Term
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_TerminationCondition_state2, _FSM_GC_SUITE_TerminationCondition_state2)
 FSM_GC_CREATE_EVENT(FSM_GC_SUITE_TerminationCondition_event1, 0)
 FSM_GC_CREATE_TABLE(
-  FSM_GC_SUITE_TerminationCondition_fsm_table,
-  {&FSM_GC_SUITE_TerminationCondition_state1, &FSM_GC_SUITE_TerminationCondition_event1, &FSM_GC_SUITE_TerminationCondition_state2, NULL},
-  {&FSM_GC_SUITE_TerminationCondition_state2, & FSM_GC_SUITE_TerminationCondition_event1, & FSM_GC_SUITE_TerminationCondition_state2, NULL}
+    FSM_GC_SUITE_TerminationCondition_fsm_table,
+    {&FSM_GC_SUITE_TerminationCondition_state1, &FSM_GC_SUITE_TerminationCondition_event1, &FSM_GC_SUITE_TerminationCondition_state2, NULL},
+    {&FSM_GC_SUITE_TerminationCondition_state2, & FSM_GC_SUITE_TerminationCondition_event1, & FSM_GC_SUITE_TerminationCondition_state2, NULL}
 )
 void _FSM_GC_SUITE_TerminationCondition_state1(void) {}
 void _FSM_GC_SUITE_TerminationCondition_state2(void) {}
 GTEST_TEST(FSM_GC_SUITE, TerminationCondition)
 {
-  fsm_gc_init(&FSM_GC_SUITE_TerminationCondition_fsm, FSM_GC_SUITE_TerminationCondition_fsm_table, 2);
-  
-  // Push multiple redundant events
-  for (int i = 0; i < 5; i++) {
-    fsm_gc_push_event(&FSM_GC_SUITE_TerminationCondition_fsm, &FSM_GC_SUITE_TerminationCondition_event1);
-  }
+    fsm_gc_init(&FSM_GC_SUITE_TerminationCondition_fsm, FSM_GC_SUITE_TerminationCondition_fsm_table, 2);
+    
+    // Push multiple redundant events
+    for (int i = 0; i < 5; i++) {
+        fsm_gc_push_event(&FSM_GC_SUITE_TerminationCondition_fsm, &FSM_GC_SUITE_TerminationCondition_event1);
+    }
 
-  // Process until target state reached
-  bool target_reached = false;
-  for (int i = 0; i < 10 && !target_reached; i++) { // Safety limit
-    fsm_gc_process(&FSM_GC_SUITE_TerminationCondition_fsm);
-    target_reached = fsm_gc_is_state(&FSM_GC_SUITE_TerminationCondition_fsm, 
-                                   &FSM_GC_SUITE_TerminationCondition_state2);
-  }
-  
-  ASSERT_TRUE(target_reached);
-  // Ensure remaining events were cleared
-  ASSERT_EQ(FSM_GC_SUITE_TerminationCondition_fsm._events_count, 4);
+    // Process until target state reached
+    bool target_reached = false;
+    for (int i = 0; i < 10 && !target_reached; i++) { // Safety limit
+        fsm_gc_process(&FSM_GC_SUITE_TerminationCondition_fsm);
+        target_reached = fsm_gc_is_state(&FSM_GC_SUITE_TerminationCondition_fsm, 
+                                    &FSM_GC_SUITE_TerminationCondition_state2);
+    }
+    
+    ASSERT_TRUE(target_reached);
+    // Ensure remaining events were cleared
+    ASSERT_EQ(FSM_GC_SUITE_TerminationCondition_fsm._events_count, 4);
 }
 
 // Test 18: Check events count
@@ -388,4 +389,41 @@ GTEST_TEST(FSM_GC_SUITE, CheckEventsCount)
 {
     fsm_gc_init(&FSM_GC_SUITE_CheckEventsCount_fsm, FSM_GC_SUITE_CheckEventsCount_fsm_table, 1);
     ASSERT_EQ(__arr_len(__concat(__events_, FSM_GC_SUITE_CheckEventsCount_fsm)), FSM_GC_EVENTS_COUNT);
+}
+
+
+FSM_GC_CREATE(FSM_GC_SUITE_CheckMatchesStates_fsm)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckMatchesStates_state1, _FSM_GC_SUITE_CheckMatchesStates_state1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckMatchesStates_state2, _FSM_GC_SUITE_CheckMatchesStates_state1)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_CheckMatchesStates_event1, 0)
+FSM_GC_CREATE_TABLE(
+    FSM_GC_SUITE_CheckMatchesStates_fsm_table,
+    { &FSM_GC_SUITE_CheckMatchesStates_state1, &FSM_GC_SUITE_CheckMatchesStates_event1, &FSM_GC_SUITE_CheckMatchesStates_state1, NULL },
+    { &FSM_GC_SUITE_CheckMatchesStates_state2, &FSM_GC_SUITE_CheckMatchesStates_event1, &FSM_GC_SUITE_CheckMatchesStates_state2, NULL }
+)
+void _FSM_GC_SUITE_CheckMatchesStates_state1(void) {}
+GTEST_TEST(FSM_GC_SUITE, CheckMatchesStates)
+{
+    fsm_gc_init(&FSM_GC_SUITE_CheckMatchesStates_fsm, FSM_GC_SUITE_CheckMatchesStates_fsm_table, 2);
+
+    char buffer[1024] = "";
+
+    freopen("/dev/null", "a", stdout); // TODO: add for windows
+    setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
+
+    fsm_gc_init(&FSM_GC_SUITE_CheckMatchesStates_fsm, FSM_GC_SUITE_CheckMatchesStates_fsm_table, 2);
+
+    setvbuf(stdout, NULL, _IONBF, 0);
+    freopen("/dev/tty", "a", stdout); // TODO: add for windows
+
+    for (unsigned i = 0; i < sizeof(buffer); i++) {
+        std::cout << buffer[i];
+    }
+
+    std::string str(buffer);
+    std::size_t found = str.find("FSMc:        \"FSM_GC_SUITE_CheckEventsCount_fsm\" has been initialized");
+    bool res = found == std::string::npos;
+    // ASSERT_FALSE(res);
+
+    // TODO: str.find("WARNING! \"FSM_GC_SUITE_CheckMatchesStates_fsm\" has matches functions states  FSM_GC_SUITE_CheckMatchesStates_state1")
 }
