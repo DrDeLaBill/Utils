@@ -2,8 +2,8 @@
 
 #ifdef USE_HAL_DRIVER
 
+
 #include "glog.h"
-#include "gconfig.h"
 
 
 void COREInfo(void);
