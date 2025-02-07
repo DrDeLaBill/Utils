@@ -125,4 +125,19 @@ unsigned util_hash(const uint8_t* data, const unsigned size)
 	return hash;
 }
 
+uint8_t* util_memfind(uint8_t* buf, const size_t buf_size, const uint8_t* pattern, const size_t pattern_size)
+{
+    if (!buf_size || !pattern_size) {
+        return NULL;
+    }
+    for (size_t i = 0; i < buf_size; i++) {
+        if (buf_size - i < pattern_size) {
+            return NULL;
+        }
+        if (!memcmp(buf + i, pattern, pattern_size)) {
+            return &buf[i];
+        }
+    }
+    return NULL;
+}
 

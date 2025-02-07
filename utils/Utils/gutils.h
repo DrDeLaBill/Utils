@@ -114,6 +114,8 @@ uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(const uint32_t number, uint32_t degree);
 size_t   util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, size_t rngh2);
 unsigned util_hash(const uint8_t* data, const unsigned size);
+uint8_t* util_memfind(uint8_t* buf, const size_t buf_size, const uint8_t* pattern, const size_t pattern_size);
+
 
 
 #ifdef __cplusplus

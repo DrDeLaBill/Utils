@@ -3,6 +3,7 @@
 #define FSM_GC_EVENTS_COUNT 15
 
 #include <string>
+#include <fcntl.h>
 #include <gtest/gtest.h>
 
 #include "fsm_gc.h"
@@ -392,6 +393,7 @@ GTEST_TEST(FSM_GC_SUITE, CheckEventsCount)
 }
 
 
+#if !defined(FSM_GC_NO_DEBUG) && (defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE))
 FSM_GC_CREATE(FSM_GC_SUITE_CheckMatchesStates_fsm)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckMatchesStates_state1, _FSM_GC_SUITE_CheckMatchesStates_state1)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckMatchesStates_state2, _FSM_GC_SUITE_CheckMatchesStates_state1)
@@ -404,26 +406,42 @@ FSM_GC_CREATE_TABLE(
 void _FSM_GC_SUITE_CheckMatchesStates_state1(void) {}
 GTEST_TEST(FSM_GC_SUITE, CheckMatchesStates)
 {
+    // Перехват stdout с помощью pipe
+    uint8_t buffer[1024] = "";
+    int pipefd[2];
+#if defined(_MSC_VER)
+    _pipe(pipefd, sizeof(buffer), O_BINARY);
+    int old_stdout = _dup(_fileno(stdout));
+    _dup2(pipefd[1], _fileno(stdout));
+#elif defined(__GNUC__)
+    pipe(pipefd);
+    int old_stdout = dup(STDOUT_FILENO);
+    dup2(pipefd[1], STDOUT_FILENO);
+#else
+#   error "change stdout error"
+#endif
+
+    std::cout << "FSM_GC_SUITE CheckMatchesStates ";
     fsm_gc_init(&FSM_GC_SUITE_CheckMatchesStates_fsm, FSM_GC_SUITE_CheckMatchesStates_fsm_table, 2);
+    
+    fflush(stdout);
+#if defined(_MSC_VER)
+    // Чтение из pipe
+    _read(pipefd[0], buffer, sizeof(buffer));
+    // Восстановление stdout
+    _dup2(old_stdout, _fileno(stdout));
+#elif defined(__GNUC__)
+    // Чтение из pipe
+    read(pipefd[0], buffer, sizeof(buffer));
+    // Восстановление stdout
+    dup2(old_stdout, STDOUT_FILENO);
+#endif
 
-    char buffer[1024] = "";
-
-    freopen("/dev/null", "a", stdout); // TODO: add for windows
-    setvbuf(stdout, buffer, _IOFBF, sizeof(buffer));
-
-    fsm_gc_init(&FSM_GC_SUITE_CheckMatchesStates_fsm, FSM_GC_SUITE_CheckMatchesStates_fsm_table, 2);
-
-    setvbuf(stdout, NULL, _IONBF, 0);
-    freopen("/dev/tty", "a", stdout); // TODO: add for windows
-
-    for (unsigned i = 0; i < sizeof(buffer); i++) {
-        std::cout << buffer[i];
-    }
-
-    std::string str(buffer);
-    std::size_t found = str.find("FSMc:        \"FSM_GC_SUITE_CheckEventsCount_fsm\" has been initialized");
-    bool res = found == std::string::npos;
-    // ASSERT_FALSE(res);
-
-    // TODO: str.find("WARNING! \"FSM_GC_SUITE_CheckMatchesStates_fsm\" has matches functions states  FSM_GC_SUITE_CheckMatchesStates_state1")
+    const uint8_t str1[] = "\"FSM_GC_SUITE_CheckMatchesStates_fsm\" has been initialized";
+    const uint8_t str2[] = "WARNING! \"FSM_GC_SUITE_CheckMatchesStates_fsm\" has matches functions states FSM_GC_SUITE_CheckMatchesStates_state1{";
+    const uint8_t str3[] = "} = FSM_GC_SUITE_CheckMatchesStates_state2{";
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str1, strlen((char*)str1)));
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str2, strlen((char*)str2)));
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str3, strlen((char*)str3)));
 }
+#endif
