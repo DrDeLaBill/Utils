@@ -11,7 +11,7 @@ void FPUInfo(void);
 void IDCODEInfo(void);
 
 
-#ifdef DEBUG
+#if defined(DEBUG) && !defined(NO_CPU_INFO)
 static const char CORE_TAG[] = "CORE";
 #endif
 
@@ -44,6 +44,8 @@ bool MCUcheck(void)
 #   else
 #       error "Select MCU"
 #   endif
+#else
+	return true;
 #endif
 }
 

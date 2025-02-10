@@ -190,7 +190,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     	return;
     }
     if (fsm->_events_count >= fsm->_events_length) {
-        for (unsigned i = 0; i < fsm->_events_length - 1; i++) {
+        for (uint8_t i = 0; i < fsm->_events_length - 1; i++) {
             fsm->_events[i] = fsm->_events[i + 1];
         }
         fsm->_events_count = fsm->_events_length - 1;

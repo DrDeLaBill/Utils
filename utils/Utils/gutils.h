@@ -112,7 +112,7 @@ void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_
 bool     util_wait_event(bool (*condition) (void), TIME_MS_T time);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(const uint32_t number, uint32_t degree);
-size_t   util_convert_range(size_t val, size_t rngl1, size_t rngh1, size_t rngl2, size_t rngh2);
+int      util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2);
 unsigned util_hash(const uint8_t* data, const unsigned size);
 uint8_t* util_memfind(uint8_t* buf, const size_t buf_size, const uint8_t* pattern, const size_t pattern_size);
 

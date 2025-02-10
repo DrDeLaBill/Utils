@@ -1,6 +1,7 @@
-/* Copyright © 2023 Georgy E. All rights reserved. */
+/* Copyright © 2025 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _CIRCLE_BUFFER_H_
+#define _CIRCLE_BUFFER_H_
 
 
 #include <limits>
@@ -46,7 +47,7 @@ namespace utl
 	}
 	
 	template<unsigned SIZE, class DATA_T=uint8_t>
-	class circle_buffer
+	class CircleBuffer
 	{
 	
 	static_assert(SIZE > 0);
@@ -64,7 +65,7 @@ namespace utl
 		DATA_T m_data[SIZE];
 		
 	public:
-		circle_buffer()
+		CircleBuffer()
 		{
 			m_readCount = 0;
 			m_writeCount = 0;
@@ -185,3 +186,5 @@ namespace utl
 		inline unsigned size() { return SIZE; }
 	};
 }
+
+#endif

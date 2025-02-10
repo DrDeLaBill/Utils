@@ -1,3 +1,5 @@
+/* Copyright © 2025 Georgy E. All rights reserved. */
+
 #include <gtest/gtest.h>
 
 #include "gversion.h"

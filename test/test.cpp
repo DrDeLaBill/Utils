@@ -1,3 +1,5 @@
+/* Copyright © 2025 Georgy E. All rights reserved. */
+
 #include <iostream>
 #include <cassert>
 #include <gtest/gtest.h>

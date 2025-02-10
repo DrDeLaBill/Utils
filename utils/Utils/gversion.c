@@ -51,9 +51,9 @@ bool gversion_from_string(const char* str, const unsigned size, gversion_t* vers
     if (res != 3) {
         return false;
     }
-    version->major = major;
-    version->minor = minor;
-    version->patch = patch;
+    version->major = (uint8_t)major;
+    version->minor = (uint8_t)minor;
+    version->patch = (uint8_t)patch;
     return true;
 }
 

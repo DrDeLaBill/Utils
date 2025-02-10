@@ -1,4 +1,4 @@
-/* Copyright � 2025 Georgy E. All rights reserved. */
+/* Copyright © 2025 Georgy E. All rights reserved. */
 
 #define FSM_GC_EVENTS_COUNT 15
 

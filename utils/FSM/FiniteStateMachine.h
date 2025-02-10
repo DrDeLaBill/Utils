@@ -17,7 +17,7 @@
 #include "FSMTransition.h"
 #include "FSMTransitionTable.h"
 
-#include "CircleBuffer.h"
+#include "CircleBuffer.hpp"
 #include "TypeListBuilder.h"
 #include "TypeListService.h"
 
@@ -51,10 +51,10 @@ namespace fsm
                 KeyEqual
 			>;
         using queue_t =
-            utl::circle_buffer<
+            utl::CircleBuffer<
                 EVENT_STACK_SIZE,
                 event_v
-		>;
+		    >;
 
         key_t key;
         tuple_t transitions;
@@ -119,9 +119,10 @@ namespace fsm
 
             event_v resVariant;
             key_t resKey{ this->key.state_idx, 0 };
-            bool found = false;
-            auto it    = transitions.begin();
-            for (unsigned i = 0; i < events.count(); i++) {
+            bool found          = false;
+            auto it             = transitions.begin();
+            unsigned events_cnt = events.count();
+            for (unsigned i = 0; i < events_cnt; i++) {
                 auto eventVariant = events.pop_front();
 
                 key_t tmpKey{ this->key.state_idx, 0 };
