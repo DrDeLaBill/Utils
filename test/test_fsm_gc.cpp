@@ -445,3 +445,5 @@ GTEST_TEST(FSM_GC_SUITE, CheckMatchesStates)
     ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str3, strlen((char*)str3)));
 }
 #endif
+
+// TODO: add DEBUG messages fixture and tests

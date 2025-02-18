@@ -86,6 +86,24 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     fsm->_table[j].action
                 );
             }
+            if (fsm->_table[i].source == fsm->_table[j].source &&
+                fsm->_table[i].target == fsm->_table[j].target &&
+                fsm->_table[i].action == fsm->_table[j].action
+            ) {
+                printTagLog(
+                    FSM_GC_TAG,
+                    "WARNING! \"%s\" has duplicate transitions [idx-%u == idx-%u] %s{0x%08X} -> %s{0x%08X} -> %s{0x%08X}",
+                    fsm->_name,
+                    i,
+                    j,
+                    fsm->_table[j].source->_name,
+                    fsm->_table[j].source,
+                    fsm->_table[j].target->_name,
+                    fsm->_table[j].target,
+                    fsm->_table[j].action ? fsm->_table[j].action->action : "NULL",
+                    fsm->_table[j].action
+                );
+            }
         }
 #endif
 	}
@@ -93,6 +111,27 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 #ifdef FSM_GC_BEDUG
     printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
 #endif
+}
+
+void fsm_gc_reset(fsm_gc_t* fsm)
+{  
+    if (!fsm) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(false, "Empty FSM pointer");
+#endif
+        return;
+    }
+    if (!fsm->_initialized || !fsm->_state || !fsm->_table) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state, table and event must not be NULL");
+        fsm->_fsm_not_i = true;
+#endif
+        return;
+    }
+    
+    fsm->_events_count = 0;
+    fsm->_state        = fsm->_table[0].source;
 }
 
 void fsm_gc_process(fsm_gc_t* fsm) 

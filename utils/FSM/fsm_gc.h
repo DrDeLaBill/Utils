@@ -149,6 +149,7 @@ extern size_t _fsm_gc_events_iterator;
 
 
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size);
+void fsm_gc_reset(fsm_gc_t* fsm);
 void fsm_gc_process(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
 void fsm_gc_clear(fsm_gc_t* fsm);
