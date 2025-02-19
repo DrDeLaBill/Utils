@@ -15,10 +15,12 @@ static unsigned _ptr_index_from_read(const circle_buf_gc_t* p, unsigned index);
 void circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length)
 {
     if (!p) {
+        BEDUG_ASSERT(false, "bad buffer");
         return;
     }
     memset((uint8_t*)p, 0, sizeof(circle_buf_gc_t));
     if (!ptr) {
+        BEDUG_ASSERT(false, "bad buffer");
         return;
     }
     p->m_bedacode  = BEDACODE;
@@ -30,6 +32,7 @@ void circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, un
 unsigned circle_buf_gc_count(const circle_buf_gc_t* p) 
 {
     if (!p || p->m_bedacode != BEDACODE) {
+        BEDUG_ASSERT(false, "uninitialized buffer");
         return 0;
     }
     return p->m_write_cnt;
@@ -38,6 +41,7 @@ unsigned circle_buf_gc_count(const circle_buf_gc_t* p)
 void circle_buf_gc_free(circle_buf_gc_t* p)
 {
     if (!p || p->m_bedacode != BEDACODE) {
+        BEDUG_ASSERT(false, "uninitialized buffer");
         return;
     }
     p->m_read_idx = 0;
@@ -46,17 +50,26 @@ void circle_buf_gc_free(circle_buf_gc_t* p)
 
 bool circle_buf_gc_empty(const circle_buf_gc_t* p) 
 {
-    return (p && p->m_bedacode == BEDACODE) ? (circle_buf_gc_count(p) == 0) : true;
+	if (p && p->m_bedacode == BEDACODE) {
+		return circle_buf_gc_count(p) == 0;
+	}
+    BEDUG_ASSERT(false, "uninitialized buffer");
+    return false;
 }
 
 bool circle_buf_gc_full(const circle_buf_gc_t* p) 
 {
-    return (p && p->m_bedacode == BEDACODE) ? (circle_buf_gc_count(p) == p->m_length) : false;
+	if (p && p->m_bedacode == BEDACODE) {
+		return circle_buf_gc_count(p) == p->m_length;
+	}
+    BEDUG_ASSERT(false, "uninitialized buffer");
+    return false;
 }
 
 void circle_buf_gc_push_back(circle_buf_gc_t* p, const uint8_t* data) 
 {
     if (!p || !data || p->m_bedacode != BEDACODE) {
+        BEDUG_ASSERT(false, "uninitialized buffer");
         return;
     }
     if (circle_buf_gc_full(p)) {
@@ -68,6 +81,7 @@ void circle_buf_gc_push_back(circle_buf_gc_t* p, const uint8_t* data)
 void circle_buf_gc_push_front(circle_buf_gc_t* p, const uint8_t* data) 
 {
     if (!p || !data || p->m_bedacode != BEDACODE) {
+        BEDUG_ASSERT(false, "uninitialized buffer");
         return;
     }
     if (circle_buf_gc_full(p)) {

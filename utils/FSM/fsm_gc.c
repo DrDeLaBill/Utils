@@ -11,7 +11,8 @@
 
 #ifdef FSM_GC_BEDUG
 
-const char FSM_GC_TAG[] = "FSMc";
+static const char FSM_GC_TAG[] = "FSMc";
+static const char EMPTY[] = "NULL";
 
 #endif
 
@@ -61,7 +62,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 );
             }
             if (fsm->_table[i].source != fsm->_table[j].target &&
-                fsm->_table[i].target->state == fsm->_table[j].target->state
+                fsm->_table[i].source->state == fsm->_table[j].target->state
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -80,9 +81,9 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     FSM_GC_TAG, 
                     "WARNING! \"%s\" has matches functions actions %s{0x%08X} = %s{0x%08X}",
                     fsm->_name,
-                    fsm->_table[i].action->action,
+                    fsm->_table[i].action->_name,
                     fsm->_table[i].action,
-                    fsm->_table[j].action->action,
+                    fsm->_table[j].action->_name,
                     fsm->_table[j].action
                 );
             }
@@ -100,7 +101,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     fsm->_table[j].source,
                     fsm->_table[j].target->_name,
                     fsm->_table[j].target,
-                    fsm->_table[j].action ? fsm->_table[j].action->action : "NULL",
+                    fsm->_table[j].action ? fsm->_table[j].action->_name : EMPTY,
                     fsm->_table[j].action
                 );
             }
@@ -189,7 +190,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
         fsm->_name,
         fsm->_table[table_idx].source->_name,
         fsm->_table[table_idx].event->_name,
-        fsm->_table[table_idx].action ? fsm->_table[table_idx].action->_name : "NULL",
+        fsm->_table[table_idx].action ? fsm->_table[table_idx].action->_name : EMPTY,
         fsm->_table[table_idx].target->_name
     );
 #endif
