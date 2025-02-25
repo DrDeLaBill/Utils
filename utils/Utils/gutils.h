@@ -66,6 +66,10 @@ extern "C" {
 #   define __percent(PART, MAX) (((PART) * 100) / (MAX))
 #endif
 
+#ifndef __rm_mod
+#   define __rm_mod(NUM, DIV) ((NUM) - ((NUM) % (DIV)))
+#endif
+
 
 #ifndef TYPE_PACK
 #   ifdef __MINGW32__
