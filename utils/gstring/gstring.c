@@ -2,6 +2,7 @@
 
 #include "gstring.h"
 
+#include <stdio.h>
 #include <string.h>
 
 
@@ -46,4 +47,45 @@ void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len,
 	};
 
 	phrase[need_len] = 0;
+}
+
+void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned div, unsigned point_count)
+{
+	snprintf(
+		target,
+		size - 1,
+		"%s%lu.",
+		value < 0 ? "-" : "",
+		(long unsigned int)(__abs(value) / div)
+	);
+	BEDUG_ASSERT(
+		size > strlen(target) + 1 && div % 10 == 0 && div > 1 && point_count > 0,
+		"util_int_to_str_with_point bad size"
+	);
+	if (size < strlen(target) + 1) {
+		return;
+	}
+	if (div % 10) {
+		target[strlen(target)] = '0';
+		return;
+	}
+	unsigned dec = util_small_pow(10, point_count);
+	value = __abs(value) % div;
+	if (div > dec) {
+		value /= (div / dec);
+	}
+	char format[8] = "";
+	snprintf(
+		format,
+		sizeof(format) - 1,
+		"%c0%uld",
+		'%',
+		point_count
+	);
+	snprintf(
+		target + strlen(target),
+		size - strlen(target) - 1,
+		format,
+		value
+	);
 }

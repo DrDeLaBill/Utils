@@ -59,8 +59,8 @@ namespace utl
 	
 		static const INDEX_T m_mask = SIZE - 1;
 		
-		volatile INDEX_T m_readCount;
-		volatile INDEX_T m_writeCount;
+		INDEX_T m_readCount;
+		INDEX_T m_writeCount;
 		
 		DATA_T m_data[SIZE];
 		
