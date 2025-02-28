@@ -533,3 +533,88 @@ TEST(UtilsFixture, test_push_back_to_non_full_buffer)
     ASSERT_TRUE(circle_buf_gc_empty(&buf) == false);
     ASSERT_TRUE(circle_buf_gc_full(&buf) == false);
 }
+
+TEST(UtilsFixture, test_index_basic)
+{
+    const unsigned TEST_BUFFER_SIZE = 5;
+    const unsigned TEST_UNIT_SIZE = 4;
+    uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
+    circle_buf_gc_t cb;
+
+    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+
+    // Заполнение буфера
+    uint32_t data[] = {10, 20, 30, 40, 50};
+    for (int i = 0; i < 5; i++) {
+        circle_buf_gc_push_back(&cb, (uint8_t*)&data[i]);
+    }
+
+    // Проверка индексов
+    for (int i = 0; i < 5; i++) {
+        uint32_t* item = (uint32_t*)circle_buf_gc_index(&cb, i);
+        ASSERT_TRUE(item && *item == data[i]);
+    }
+}
+
+TEST(UtilsFixture, test_index_out_of_bounds)
+{
+    const unsigned TEST_BUFFER_SIZE = 5;
+    const unsigned TEST_UNIT_SIZE = 4;
+    uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
+    circle_buf_gc_t cb;
+
+    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+
+    // Попытка получить элемент из пустого буфера
+    ASSERT_TRUE(circle_buf_gc_index(&cb, 0) == NULL);
+
+    // Добавление одного элемента
+    uint32_t val = 100;
+    circle_buf_gc_push_back(&cb, (uint8_t*)&val);
+
+    // Проверка некорректных индексов
+    ASSERT_TRUE(circle_buf_gc_index(&cb, 1) == NULL);
+    ASSERT_TRUE(circle_buf_gc_index(&cb, 100) == NULL);
+}
+
+TEST(UtilsFixture, test_index_wraparound)
+{
+    const unsigned TEST_BUFFER_SIZE = 5;
+    const unsigned TEST_UNIT_SIZE = 4;
+    uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
+    circle_buf_gc_t cb;
+
+    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+
+    // Создаем ситуацию с перемещением read_idx
+    uint32_t data[TEST_BUFFER_SIZE + 2] = {1, 2, 3, 4, 5, 6, 7};
+    for (int i = 0; i < TEST_BUFFER_SIZE + 2; i++) {
+        circle_buf_gc_push_back(&cb, (uint8_t*)&data[i]);
+    }
+
+    // Буфер должен содержать [3,4,5,6,7]
+    ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 0) == 3);
+    ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 2) == 5);
+    ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 4) == 7);
+}
+
+TEST(UtilsFixture, test_index_after_operations) 
+{
+    const unsigned TEST_BUFFER_SIZE = 5;
+    const unsigned TEST_UNIT_SIZE = 4;
+    uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
+    circle_buf_gc_t cb;
+
+    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+
+    // Добавляем и удаляем элементы
+    uint32_t values[] = {100, 200, 300};
+    for (int i = 0; i < 3; i++) {
+        circle_buf_gc_push_back(&cb, (uint8_t*)&values[i]);
+    }
+    circle_buf_gc_pop_front(&cb);
+
+    // Должно остаться [200, 300]
+    ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 0) == 200);
+    ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 1) == 300);
+}

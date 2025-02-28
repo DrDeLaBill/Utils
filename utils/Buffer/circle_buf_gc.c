@@ -50,18 +50,18 @@ void circle_buf_gc_free(circle_buf_gc_t* p)
 
 bool circle_buf_gc_empty(const circle_buf_gc_t* p) 
 {
-	if (p && p->m_bedacode == BEDACODE) {
-		return circle_buf_gc_count(p) == 0;
-	}
+    if (p && p->m_bedacode == BEDACODE) {
+        return circle_buf_gc_count(p) == 0;
+    }
     BEDUG_ASSERT(false, "uninitialized buffer");
     return false;
 }
 
 bool circle_buf_gc_full(const circle_buf_gc_t* p) 
 {
-	if (p && p->m_bedacode == BEDACODE) {
-		return circle_buf_gc_count(p) == p->m_length;
-	}
+    if (p && p->m_bedacode == BEDACODE) {
+        return circle_buf_gc_count(p) == p->m_length;
+    }
     BEDUG_ASSERT(false, "uninitialized buffer");
     return false;
 }
@@ -129,6 +129,15 @@ uint8_t* circle_buf_gc_back(circle_buf_gc_t* p)
         return NULL;
     }
     return p->m_data + _ptr_index_from_read(p, p->m_write_cnt - 1);
+}
+
+uint8_t* circle_buf_gc_index(circle_buf_gc_t* p, const unsigned index)
+{
+    if (index >= p->m_write_cnt) {
+        BEDUG_ASSERT(false, "error index unit - empty");
+        return NULL;
+    }
+    return p->m_data + _ptr_index_from_read(p, index);
 }
 
 unsigned _ptr_index_from_read(const circle_buf_gc_t* p, unsigned index) 

@@ -72,7 +72,7 @@ GTEST_TEST(FSM_GC_SUITE, EventOverflow)
   for (int i = 0; i < FSM_GC_EVENTS_COUNT + 1; i++) {
     fsm_gc_push_event(&FSM_GC_SUITE_EventOverflow_fsm, &FSM_GC_SUITE_EventOverflow_event1);
   }
-  ASSERT_EQ(FSM_GC_SUITE_EventOverflow_fsm._events_count, FSM_GC_EVENTS_COUNT);
+  ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_EventOverflow_fsm._events), FSM_GC_EVENTS_COUNT);
 }
 
 // Test 5: Clear event queue
@@ -89,7 +89,7 @@ GTEST_TEST(FSM_GC_SUITE, ClearEvents)
   fsm_gc_init(&FSM_GC_SUITE_ClearEvents_fsm, FSM_GC_SUITE_ClearEvents_fsm_table, 1);
   fsm_gc_push_event(&FSM_GC_SUITE_ClearEvents_fsm, &FSM_GC_SUITE_ClearEvents_event1);
   fsm_gc_clear(&FSM_GC_SUITE_ClearEvents_fsm);
-  ASSERT_EQ(FSM_GC_SUITE_ClearEvents_fsm._events_count, 0);
+  ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_ClearEvents_fsm._events), 0);
 }
 // Test 6: Check current state
 FSM_GC_CREATE(FSM_GC_SUITE_IsStateCheck_fsm)
@@ -128,7 +128,7 @@ GTEST_TEST(FSM_GC_SUITE, EventPriority)
   fsm_gc_process(&FSM_GC_SUITE_EventPriority_fsm);
   ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_EventPriority_fsm, &FSM_GC_SUITE_EventPriority_state2));
   // High-priority event should be processed first
-  ASSERT_EQ(FSM_GC_SUITE_EventPriority_fsm._events_count, 1);
+  ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_EventPriority_fsm._events), 1);
 }
 
 // Test 8: No valid transition for current state/event
@@ -250,7 +250,7 @@ GTEST_TEST(FSM_GC_SUITE, ProcessCycle)
   }
   
   // Process in loop until all events are handled
-  while (FSM_GC_SUITE_ProcessCycle_fsm._events_count > 0) {
+  while (circle_buf_gc_count(FSM_GC_SUITE_ProcessCycle_fsm._events) > 0) {
     fsm_gc_process(&FSM_GC_SUITE_ProcessCycle_fsm);
   }
   
@@ -335,7 +335,7 @@ GTEST_TEST(FSM_GC_SUITE, PriorityLoop)
     fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_lowPrio);
 
     // Process until queue empty
-    while (FSM_GC_SUITE_PriorityLoop_fsm._events_count > 0) {
+    while (circle_buf_gc_count(FSM_GC_SUITE_PriorityLoop_fsm._events) > 0) {
         fsm_gc_process(&FSM_GC_SUITE_PriorityLoop_fsm);
     }
     
@@ -374,7 +374,7 @@ GTEST_TEST(FSM_GC_SUITE, TerminationCondition)
     
     ASSERT_TRUE(target_reached);
     // Ensure remaining events were cleared
-    ASSERT_EQ(FSM_GC_SUITE_TerminationCondition_fsm._events_count, 4);
+    ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_TerminationCondition_fsm._events), 4);
 }
 
 // Test 18: Check events count
@@ -389,7 +389,7 @@ void _FSM_GC_SUITE_CheckEventsCount_state1(void) {}
 GTEST_TEST(FSM_GC_SUITE, CheckEventsCount)
 {
     fsm_gc_init(&FSM_GC_SUITE_CheckEventsCount_fsm, FSM_GC_SUITE_CheckEventsCount_fsm_table, 1);
-    ASSERT_EQ(__arr_len(__concat(__events_, FSM_GC_SUITE_CheckEventsCount_fsm)), FSM_GC_EVENTS_COUNT);
+    ASSERT_EQ(__arr_len(__concat(__events_buf_, FSM_GC_SUITE_CheckEventsCount_fsm)), FSM_GC_EVENTS_COUNT);
 }
 
 

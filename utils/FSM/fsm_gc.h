@@ -25,6 +25,7 @@ extern "C" {
 #include <stdbool.h>
 
 #include "gutils.h"
+#include "circle_buf_gc.h"
 
 
 typedef struct _fsm_gc_event_t {
@@ -60,8 +61,8 @@ typedef struct _fsm_gc_t {
     bool                 _initialized;
     fsm_gc_state_t*      _state;
     uint8_t              _events_length;
-    uint8_t              _events_count;
-    fsm_gc_event_t*      _events;
+    fsm_gc_event_t*      _events_buf;
+    circle_buf_gc_t*     _events;
     fsm_gc_transition_t* _table;
     size_t               _table_size;
 #ifdef FSM_GC_BEDUG
@@ -121,13 +122,14 @@ extern size_t _fsm_gc_events_iterator;
 
 #ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE(FSM_NAME)            static const char __concat(__bedug_fsm_name_, FSM_NAME)[] = __STR_DEF__(FSM_NAME); \
-                                              static fsm_gc_event_t  __concat(__events_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0,""}}; \
+                                              static fsm_gc_event_t  __concat(__events_buf_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0,""}}; \
+                                              static circle_buf_gc_t __concat(__events_, FSM_NAME) = { 0, NULL, 0, 0, 0, 0 };\
                                               static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \
-                                                  /* ._events_length = */ FSM_GC_EVENTS_COUNT, \
-                                                  /* ._events_count = */  0, \
-                                                  /* ._events = */        __concat(__events_, FSM_NAME), \
+                                                  /* ._events_length = */ __arr_len(__concat(__events_buf_, FSM_NAME)), \
+                                                  /* ._events_buf = */    __concat(__events_buf_, FSM_NAME), \
+                                                  /* ._events = */        &__concat(__events_, FSM_NAME), \
                                                   /* ._table = */         NULL, \
                                                   /* ._table_size = */    0, \
                                                   /* _e_fsm_tt = */       false, \
@@ -135,13 +137,14 @@ extern size_t _fsm_gc_events_iterator;
                                                   /* _name = */           __concat(__bedug_fsm_name_, FSM_NAME) \
                                               };
 #else
-#   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_event_t  __concat(__events_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0, 0}}; \
+#   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_event_t  __concat(__events_buf_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0}}; \
+                                              static circle_buf_gc_t __concat(__events_, FSM_NAME) = { 0, NULL, 0, 0, 0, 0 };\
                                               static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \
-                                                  /* ._events_length = */ FSM_GC_EVENTS_COUNT, \
-                                                  /* ._events_count = */  0, \
-                                                  /* ._events = */        __concat(__events_, FSM_NAME), \
+                                                  /* ._events_length = */ __arr_len(__concat(__events_buf_, FSM_NAME)), \
+                                                  /* ._events_buf = */    __concat(__events_buf_, FSM_NAME), \
+                                                  /* ._events = */        &__concat(__events_, FSM_NAME), \
                                                   /* ._table = */         NULL, \
                                                   /* ._table_size = */    0 \
                                               };

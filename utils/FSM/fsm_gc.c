@@ -38,6 +38,8 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     fsm->_table       = table;
     fsm->_table_size  = size;
     fsm->_state       = fsm->_table[0].source;
+    circle_buf_gc_init(fsm->_events, (uint8_t*)fsm->_events_buf, sizeof(*fsm->_events_buf), fsm->_events_length);
+
     for (unsigned i = 0; i < fsm->_table_size; i++) {
         if (fsm->_table[i].event) {
             fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
@@ -107,7 +109,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             }
         }
 #endif
-	}
+    }
 
 #ifdef FSM_GC_BEDUG
     printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
@@ -131,8 +133,7 @@ void fsm_gc_reset(fsm_gc_t* fsm)
         return;
     }
     
-    fsm->_events_count = 0;
-    fsm->_state        = fsm->_table[0].source;
+    fsm->_state = fsm->_table[0].source;
 }
 
 void fsm_gc_process(fsm_gc_t* fsm) 
@@ -159,23 +160,31 @@ void fsm_gc_process(fsm_gc_t* fsm)
     size_t event_idx = 0;
     size_t event_prio = 0;
 
-    for (unsigned i = 0; i < fsm->_events_count; i++) {
-        fsm_gc_event_t event = fsm->_events[i];
+    for (unsigned i = 0; i < circle_buf_gc_count(fsm->_events); i++) {
+        fsm_gc_event_t* event = (fsm_gc_event_t*)circle_buf_gc_index(fsm->_events, i);
         for (unsigned j = 0; j < fsm->_table_size; j++) {
             fsm_gc_transition_t tr = fsm->_table[j];
-            if (!tr.source || !tr.event || !tr.target) {
+            if (!tr.source) {
                 continue;
             }
-            if (fsm->_state->state == tr.source->state && 
-                event.index == tr.event->index
-            ) {
-                if (!is_transition || event_prio < event.priority) {
-                    event_idx = i;
-                    table_idx = j;
-                    event_prio = event.priority;
-                }
-                is_transition = true;
+            if (!tr.event) {
+                continue;
             }
+            if (!tr.target) {
+                continue;
+            }
+            if (fsm->_state->state != tr.source->state) {
+                continue;
+            }
+            if (event->index != tr.event->index) {
+                continue;
+            }
+            if (!is_transition || event_prio < event->priority) {
+                event_idx  = i;
+                table_idx  = j;
+                event_prio = event->priority;
+            }
+            is_transition = true;
         }
     }
 
@@ -196,12 +205,11 @@ void fsm_gc_process(fsm_gc_t* fsm)
 #endif
 
     fsm->_state = fsm->_table[table_idx].target;
-    fsm->_events_count--;
-		memset((void*)&fsm->_events[event_idx], 0, sizeof(fsm->_events[event_idx]));
-
-    for (unsigned i = event_idx; i < fsm->_events_count; i++) {
-        fsm->_events[i] = fsm->_events[i + 1];
+    for (unsigned i = 0; i < event_idx; i++) {
+        fsm_gc_event_t event = *(fsm_gc_event_t*)circle_buf_gc_pop_front(fsm->_events);
+        circle_buf_gc_push_back(fsm->_events, (uint8_t*)&event);
     }
+    circle_buf_gc_pop_front(fsm->_events);
 
     if (fsm->_table[table_idx].action) {
         fsm->_table[table_idx].action->action();
@@ -224,28 +232,21 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     }
     if (!fsm->_initialized) {
 #ifdef FSM_GC_BEDUG
-    	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
-    	return;
+        return;
     }
-    if (fsm->_events_count >= fsm->_events_length) {
-        for (uint8_t i = 0; i < fsm->_events_length - 1; i++) {
-            fsm->_events[i] = fsm->_events[i + 1];
-        }
-        fsm->_events_count = fsm->_events_length - 1;
-    }
-    fsm->_events[fsm->_events_count++] = *event;
-
+    circle_buf_gc_push_back(fsm->_events, (uint8_t*)event);
 
 #ifdef FSM_GC_BEDUG
-	printTagLog(
-		FSM_GC_TAG, \
-		"\"%s\" push %02u event: %s",
-		fsm->_name,
-        fsm->_events_count,
-		event->_name
-	);
+    printTagLog(
+        FSM_GC_TAG, \
+        "\"%s\" push %02u event: %s",
+        fsm->_name,
+        circle_buf_gc_count(fsm->_events),
+        event->_name
+    );
 #endif
 }
 
@@ -259,20 +260,20 @@ void fsm_gc_clear(fsm_gc_t* fsm)
     }
     if (!fsm->_initialized) {
 #ifdef FSM_GC_BEDUG
-    	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
-    	return;
+        return;
     }
 
-	fsm->_events_count = 0;
+    circle_buf_gc_free(fsm->_events);
 
 #ifdef FSM_GC_BEDUG
-	printTagLog(
-		FSM_GC_TAG, \
-		"\"%s\" clear",
-		fsm->_name
-	);
+    printTagLog(
+        FSM_GC_TAG, \
+        "\"%s\" clear",
+        fsm->_name
+    );
 #endif
 }
 
@@ -292,10 +293,10 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
     }
     if (!fsm->_initialized) {
 #ifdef FSM_GC_BEDUG
-    	BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
-    	return false;
+        return false;
     }
     if (!fsm->_state) {
 #ifdef FSM_GC_BEDUG
@@ -304,5 +305,5 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 #endif
         return false;
     }
-	return fsm->_state->state == state->state;
+    return fsm->_state->state == state->state;
 }

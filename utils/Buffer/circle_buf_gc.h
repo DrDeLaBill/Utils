@@ -14,7 +14,7 @@ extern "C" {
 
 
 typedef struct _circle_buf_gc_t {
-	uint32_t m_bedacode;
+    uint32_t m_bedacode;
     uint8_t* m_data;
     unsigned m_unit_size;
     unsigned m_length;
@@ -36,6 +36,7 @@ uint8_t* circle_buf_gc_pop_front(circle_buf_gc_t* p);
 uint8_t* circle_buf_gc_pop_back(circle_buf_gc_t* p);
 uint8_t* circle_buf_gc_front(circle_buf_gc_t* p);
 uint8_t* circle_buf_gc_back(circle_buf_gc_t* p);
+uint8_t* circle_buf_gc_index(circle_buf_gc_t* p, const unsigned index);
 
 
 #ifdef __cplusplus
