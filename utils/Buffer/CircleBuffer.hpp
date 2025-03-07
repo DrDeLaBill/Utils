@@ -73,27 +73,11 @@ namespace utl
 
 		DATA_T& operator[] (INDEX_T i)
         {
-			if(empty() || i > count()) {
-#ifdef USE_HAL_DRIVER
-				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
-				return m_data[0];
-#else
-				throw;
-#endif
-			}
 			return m_data[(m_readCount + i) & m_mask];
         }
 
         const DATA_T operator[] (INDEX_T i) const
         {
-			if(empty()) {
-#ifdef USE_HAL_DRIVER
-				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
-				return m_data[0];
-#else
-				throw;
-#endif
-			}
 			return m_data[(m_readCount + i) & m_mask];
         }
 
@@ -126,8 +110,7 @@ namespace utl
 		{
 			BEDUG_ASSERT(!empty(), "error pop front unit - circle buffer is empty");
 			if (empty()) {
-				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
-				return m_data[0];
+				return m_data[m_readCount & m_mask];
 			}
 			return m_data[m_readCount++ & m_mask];
 		}
@@ -136,8 +119,7 @@ namespace utl
 		{
 			BEDUG_ASSERT(!empty(), "error pop back unit - circle buffer is empty");
 			if (empty()) {
-				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
-				return m_data[0];
+				return m_data[m_readCount & m_mask];
 			}
 			return m_data[(m_writeCount-- - 1) & m_mask];
 		}
@@ -146,8 +128,7 @@ namespace utl
 		{
 			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
 			if (empty()) {
-				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
-				return m_data[0];
+				return m_data[m_readCount & m_mask];
 			}
 			return m_data[m_readCount & m_mask];
 		}
@@ -156,8 +137,7 @@ namespace utl
 		{
 			BEDUG_ASSERT(!empty(), "error get back unit - circle buffer is empty");
 			if (empty()) {
-				memset(reinterpret_cast<void*>(&m_data[0]), 0, sizeof(m_data[0]));
-				return m_data[0];
+				return m_data[m_readCount & m_mask];
 			}
 			return m_data[(m_writeCount - 1) & m_mask];
 		}
