@@ -58,9 +58,9 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     "WARNING! \"%s\" has matches functions states %s{0x%08X} = %s{0x%08X}",
                     fsm->_name,
                     fsm->_table[i].source->_name,
-                    fsm->_table[i].source,
+                    (unsigned)fsm->_table[i].source,
                     fsm->_table[j].source->_name,
-                    fsm->_table[j].source
+					(unsigned)fsm->_table[j].source
                 );
             }
             if (fsm->_table[i].source != fsm->_table[j].target &&
@@ -71,9 +71,9 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     "WARNING! \"%s\" has matches functions states  %s{0x%08X} = %s{0x%08X}",
                     fsm->_name,
                     fsm->_table[i].source->_name,
-                    fsm->_table[i].source,
+					(unsigned)fsm->_table[i].source,
                     fsm->_table[j].target->_name,
-                    fsm->_table[j].target
+					(unsigned)fsm->_table[j].target
                 );
             }
             if (fsm->_table[i].action != fsm->_table[j].action &&
@@ -84,9 +84,9 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     "WARNING! \"%s\" has matches functions actions %s{0x%08X} = %s{0x%08X}",
                     fsm->_name,
                     fsm->_table[i].action->_name,
-                    fsm->_table[i].action,
+					(unsigned)fsm->_table[i].action,
                     fsm->_table[j].action->_name,
-                    fsm->_table[j].action
+					(unsigned)fsm->_table[j].action
                 );
             }
             if (fsm->_table[i].source == fsm->_table[j].source &&
@@ -100,11 +100,11 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     i,
                     j,
                     fsm->_table[j].source->_name,
-                    fsm->_table[j].source,
+					(unsigned)fsm->_table[j].source,
                     fsm->_table[j].target->_name,
-                    fsm->_table[j].target,
+					(unsigned)fsm->_table[j].target,
                     fsm->_table[j].action ? fsm->_table[j].action->_name : EMPTY,
-                    fsm->_table[j].action
+					(unsigned)fsm->_table[j].action
                 );
             }
         }

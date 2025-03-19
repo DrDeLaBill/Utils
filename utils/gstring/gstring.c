@@ -54,10 +54,14 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 	snprintf(
 		target,
 		size - 1,
-		"%s%lu.",
+		"%s%lu",
 		value < 0 ? "-" : "",
 		(long unsigned int)(__abs(value) / div)
 	);
+	if (!point_count) {
+		return;
+	}
+	target[strlen(target)] = '.';
 	BEDUG_ASSERT(
 		size > strlen(target) + 1 && div % 10 == 0 && div > 1 && point_count > 0,
 		"util_int_to_str_with_point bad size"
@@ -74,7 +78,7 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 	if (div > dec) {
 		value /= (div / dec);
 	}
-	char format[8] = "";
+	char format[16] = "";
 	snprintf(
 		format,
 		sizeof(format) - 1,
