@@ -193,15 +193,17 @@ void fsm_gc_process(fsm_gc_t* fsm)
     }
 
 #ifdef FSM_GC_BEDUG
-    printTagLog(
-        FSM_GC_TAG,
-        "\"%s\" transition: %s{%s} -> %s -> %s",
-        fsm->_name,
-        fsm->_table[table_idx].source->_name,
-        fsm->_table[table_idx].event->_name,
-        fsm->_table[table_idx].action ? fsm->_table[table_idx].action->_name : EMPTY,
-        fsm->_table[table_idx].target->_name
-    );
+    if (fsm->_enable_msg) {
+		printTagLog(
+			FSM_GC_TAG,
+			"\"%s\" transition: %s{%s} -> %s -> %s",
+			fsm->_name,
+			fsm->_table[table_idx].source->_name,
+			fsm->_table[table_idx].event->_name,
+			fsm->_table[table_idx].action ? fsm->_table[table_idx].action->_name : EMPTY,
+			fsm->_table[table_idx].target->_name
+		);
+    }
 #endif
 
     fsm->_state = fsm->_table[table_idx].target;
@@ -240,13 +242,15 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     circle_buf_gc_push_back(fsm->_events, (uint8_t*)event);
 
 #ifdef FSM_GC_BEDUG
-    printTagLog(
-        FSM_GC_TAG, \
-        "\"%s\" push %02u event: %s",
-        fsm->_name,
-        circle_buf_gc_count(fsm->_events),
-        event->_name
-    );
+    if (fsm->_enable_msg) {
+		printTagLog(
+			FSM_GC_TAG, \
+			"\"%s\" push %02u event: %s",
+			fsm->_name,
+			circle_buf_gc_count(fsm->_events),
+			event->_name
+		);
+    }
 #endif
 }
 
@@ -269,11 +273,13 @@ void fsm_gc_clear(fsm_gc_t* fsm)
     circle_buf_gc_free(fsm->_events);
 
 #ifdef FSM_GC_BEDUG
-    printTagLog(
-        FSM_GC_TAG, \
-        "\"%s\" clear",
-        fsm->_name
-    );
+    if (fsm->_enable_msg) {
+		printTagLog(
+			FSM_GC_TAG, \
+			"\"%s\" clear",
+			fsm->_name
+		);
+    }
 #endif
 }
 
@@ -307,3 +313,15 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
     }
     return fsm->_state->state == state->state;
 }
+
+#ifdef FSM_GC_BEDUG
+void fsm_gc_enable_messages(fsm_gc_t* fsm)
+{
+	fsm->_enable_msg = true;
+}
+
+void fsm_gc_disable_messages(fsm_gc_t* fsm)
+{
+	fsm->_enable_msg = false;
+}
+#endif

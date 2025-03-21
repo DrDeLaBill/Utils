@@ -51,10 +51,10 @@ typedef struct _fsm_gc_action_t {
 } fsm_gc_action_t;
 
 typedef struct _fsm_gc_transition_t {
-    fsm_gc_state_t*  source;
-    fsm_gc_event_t*  event;
-    fsm_gc_state_t*  target;
-    fsm_gc_action_t* action;
+    fsm_gc_state_t*  const source;
+    fsm_gc_event_t*  const event;
+    fsm_gc_state_t*  const target;
+    fsm_gc_action_t* const action;
 } fsm_gc_transition_t;
 
 typedef struct _fsm_gc_t {
@@ -69,6 +69,7 @@ typedef struct _fsm_gc_t {
     bool                 _e_fsm_tt;
     bool                 _fsm_not_i;
     const char*          _name;
+    bool                 _enable_msg;
 #endif
 } fsm_gc_t;
 
@@ -134,7 +135,8 @@ extern size_t _fsm_gc_events_iterator;
                                                   /* ._table_size = */    0, \
                                                   /* _e_fsm_tt = */       false, \
                                                   /* _fsm_not_i = */      false, \
-                                                  /* _name = */           __concat(__bedug_fsm_name_, FSM_NAME) \
+                                                  /* _name = */           __concat(__bedug_fsm_name_, FSM_NAME), \
+												  /* _enable_msg = */     true \
                                               };
 #else
 #   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_event_t  __concat(__events_buf_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0}}; \
@@ -157,6 +159,10 @@ void fsm_gc_process(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
 void fsm_gc_clear(fsm_gc_t* fsm);
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state);
+#ifdef FSM_GC_BEDUG
+void fsm_gc_enable_messages(fsm_gc_t* fsm);
+void fsm_gc_disable_messages(fsm_gc_t* fsm);
+#endif
 
 #ifdef FSM_GC_BEDUG
 unsigned _fsm_gc_get_state_debug_number(const char* name);

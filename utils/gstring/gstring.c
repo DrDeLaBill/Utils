@@ -56,7 +56,7 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 		size - 1,
 		"%s%lu",
 		value < 0 ? "-" : "",
-		(long unsigned int)(__abs(value) / div)
+		(((long unsigned)__abs(value)) / div)
 	);
 	if (!point_count) {
 		return;
@@ -74,9 +74,9 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 		return;
 	}
 	unsigned dec = util_small_pow(10, point_count);
-	value = __abs(value) % div;
+	value = (int)(((unsigned)__abs(value)) % div);
 	if (div > dec) {
-		value /= (div / dec);
+		value /= (int)(div / dec);
 	}
 	char format[16] = "";
 	snprintf(
