@@ -314,14 +314,18 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
     return fsm->_state->state == state->state;
 }
 
-#ifdef FSM_GC_BEDUG
 void fsm_gc_enable_messages(fsm_gc_t* fsm)
 {
+    (void)fsm;
+#ifdef FSM_GC_BEDUG
 	fsm->_enable_msg = true;
+#endif
 }
 
 void fsm_gc_disable_messages(fsm_gc_t* fsm)
 {
+    (void)fsm;
+#ifdef FSM_GC_BEDUG
 	fsm->_enable_msg = false;
-}
 #endif
+}

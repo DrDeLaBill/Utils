@@ -61,6 +61,7 @@ void COREInfo(void)
 		(int)((DBGMCU->IDCODE >> 16) & 0xFFFF)
 	);
 
+#   if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
 	uint32_t pat = (cpuid & 0x0000000F);
 	uint32_t var = (cpuid & 0x00F00000) >> 20;
 
@@ -90,6 +91,8 @@ void COREInfo(void)
 	} else {
 		printPretty("Unknown CORE IMPLEMENTER\n");
 	}
+#   endif
+
 #endif
 }
 

@@ -49,11 +49,10 @@ namespace utl
 	template<unsigned SIZE, class DATA_T=uint8_t>
 	class CircleBuffer
 	{
-	
 	static_assert(SIZE > 0);
 	static_assert((SIZE & (SIZE - 1)) == 0);
 
-	private:
+	protected:
 	
 		using INDEX_T = typename prvt::TypeSelector<SIZE>::TYPE;
 	
@@ -65,11 +64,7 @@ namespace utl
 		DATA_T m_data[SIZE];
 		
 	public:
-		CircleBuffer()
-		{
-			m_readCount = 0;
-			m_writeCount = 0;
-		}
+		CircleBuffer(): m_readCount(0), m_writeCount(0), m_data() {}
 
 		DATA_T& operator[] (INDEX_T i)
         {

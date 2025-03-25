@@ -4,13 +4,13 @@
 #define _G_QUEUE_H_
 
 
-#include "CircleBuffer.h"
+#include "CircleBuffer.hpp"
 
 
 namespace utl {
 
     template<unsigned SIZE, class DATA_T=uint8_t>
-    class GQueue : private CircleBuffer<SIZE, DATA_T> {
+    class GQueue : protected CircleBuffer<SIZE, DATA_T> {
     public:
         GQueue() : CircleBuffer<SIZE, DATA_T>() {}
         
@@ -26,17 +26,17 @@ namespace utl {
             return this->front();
         }
 
-        INDEX_T count() {
-            return this->count();
+        typename CircleBuffer<SIZE, DATA_T>::INDEX_T count() {
+            return CircleBuffer<SIZE, DATA_T>::count();
         }
 
         bool empty() {
-            return this->empty();
+            return CircleBuffer<SIZE, DATA_T>::empty();
 
         }
 
         bool full() {
-            return this->full();
+            return CircleBuffer<SIZE, DATA_T>::full();
         }
     };
 }

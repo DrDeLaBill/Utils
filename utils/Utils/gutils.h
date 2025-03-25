@@ -13,6 +13,7 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "glog.h"
 #include "gtime.h"
 #include "bmacro.h"
 
@@ -23,11 +24,11 @@ extern "C" {
 
 
 #ifndef __abs
-#	define __abs(num1) (((num1) > 0) ? (num1) : ((num1) * -1))
+#    define __abs(num1) (((num1) > 0) ? (num1) : ((num1) * -1))
 #endif
 
 #ifndef __abs_dif
-#	define __abs_dif(num1, num2) (((num1) > (num2)) ? (num1) - (num2) : (num2) - (num1))
+#    define __abs_dif(num1, num2) (((num1) > (num2)) ? (num1) - (num2) : (num2) - (num1))
 #endif
 
 #ifndef __arr_len
@@ -35,7 +36,7 @@ extern "C" {
 #endif
 
 #ifndef __div_up
-#	define __div_up(num, div) (((num) / (div)) + ((num) % (div) ? 1 : 0))
+#    define __div_up(num, div) (((num) / (div)) + ((num) % (div) ? 1 : 0))
 #endif
 
 #ifndef __min
@@ -47,15 +48,15 @@ extern "C" {
 #endif
 
 #ifndef __get_bit
-#	define __get_bit(REG, NUM) (((REG) >> (NUM)) & 0x1UL)
+#    define __get_bit(REG, NUM) (((REG) >> (NUM)) & 0x1UL)
 #endif
 
 #ifndef __set_bit
-#	define __set_bit(REG, NUM) ((REG) |= (0x1UL << (NUM)))
+#    define __set_bit(REG, NUM) ((REG) |= (0x1UL << (NUM)))
 #endif
 
 #ifndef __reset_bit
-#	define __reset_bit(REG, NUM) ((REG) &= ~(0x1UL << (NUM)))
+#    define __reset_bit(REG, NUM) ((REG) &= ~(0x1UL << (NUM)))
 #endif
 
 #ifndef __concat
@@ -82,6 +83,22 @@ extern "C" {
 #endif
 
 
+#ifndef __define_TPC
+#   define __define_TPC(NAME) { \
+                                  static uint32_t __concat(NAME, _cnt) = 0; \
+                                  static uint32_t __concat(NAME, _ms)  = getMillis(); \
+                                  static char __concat(NAME, _str)[]   = #NAME; \
+                                  if (getMillis() - __concat(NAME, _ms) > SECOND_MS) { \
+                                      printTagLog("TPC", "%s->%08lu", __concat(NAME, _str), __concat(NAME, _cnt)); \
+                                      __concat(NAME, _cnt) = 0; \
+                                      __concat(NAME, _ms)  = getMillis(); \
+                                  } else { \
+                                      __concat(NAME, _cnt)++; \
+                                  } \
+                              }
+#endif
+
+
 typedef struct _gtimer_t {
     TIME_MS_T start;
     TIME_MS_T delay;
@@ -102,9 +119,9 @@ typedef struct _util_port_pin_t {
 
 
 typedef enum _ALIGN_MODE {
-	ALIGN_MODE_LEFT = 1,
-	ALIGN_MODE_RIGHT,
-	ALIGN_MODE_CENTER
+    ALIGN_MODE_LEFT = 1,
+    ALIGN_MODE_RIGHT,
+    ALIGN_MODE_CENTER
 } ALIGN_MODE;
 
 

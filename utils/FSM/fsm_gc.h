@@ -136,7 +136,7 @@ extern size_t _fsm_gc_events_iterator;
                                                   /* _e_fsm_tt = */       false, \
                                                   /* _fsm_not_i = */      false, \
                                                   /* _name = */           __concat(__bedug_fsm_name_, FSM_NAME), \
-												  /* _enable_msg = */     true \
+                                                  /* _enable_msg = */     true \
                                               };
 #else
 #   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_event_t  __concat(__events_buf_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0}}; \
@@ -159,10 +159,8 @@ void fsm_gc_process(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);
 void fsm_gc_clear(fsm_gc_t* fsm);
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state);
-#ifdef FSM_GC_BEDUG
 void fsm_gc_enable_messages(fsm_gc_t* fsm);
 void fsm_gc_disable_messages(fsm_gc_t* fsm);
-#endif
 
 #ifdef FSM_GC_BEDUG
 unsigned _fsm_gc_get_state_debug_number(const char* name);
