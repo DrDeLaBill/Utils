@@ -27,6 +27,17 @@ void gtimer_reset(gtimer_t* tm)
 	tm->start = 0;
 }
 
+uint32_t gtimer_remaining(gtimer_t* tm)
+{
+    if (tm->start + tm->delay < getMillis()) {
+    	return 0;
+    }
+    if (tm->start > getMillis()) {
+    	return 0;
+    }
+    return tm->delay - (getMillis() - tm->start);
+}
+
 #if defined(_DEBUG) || defined(DEBUG)
 void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) {
     const uint8_t cols_count = 16;
@@ -105,7 +116,7 @@ int util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2)
 {
 	int range1 = __abs_dif(rngh1, rngl1);
 	int range2 = __abs_dif(rngh2, rngl2);
-	int delta  = __abs_dif(rngl1,   val);
+	int delta  = __abs_dif(rngl1, val);
     return rngl2 + ((delta * range2) / range1);
 }
 

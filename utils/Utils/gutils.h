@@ -63,6 +63,12 @@ extern "C" {
 #   define __concat(a, b) a##b
 #endif
 
+#ifndef __proportion
+#   define __proportion(VAL, RNG1L, RNG1H, RNG2L, RNG2H) ( \
+        RNG2L + ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)) \
+)
+#endif
+
 #ifndef __percent
 #   define __percent(PART, MAX) (((PART) * 100) / (MAX))
 #endif
@@ -107,6 +113,7 @@ typedef struct _gtimer_t {
 
 void gtimer_start(gtimer_t* tm, TIME_MS_T waitMs);
 bool gtimer_wait(gtimer_t* tm);
+uint32_t gtimer_remaining(gtimer_t* tm);
 void gtimer_reset(gtimer_t* tm);
 
 
