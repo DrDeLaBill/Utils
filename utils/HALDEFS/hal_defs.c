@@ -52,6 +52,7 @@ bool MCUcheck(void)
 void COREInfo(void)
 {
 #ifndef NO_CPU_INFO
+#   if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
 	uint32_t cpuid = SCB->CPUID;
 
 	printPretty(
@@ -61,7 +62,6 @@ void COREInfo(void)
 		(int)((DBGMCU->IDCODE >> 16) & 0xFFFF)
 	);
 
-#   if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
 	uint32_t pat = (cpuid & 0x0000000F);
 	uint32_t var = (cpuid & 0x00F00000) >> 20;
 
@@ -92,7 +92,6 @@ void COREInfo(void)
 		printPretty("Unknown CORE IMPLEMENTER\n");
 	}
 #   endif
-
 #endif
 }
 
@@ -138,93 +137,94 @@ void IDCODEInfo(void)
 #ifndef NO_CPU_INFO
 	uint32_t idcode = DBGMCU->IDCODE & 0xFFF;
 
+	printPretty("");
 	switch(idcode) {
 	case 0x410:
-        printPretty("STM32F103\n");
+        gprint("STM32F103\n");
         break;
 	case 0x411:
-        printPretty("STM32F457\n");
+        gprint("STM32F457\n");
         break;
 	case 0x413:
-        printPretty("STM32F407\n");
+        gprint("STM32F407\n");
         break;
 	case 0x415:
-        printPretty("STM32L475xx, L476xx or L486xx\n");
+        gprint("STM32L475xx, L476xx or L486xx\n");
         break;
 	case 0x417:
-        printPretty("STM32L0 Cat 3\n");
+        gprint("STM32L0 Cat 3\n");
         break;
 	case 0x419:
-        printPretty("STM32F429 or F439\n");
+        gprint("STM32F429 or F439\n");
         break;
 	case 0x421:
-        printPretty("STM32F446\n");
+        gprint("STM32F446\n");
         break;
 	case 0x423:
-        printPretty("STM32F401\n");
+        gprint("STM32F401\n");
         break;
 	case 0x431:
-        printPretty("STM32F411\n");
+        gprint("STM32F411\n");
         break;
 	case 0x433:
-        printPretty("STM32F401\n");
+        gprint("STM32F401\n");
         break;
 	case 0x434:
-        printPretty("STM32F469\n");
+        gprint("STM32F469\n");
         break;
 	case 0x435:
-        printPretty("STM32L43xxx or L44xxx\n");
+        gprint("STM32L43xxx or L44xxx\n");
         break;
 	case 0x440:
-        printPretty("STM32F030x8\n");
+        gprint("STM32F030x8\n");
         break;
 	case 0x441:
-        printPretty("STM32F412\n");
+        gprint("STM32F412\n");
         break;
 	case 0x442:
-        printPretty("STM32F030xC\n");
+        gprint("STM32F030xC\n");
         break;
 	case 0x444:
-        printPretty("STM32F030x4 or F030x6\n");
+        gprint("STM32F030x4 or F030x6\n");
         break;
 	case 0x445:
-        printPretty("STM32F070x6\n");
+        gprint("STM32F070x6\n");
         break;
 	case 0x447:
-        printPretty("STM32L0 Cat 5\n");
+        gprint("STM32L0 Cat 5\n");
         break;
 	case 0x448:
-        printPretty("STM32F070x8\n");
+        gprint("STM32F070x8\n");
         break;
 	case 0x449:
-        printPretty("STM32F74xxx or F75xxx\n");
+        gprint("STM32F74xxx or F75xxx\n");
         break;
 	case 0x450:
-        printPretty("STM32H7xx\n");
+        gprint("STM32H7xx\n");
         break;
 	case 0x451:
-        printPretty("STM32F76xxx or F77xxx\n");
+        gprint("STM32F76xxx or F77xxx\n");
         break;
 	case 0x452:
-        printPretty("STM32F72xxx or F73xxx\n");
+        gprint("STM32F72xxx or F73xxx\n");
         break;
 	case 0x457:
-        printPretty("STM32L011xx\n");
+        gprint("STM32L011xx\n");
         break;
 	case 0x461:
-        printPretty("STM32L496xx or L4A6xx\n");
+        gprint("STM32L496xx or L4A6xx\n");
         break;
 	case 0x462:
-        printPretty("STM32L45xxx or L46xxx\n");
+        gprint("STM32L45xxx or L46xxx\n");
         break;
 	case 0x470:
-        printPretty("STM32L4Rxxx or L4Sxxx\n");
+        gprint("STM32L4Rxxx or L4Sxxx\n");
         break;
 	case 0x480:
-        printPretty("STM32H7Ax or H7Bx\n");
+        gprint("STM32H7Ax or H7Bx\n");
         break;
 	default:
-        printPretty("Unknown STM32 (IDCODE=0x%X)\n", (int)idcode);
+        gprint("Unknown STM32 (IDCODE=0x%X)\n", (int)idcode);
 		break;
 	}
 #endif
