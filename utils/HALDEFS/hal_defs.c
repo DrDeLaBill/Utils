@@ -30,22 +30,16 @@ void SystemInfo(void)
 
 bool MCUcheck(void)
 {
-#ifndef NO_CPU_INFO
 	uint32_t cpuid = SCB->CPUID;
 	if ((cpuid & 0xFF000000) != 0x41000000) {
 		return false;
 	}
-#   if defined(STM32F1)
+#if defined(STM32F1)
 	return ((cpuid & 0x0000FFF0) >> 4) == 0xC23;
-#   elif defined(STM32F2)
-#       error "Select MCU"
-#   elif defined(STM32F4)
+#elif defined(STM32F4)
 	return ((cpuid & 0x0000FFF0) >> 4) == 0xC24;
-#   else
-#       error "Select MCU"
-#   endif
 #else
-	return true;
+#   error "Select MCU"
 #endif
 }
 
