@@ -5,6 +5,8 @@
 #include <stdio.h>
 #include <string.h>
 
+#include "gutils.h"
+
 
 void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode)
 {
@@ -49,6 +51,7 @@ void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len,
 	phrase[need_len] = 0;
 }
 
+// TODO: point_count = 100 fix
 void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned div, unsigned point_count)
 {
 	snprintf(
@@ -61,16 +64,19 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 	if (!point_count) {
 		return;
 	}
-	target[strlen(target)] = '.';
+	size_t len = strlen(target);
+	target[len++] = '.';
+	target[len]   = 0;
 	BEDUG_ASSERT(
-		size > strlen(target) + 1 && div % 10 == 0 && div > 1 && point_count > 0,
+		size > len + 1 && div % 10 == 0 && div > 1 && point_count > 0,
 		"util_int_to_str_with_point bad size"
 	);
-	if (size < strlen(target) + 1) {
+	if (size < len + 1) {
 		return;
 	}
 	if (div % 10) {
-		target[strlen(target)] = '0';
+		target[len++] = '0';
+		target[len]   = 0;
 		return;
 	}
 	unsigned dec = util_small_pow(10, point_count);
@@ -87,8 +93,8 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 		point_count
 	);
 	snprintf(
-		target + strlen(target),
-		size - strlen(target) - 1,
+		target + len,
+		size - len - 1,
 		format,
 		value
 	);
