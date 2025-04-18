@@ -17,6 +17,7 @@ extern "C" {
 
 void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len, ALIGN_MODE mode);
 void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned div, unsigned point_count);
+char* util_u64_to_str(uint64_t value);
 
 
 #ifdef __cplusplus
