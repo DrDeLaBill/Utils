@@ -8,7 +8,6 @@
 
 
 #if defined(USE_HAL_DRIVER)
-#	include "hal_defs.h"
 #elif defined(ARDUINO)
 #   include <Arduino.h>
 #elif defined(__GNUC__)

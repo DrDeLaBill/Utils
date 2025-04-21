@@ -7,10 +7,6 @@
 
 #include "glog.h"
 
-#ifdef USE_HAL_DRIVER
-#   include "hal_defs.h"
-#endif
-
 
 void gtimer_start(gtimer_t* timer, TIME_MS_T delay) {
     timer->start = getMillis();

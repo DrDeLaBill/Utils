@@ -18,11 +18,6 @@ extern "C" {
 #include "bmacro.h"
 
 
-#ifdef USE_HAL_DRIVER
-#   include "hal_defs.h"
-#endif
-
-
 #ifndef __abs
 #    define __abs(num1) (((num1) > 0) ? (num1) : ((num1) * -1))
 #endif
@@ -115,14 +110,6 @@ void gtimer_start(gtimer_t* tm, TIME_MS_T waitMs);
 bool gtimer_wait(gtimer_t* tm);
 uint32_t gtimer_remaining(gtimer_t* tm);
 void gtimer_reset(gtimer_t* tm);
-
-
-#ifdef USE_HAL_DRIVER
-typedef struct _util_port_pin_t {
-    GPIO_TypeDef* port;
-    uint16_t      pin;
-} util_port_pin_t;
-#endif
 
 
 typedef enum _ALIGN_MODE {
