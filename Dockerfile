@@ -1,6 +1,6 @@
-ARG CI_DOCKER_REGISTRY=ghcr.io/drdelabill/stm_builder:latest
+ARG CI_REGISTRY=ghcr.io/drdelabill/stm_builder:latest
 
-FROM $CI_DOCKER_REGISTRY AS builder
+FROM $CI_REGISTRY AS builder
 
 ENV APP_ROOT=/app
 ENV SRC_ROOT=$APP_ROOT/src

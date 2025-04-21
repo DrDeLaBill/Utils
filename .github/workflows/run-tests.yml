@@ -12,4 +12,4 @@ jobs:
     steps:
     - uses: actions/checkout@v3
     - name: Testing
-      run: docker build --no-cache --progress=plain . --build-arg CI_DOCKER_REGISTRY="${{secrets.BUILD_CI_REGISTRY}}"
+      run: docker build --no-cache --progress=plain . --build-arg CI_REGISTRY="${{secrets.BUILD_CI_REGISTRY}}"
