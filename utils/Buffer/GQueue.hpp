@@ -27,16 +27,26 @@ namespace utl {
         }
 
         typename CircleBuffer<SIZE, DATA_T>::INDEX_T count() {
-            return CircleBuffer<SIZE, DATA_T>::count();
+            return this->count();
         }
 
         bool empty() {
-            return CircleBuffer<SIZE, DATA_T>::empty();
+            return this->empty();
 
         }
 
         bool full() {
-            return CircleBuffer<SIZE, DATA_T>::full();
+            return this->full();
+        }
+
+        const DATA_T& back()
+        {
+            return this->back();
+        }
+
+        const DATA_T& front()
+        {
+            return this->front();
         }
     };
 }

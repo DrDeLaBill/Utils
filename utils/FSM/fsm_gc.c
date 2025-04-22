@@ -133,6 +133,7 @@ void fsm_gc_reset(fsm_gc_t* fsm)
         return;
     }
     
+    circle_buf_gc_free(fsm->_events);
     fsm->_state = fsm->_table[0].source;
 }
 
