@@ -27,7 +27,7 @@ namespace utl {
         }
 
         typename CircleBuffer<SIZE, DATA_T>::INDEX_T count() {
-            return this->count();
+            return CircleBuffer<SIZE, DATA_T>::count();
         }
 
         bool empty() {
