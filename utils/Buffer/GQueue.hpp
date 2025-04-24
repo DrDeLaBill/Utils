@@ -39,15 +39,15 @@ namespace utl {
             return this->full();
         }
 
-        const DATA_T& back()
-        {
-            return this->back();
-        }
+        DATA_T& back()
+		{
+			return this->back();
+		}
 
-        const DATA_T& front()
-        {
-            return this->front();
-        }
+        DATA_T& front()
+		{
+			return this->front();
+		}
     };
 }
 
