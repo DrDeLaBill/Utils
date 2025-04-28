@@ -3,19 +3,22 @@
 #include "Timer.h"
 
 #include "gtime.h"
-#include "bmacro.h"
 
 
 namespace utl
 {
     Timer::Timer(const TIME_MS_T delay):
         delay(delay), start_time(0)
-	{
-        BEDUG_ASSERT(this->delay > 0, "The delay for the timer must be greater than 0");
-	}
+	{}
 
     void Timer::start()
     {
+        this->start_time = getMillis();
+    }
+
+    void Timer::start(uint32_t delay_ms)
+    {
+        this->changeDelay(delay_ms);
         this->start_time = getMillis();
     }
 

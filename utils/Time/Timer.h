@@ -16,9 +16,10 @@ namespace utl
         TIME_MS_T start_time;
 
     public:
-        Timer(const TIME_MS_T delay);
+        Timer(const TIME_MS_T delay = 0);
         
         void start();
+        void start(uint32_t delay_ms);
         void reset();
         bool wait();
         TIME_MS_T deadline();

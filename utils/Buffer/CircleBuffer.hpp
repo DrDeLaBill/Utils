@@ -119,7 +119,7 @@ namespace utl
 			return m_data[(m_writeCount-- - 1) & m_mask];
 		}
 
-		const DATA_T& front()
+		DATA_T& front()
 		{
 			BEDUG_ASSERT(!empty(), "error get front unit - circle buffer is empty");
 			if (empty()) {
@@ -128,7 +128,7 @@ namespace utl
 			return m_data[m_readCount & m_mask];
 		}
 
-		const DATA_T& back()
+		DATA_T& back()
 		{
 			BEDUG_ASSERT(!empty(), "error get back unit - circle buffer is empty");
 			if (empty()) {
