@@ -48,6 +48,11 @@ namespace utl {
 		{
 			return CircleBuffer<SIZE, DATA_T>::front();
 		}
+
+        void clear()
+        {
+            return CircleBuffer<SIZE, DATA_T>::clear();
+        }
     };
 }
 

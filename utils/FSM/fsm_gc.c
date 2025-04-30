@@ -29,7 +29,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     }
     if (!size || !table) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_e_fsm_tt, "Empty FSM transition table");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_e_fsm_tt, "Empty FSM transition table");
         fsm->_e_fsm_tt = true;
 #endif
         return;
@@ -43,15 +43,15 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     for (unsigned i = 0; i < fsm->_table_size; i++) {
         if (fsm->_table[i].event) {
             fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
-        } else {
+        } 
 #ifdef FSM_GC_BEDUG
+        else if (fsm->_enable_msg) {
             printTagLog(FSM_GC_TAG, "\"%s\" empty event", fsm->_name);
-#endif
         }
-#ifdef FSM_GC_BEDUG
         for (unsigned j = i + 1; j < fsm->_table_size; j++) {
             if (fsm->_table[i].source != fsm->_table[j].source &&
-                fsm->_table[i].source->state == fsm->_table[j].source->state
+                fsm->_table[i].source->state == fsm->_table[j].source->state &&
+                fsm->_enable_msg
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -64,7 +64,8 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 );
             }
             if (fsm->_table[i].source != fsm->_table[j].target &&
-                fsm->_table[i].source->state == fsm->_table[j].target->state
+                fsm->_table[i].source->state == fsm->_table[j].target->state &&
+                fsm->_enable_msg
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -77,7 +78,8 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 );
             }
             if (fsm->_table[i].action != fsm->_table[j].action &&
-                fsm->_table[i].action->action == fsm->_table[j].action->action
+                fsm->_table[i].action->action == fsm->_table[j].action->action &&
+                fsm->_enable_msg
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -91,7 +93,8 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             }
             if (fsm->_table[i].source == fsm->_table[j].source &&
                 fsm->_table[i].target == fsm->_table[j].target &&
-                fsm->_table[i].action == fsm->_table[j].action
+                fsm->_table[i].action == fsm->_table[j].action &&
+                fsm->_enable_msg
             ) {
                 printTagLog(
                     FSM_GC_TAG,
@@ -112,7 +115,9 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     }
 
 #ifdef FSM_GC_BEDUG
-    printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
+    if (fsm->_enable_msg) {
+        printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
+    }
 #endif
 }
 
@@ -126,8 +131,8 @@ void fsm_gc_reset(fsm_gc_t* fsm)
     }
     if (!fsm->_initialized || !fsm->_state || !fsm->_table) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state, table and event must not be NULL");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM state, table and event must not be NULL");
         fsm->_fsm_not_i = true;
 #endif
         return;
@@ -147,8 +152,8 @@ void fsm_gc_process(fsm_gc_t* fsm)
     }
     if (!fsm->_initialized || !fsm->_state || !fsm->_table) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM state, table and event must not be NULL");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM state, table and event must not be NULL");
         fsm->_fsm_not_i = true;
 #endif
         return;
@@ -229,13 +234,13 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     }
     if (!event) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(false, "Empty FSM event pointer");
+        BEDUG_ASSERT(!fsm->_enable_msg, "Empty FSM event pointer");
 #endif
         return;
     }
     if (!fsm->_initialized) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
         return;
@@ -265,7 +270,7 @@ void fsm_gc_clear(fsm_gc_t* fsm)
     }
     if (!fsm->_initialized) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
         return;
@@ -294,20 +299,20 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
     }
     if (!state) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(false, "Empty FSM state pointer");
+        BEDUG_ASSERT(!fsm->_enable_msg, "Empty FSM state pointer");
 #endif
         return false;
     }
     if (!fsm->_initialized) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM has not initialized");
         fsm->_fsm_not_i = true;
 #endif
         return false;
     }
     if (!fsm->_state) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_fsm_not_i, "FSM bad state");
+        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i, "FSM bad state");
         fsm->_fsm_not_i = true;
 #endif
         return false;

@@ -38,6 +38,11 @@ namespace utl {
         bool full() {
             return CircleBuffer<SIZE, DATA_T>::full();
         }
+
+        void clear()
+        {
+            return CircleBuffer<SIZE, DATA_T>::clear();
+        }
     };
 }
 
