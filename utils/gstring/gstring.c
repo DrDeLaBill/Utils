@@ -109,7 +109,7 @@ char* util_u64_to_str(uint64_t value)
 		for (size_t i = counter + 1; i > 0; i--) {
 			str[i] = str[i-1];
 		}
-		str[0] = (value % 10) + '0';
+		str[0] = (uint8_t)(value % 10) + '0';
 		value /= 10;
 		counter++;
 	}

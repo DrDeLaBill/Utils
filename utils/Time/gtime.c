@@ -23,6 +23,7 @@
 TIME_MS_T getMillis()
 {
 #if defined(USE_HAL_DRIVER)
+	extern uint32_t HAL_GetTick();
     return HAL_GetTick();
 #elif defined(ARDUINO)
     return millis();
