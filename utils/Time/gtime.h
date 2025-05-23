@@ -12,10 +12,10 @@ extern "C" {
 #include <stdint.h>
 
 
-#ifdef USE_HAL_DRIVER
+#if defined(USE_HAL_DRIVER) || defined(ARDUINO)
 #   define TIME_MS_T uint32_t 
 #else
-#   define TIME_MS_T unsigned long long 
+#   define TIME_MS_T uint64_t
 #endif
 
 

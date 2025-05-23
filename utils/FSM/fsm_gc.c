@@ -167,22 +167,22 @@ void fsm_gc_process(fsm_gc_t* fsm)
     size_t event_prio = 0;
 
     for (unsigned i = 0; i < circle_buf_gc_count(fsm->_events); i++) {
-        fsm_gc_event_t* event = (fsm_gc_event_t*)circle_buf_gc_index(fsm->_events, i);
+        const fsm_gc_event_t* event = (fsm_gc_event_t*)circle_buf_gc_index(fsm->_events, i);
         for (unsigned j = 0; j < fsm->_table_size; j++) {
-            fsm_gc_transition_t tr = fsm->_table[j];
-            if (!tr.source) {
+            const fsm_gc_transition_t* tr = &fsm->_table[j];
+            if (!tr->source) {
                 continue;
             }
-            if (!tr.event) {
+            if (!tr->event) {
                 continue;
             }
-            if (!tr.target) {
+            if (!tr->target) {
                 continue;
             }
-            if (fsm->_state->state != tr.source->state) {
+            if (fsm->_state->state != tr->source->state) {
                 continue;
             }
-            if (event->index != tr.event->index) {
+            if (event->index != tr->event->index) {
                 continue;
             }
             if (!is_transition || event_prio < event->priority) {
