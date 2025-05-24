@@ -1,9 +1,12 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef _CODE_STOPWATCH_T_
+#define _CODE_STOPWATCH_T_
 
 
 #include <cstdint>
+
+#include "gtime.h"
 
 
 namespace utl
@@ -16,12 +19,10 @@ namespace utl
     private:
         static constexpr unsigned IDENTIFIER_LEN = 6;
         char identifier[IDENTIFIER_LEN];
-#ifdef USE_HAL_DRIVER
-        using time_ms_t = uint32_t;
-#else
-        using time_ms_t = unsigned long long;
-#endif
-        time_ms_t start;
-        time_ms_t trig_time;
+        TIME_MS_T start;
+        TIME_MS_T trig_time;
     };
 }
+
+
+#endif

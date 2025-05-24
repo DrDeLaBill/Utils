@@ -8,7 +8,6 @@
 
 #include "glog.h"
 #include "gutils.h"
-#include "gtime.h"
 
 
 namespace utl
@@ -22,16 +21,12 @@ namespace utl
 
     CodeStopwatch::~CodeStopwatch()
     {
-    	time_ms_t cur_time = getMillis();
-        time_ms_t delta = __abs_dif(cur_time, start);
-        if (delta > this->trig_time) {
+    	TIME_MS_T cur_time = getMillis();
+        TIME_MS_T delta = __abs_dif(cur_time, start);
 #ifdef DEBUG
-#   ifdef USE_HAL_DRIVER
-            printPretty("Code execution time for %s identifier: %lu ms\n", this->identifier, delta);
-#   else
-            printPretty("Code execution time for %s identifier: %llu ms\n", this->identifier, delta);
-#   endif
-#endif
+        if (delta > this->trig_time) {
+            printPretty("Code execution time for %s identifier: %" __printTagLog_PARAM " ms\n", this->identifier, delta);
         }
+#endif
     }
 }
