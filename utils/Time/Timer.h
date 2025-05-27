@@ -23,6 +23,7 @@ namespace utl
         void reset();
         bool wait();
         TIME_MS_T deadline();
+        TIME_MS_T getStart();
         TIME_MS_T end();
 
         void changeDelay(const TIME_MS_T delay_ms);

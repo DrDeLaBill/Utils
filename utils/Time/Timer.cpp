@@ -40,6 +40,11 @@ namespace utl
         }
         return end_ms - getMillis();
     }
+    
+    TIME_MS_T Timer::getStart()
+    {
+        return this->start_time;
+    }
 
     TIME_MS_T Timer::end()
     {

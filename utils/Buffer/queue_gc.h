@@ -27,6 +27,7 @@ bool queue_gc_full(const queue_gc_t* p);
 void queue_gc_push(queue_gc_t* p, const uint8_t* data);
 uint8_t* queue_gc_pop(queue_gc_t* p);
 uint8_t* queue_gc_peek(queue_gc_t* p);
+uint8_t* queue_gc_back(queue_gc_t* p);
 
 
 #ifdef __cplusplus

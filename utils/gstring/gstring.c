@@ -52,7 +52,7 @@ void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len,
 }
 
 // TODO: point_count = 100 fix
-void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned div, unsigned point_count)
+void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned div, unsigned point_count, char point)
 {
 	snprintf(
 		target,
@@ -65,7 +65,7 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 		return;
 	}
 	size_t len = strlen(target);
-	target[len++] = '.';
+	target[len++] = point;
 	target[len]   = 0;
 	BEDUG_ASSERT(
 		size > len + 1 && div % 10 == 0 && div > 1 && point_count > 0,
