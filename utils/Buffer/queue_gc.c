@@ -45,5 +45,5 @@ uint8_t* queue_gc_peek(queue_gc_t* p)
 
 uint8_t* queue_gc_back(queue_gc_t* p)
 {
-    return circle_buf_gc_back(p);
+    return circle_buf_gc_back(&p->buf);
 }

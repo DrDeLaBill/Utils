@@ -98,10 +98,13 @@ uint8_t* circle_buf_gc_pop_front(circle_buf_gc_t* p)
         BEDUG_ASSERT(false, "error pop front unit - empty");
         return NULL;
     }
-    uint8_t* ptr = p->m_data + _ptr_index_from_read(p, 0);
-    p->m_read_idx = (p->m_read_idx + 1) % p->m_length;
-    p->m_write_cnt--;
-    return ptr;
+    if (p && p->m_bedacode == BEDACODE) {
+        uint8_t* ptr = p->m_data + _ptr_index_from_read(p, 0);
+        p->m_read_idx = (p->m_read_idx + 1) % p->m_length;
+        p->m_write_cnt--;
+        return ptr;
+    }
+    return NULL;
 }
 
 uint8_t* circle_buf_gc_pop_back(circle_buf_gc_t* p) 
@@ -110,7 +113,10 @@ uint8_t* circle_buf_gc_pop_back(circle_buf_gc_t* p)
         BEDUG_ASSERT(false, "error pop back unit - empty");
         return NULL;
     }
-    return p->m_data + _ptr_index_from_read(p, --p->m_write_cnt);
+    if (p && p->m_bedacode == BEDACODE) {
+        return p->m_data + _ptr_index_from_read(p, --p->m_write_cnt);
+    }
+    return NULL;
 }
 
 uint8_t* circle_buf_gc_front(circle_buf_gc_t* p) 
@@ -119,7 +125,10 @@ uint8_t* circle_buf_gc_front(circle_buf_gc_t* p)
         BEDUG_ASSERT(false, "error front unit - empty");
         return NULL;
     }
-    return p->m_data + _ptr_index_from_read(p, 0);
+    if (p && p->m_bedacode == BEDACODE) {
+        return p->m_data + _ptr_index_from_read(p, 0);
+    }
+    return NULL;
 }
 
 uint8_t* circle_buf_gc_back(circle_buf_gc_t* p) 
@@ -128,7 +137,10 @@ uint8_t* circle_buf_gc_back(circle_buf_gc_t* p)
         BEDUG_ASSERT(false, "error back unit - empty");
         return NULL;
     }
-    return p->m_data + _ptr_index_from_read(p, p->m_write_cnt - 1);
+    if (p && p->m_bedacode == BEDACODE) {
+        return p->m_data + _ptr_index_from_read(p, p->m_write_cnt - 1);
+    }
+    return NULL;
 }
 
 uint8_t* circle_buf_gc_index(circle_buf_gc_t* p, const unsigned index)
