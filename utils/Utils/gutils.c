@@ -118,18 +118,14 @@ int util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2)
 
 unsigned util_hash(const uint8_t* data, const unsigned size)
 {
-	unsigned hash = 0;
-
-	for (unsigned i = 0; i < size; i++) {
-		uint8_t symbol = data[i];
-        for (unsigned j = sizeof (char) * 8; j > 0; j--) {
-        	hash = ((hash ^ (unsigned)symbol) & 1) ? (hash >> 1) ^ 0x8C : (hash >> 1);
-            symbol >>= 1;
-        }
-        hash <<= 1;
-	}
-
-	return hash;
+    const unsigned OFFSET_BASIS = 2166136261;
+    const unsigned FNV_PRIME = 16777619;
+    unsigned hash = OFFSET_BASIS;
+    for (unsigned i = 0; i < size; i++) {
+        hash ^= (unsigned)data[i];
+        hash *= FNV_PRIME;
+    }
+    return hash;
 }
 
 uint8_t* util_memfind(uint8_t* buf, const size_t buf_size, const uint8_t* pattern, const size_t pattern_size)
