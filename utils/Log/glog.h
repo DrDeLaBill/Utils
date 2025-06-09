@@ -21,6 +21,7 @@ extern "C" {
     int __gprint_tag_offset(const char* tag);
 
     #define __GLOG_MILLIS_SYMBOLS_CNT_ 8
+    #define __GLOG_MILLIS_TIME_DIV_    100000000
     #define __GLOG_TOSTRING_(x)        __STR_DEF__(x)
     #define __GLOG_PRETTY_LOG_OFFSET_  (__GLOG_MILLIS_SYMBOLS_CNT_ + 8)
 
@@ -46,15 +47,12 @@ extern "C" {
             #define __printTagLog_PARAM "llu"
         #endif
         #if defined(__MINGW32__) || defined(_MSC_VER)
-            #define printTagLog(tag, format, ...) printMessage("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __printTagLog_PARAM "->%s:%*s" format "\n", getMillis(), tag, __gprint_tag_offset(tag), "", ##__VA_ARGS__);
+            #define printTagLog(tag, format, ...) printMessage("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __printTagLog_PARAM "->%s:%*s" format "\n", getMillis() % __GLOG_MILLIS_TIME_DIV_, tag, __gprint_tag_offset(tag), "", ##__VA_ARGS__);
         #elif defined(__GNUC__)
             #if __cplusplus >= 202002L
-                #define printTagLog(tag, format, ...) printMessage("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __printTagLog_PARAM "->%s:%*s" format "\n", getMillis() % 10000000, tag, __gprint_tag_offset(tag), "" __VA_OPT__(,) __VA_ARGS__);
+                #define printTagLog(tag, format, ...) printMessage("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __printTagLog_PARAM "->%s:%*s" format "\n", getMillis() % __GLOG_MILLIS_TIME_DIV_, tag, __gprint_tag_offset(tag), "" __VA_OPT__(,) __VA_ARGS__);
             #else
-            
-                #define VERSION 8
-                #define TOSTRING(x) __STR_DEF__(x)
-                #define printTagLog(tag, format, ...) printMessage("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __printTagLog_PARAM "->%s:%*s" format "\n", getMillis() % 10000000, tag, __gprint_tag_offset(tag), "", ##__VA_ARGS__);
+                #define printTagLog(tag, format, ...) printMessage("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __printTagLog_PARAM "->%s:%*s" format "\n", getMillis() % __GLOG_MILLIS_TIME_DIV_, tag, __gprint_tag_offset(tag), "", ##__VA_ARGS__);
             #endif
         #endif
    #endif
