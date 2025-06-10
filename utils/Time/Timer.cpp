@@ -41,6 +41,15 @@ namespace utl
         return end_ms - getMillis();
     }
     
+    TIME_MS_T Timer::passed()
+    {
+        TIME_MS_T start_ms = getStart();
+        if (getMillis() > start_ms) {
+            return getMillis() - start_ms;
+        }
+        return 0;
+    }
+    
     TIME_MS_T Timer::getStart()
     {
         return this->start_time;
@@ -49,6 +58,11 @@ namespace utl
     TIME_MS_T Timer::end()
     {
     	return this->start_time + this->delay;
+    }
+
+    TIME_MS_T Timer::getDelay()
+    {
+        return this->delay;
     }
 
 	void Timer::changeDelay(const TIME_MS_T delay_ms)
