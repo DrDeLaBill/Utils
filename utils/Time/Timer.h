@@ -13,7 +13,7 @@ namespace utl
     {
     private:
         TIME_MS_T delay;
-        TIME_MS_T start_time;
+        TIME_MS_T start_ms;
 
     public:
         Timer(const TIME_MS_T delay = 0);

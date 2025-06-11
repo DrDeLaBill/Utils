@@ -8,32 +8,38 @@
 namespace utl
 {
     Timer::Timer(const TIME_MS_T delay):
-        delay(delay), start_time(0)
+        delay(delay), start_ms(0)
 	{}
 
     void Timer::start()
     {
-        this->start_time = getMillis();
+        this->start_ms = getMillis();
     }
 
     void Timer::start(uint32_t delay_ms)
     {
         this->changeDelay(delay_ms);
-        this->start_time = getMillis();
+        this->start_ms = getMillis();
     }
 
     void Timer::reset()
     {
-    	this->start_time = 0;
+    	this->start_ms = 0;
     }
 
     bool Timer::wait()
     {
-        return this->start_time + this->delay > getMillis();
+        if (!this->start_ms) {
+            return false;
+        }
+        return this->start_ms + this->delay > getMillis();
     }
     
     TIME_MS_T Timer::deadline()
     {
+        if (!this->start_ms) {
+            return 0;
+        }
         TIME_MS_T end_ms = end();
         if (getMillis() > end_ms) {
             return 0;
@@ -43,21 +49,26 @@ namespace utl
     
     TIME_MS_T Timer::passed()
     {
-        TIME_MS_T start_ms = getStart();
-        if (getMillis() > start_ms) {
-            return getMillis() - start_ms;
+        if (!this->start_ms) {
+            return 0;
+        }
+        if (getMillis() > this->start_ms) {
+            return getMillis() - this->start_ms;
         }
         return 0;
     }
     
     TIME_MS_T Timer::getStart()
     {
-        return this->start_time;
+        return this->start_ms;
     }
 
     TIME_MS_T Timer::end()
     {
-    	return this->start_time + this->delay;
+        if (!this->start_ms) {
+            return 0;
+        }
+    	return this->start_ms + this->delay;
     }
 
     TIME_MS_T Timer::getDelay()
