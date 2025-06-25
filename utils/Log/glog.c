@@ -11,5 +11,5 @@
 
 int __gprint_tag_offset(const char* tag) 
 {
-    return strlen(tag) > GLOG_TAG_MAX_SIZE + 1 ? 1 : GLOG_TAG_MAX_SIZE - strlen(tag);
+    return strlen(tag) > GLOG_TAG_MAX_SIZE + 1 ? 1 : GLOG_TAG_MAX_SIZE - (int)strlen(tag);
 }
