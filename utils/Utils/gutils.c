@@ -8,9 +8,14 @@
 #include "glog.h"
 
 
-void gtimer_start(gtimer_t* timer, TIME_MS_T delay) {
-    timer->start = getMillis();
-    timer->delay = delay;
+void gtimer_start(gtimer_t* tm, TIME_MS_T delay) {
+	tm->start = getMillis();
+	tm->delay = delay;
+}
+
+void gtimer_reload(gtimer_t* tm)
+{
+	tm->start = getMillis();
 }
 
 bool gtimer_wait(gtimer_t* tm) {

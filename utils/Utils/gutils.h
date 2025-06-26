@@ -107,6 +107,7 @@ typedef struct _gtimer_t {
 
 
 void gtimer_start(gtimer_t* tm, TIME_MS_T waitMs);
+void gtimer_reload(gtimer_t* tm);
 bool gtimer_wait(gtimer_t* tm);
 uint32_t gtimer_remaining(gtimer_t* tm);
 void gtimer_reset(gtimer_t* tm);
