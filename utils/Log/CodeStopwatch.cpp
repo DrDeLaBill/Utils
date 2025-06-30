@@ -25,7 +25,7 @@ namespace utl
         TIME_MS_T delta = __abs_dif(cur_time, start);
 #ifdef DEBUG
         if (delta > this->trig_time) {
-            printPretty("Code execution time for %s identifier: %" __printTagLog_PARAM " ms\n", this->identifier, delta);
+            printPretty("Code execution time for %s identifier: %" __G_TIME_PRINT_LEN " ms\n", this->identifier, delta);
         }
 #endif
     }

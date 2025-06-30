@@ -174,9 +174,9 @@ TEST(UtilsFixture, parse_version_string_with_alternative_formats)
 // Pass NULL pointers to any function
 TEST(UtilsFixture, test_gversion_functions_with_null_pointers)
 {
-    gversion_t version;
-    char* version_str;
-    bool result;
+    gversion_t version = {};
+    char* version_str = nullptr;
+    bool result = false;
 
     // Testgversion_compare with NULL pointers
     ASSERT_TRUE(gversion_compare(NULL, &version) == GVERSION_ERROR);

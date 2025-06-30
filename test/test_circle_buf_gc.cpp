@@ -341,7 +341,6 @@ TEST(UtilsFixture, test_push_front_non_full_buffer)
     const unsigned unit_size = 4;
     const unsigned length = 25;
     uint8_t element[4] = {1, 2, 3, 4};
-    uint8_t expected[4] = {1, 2, 3, 4};
 
     circle_buf_gc_init(&buf, data, unit_size, length);
 
@@ -588,7 +587,7 @@ TEST(UtilsFixture, test_index_wraparound)
 
     // Создаем ситуацию с перемещением read_idx
     uint32_t data[TEST_BUFFER_SIZE + 2] = {1, 2, 3, 4, 5, 6, 7};
-    for (int i = 0; i < TEST_BUFFER_SIZE + 2; i++) {
+    for (unsigned i = 0; i < TEST_BUFFER_SIZE + 2; i++) {
         circle_buf_gc_push_back(&cb, (uint8_t*)&data[i]);
     }
 
