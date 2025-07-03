@@ -36,7 +36,7 @@ void __g_print_offset()
 #define __GPRINT_MSG_FILTER_CNT (10)
 
 typedef struct __g_print_msg_filter_t {
-    unsigned hash;
+    size_t*  ptr;
     gtimer_t timer;
 } g_print_msg_filter_t;
 
@@ -50,10 +50,10 @@ bool  __g_print_msg_filter_check(const char* msg, TIME_MS_T delay_ms)
         circle_buf_gc_init(&g_print_msg_filters_buf, (uint8_t*)&g_print_msg_filters, sizeof(g_print_msg_filter_t), __arr_len(g_print_msg_filters));
         initialized = true;
     }
-    unsigned msg_hash = util_hash((uint8_t*)msg, strlen(msg));
+    size_t* msg_hash = (size_t*)msg;
     for (unsigned i = 0; i < circle_buf_gc_count(&g_print_msg_filters_buf); i++) {
         g_print_msg_filter_t* ptr = ((g_print_msg_filter_t*)circle_buf_gc_index(&g_print_msg_filters_buf, i));
-        if (ptr->hash != msg_hash) {
+        if (ptr->ptr != msg_hash) {
             continue;
         }
         if (!gtimer_wait(&ptr->timer)) {
@@ -68,7 +68,7 @@ bool  __g_print_msg_filter_check(const char* msg, TIME_MS_T delay_ms)
     }
     g_print_msg_filter_t filter = {0};
     gtimer_start(&filter.timer, delay_ms);
-    filter.hash = msg_hash;
+    filter.ptr = msg_hash;
     circle_buf_gc_push_back(&g_print_msg_filters_buf, (uint8_t*)&filter);
     return true;
 }
