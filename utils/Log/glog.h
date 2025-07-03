@@ -11,11 +11,14 @@ extern "C" {
 
 #include <stdio.h>
 #include <string.h>
+#include <stdbool.h>
 
 #include "gtime.h"
 
 
 #if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
+
+    #define GPRINT_ENABLED
 
     #if TIME_MS_T == uint32_t
         #define __G_TIME_PRINT_LEN "lu"
@@ -94,6 +97,11 @@ extern "C" {
             #endif
         #endif
     #endif
+    
+    bool __g_print_msg_filter_check(const char*, TIME_MS_T);
+    #ifndef gprintMsgFilter
+        #define gprintMsgFilter(PRINT, TIME) if (__g_print_msg_filter_check(__STR_DEF__(PRINT), TIME)) { PRINT }
+    #endif
 
 #else
 
@@ -111,6 +119,10 @@ extern "C" {
 
     #ifndef gprint
         #define gprint(format, ...) { }
+    #endif
+
+    #ifndef gprintMsgFilter
+        #define gprintMsgFilter(PRINT, TIME) {}
     #endif
 
 #endif
