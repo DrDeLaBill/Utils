@@ -33,7 +33,7 @@ void __g_print_offset()
 }
 
 
-#define __GPRINT_MSG_FILTER_CNT (10)
+#define __GPRINT_MSG_FILTER_CNT (20)
 
 typedef struct __g_print_msg_filter_t {
     size_t*  ptr;
