@@ -12,6 +12,8 @@ namespace utl {
     template<unsigned SIZE, class DATA_T=uint8_t>
     class GQueue : protected CircleBuffer<SIZE, DATA_T> {
     public:
+        using INDEX_T = typename CircleBuffer<SIZE, DATA_T>::INDEX_T;
+
         GQueue() : CircleBuffer<SIZE, DATA_T>() {}
         
         void push(DATA_T data) {
@@ -26,7 +28,7 @@ namespace utl {
             return this->front();
         }
 
-        typename CircleBuffer<SIZE, DATA_T>::INDEX_T count() {
+        INDEX_T count() {
             return CircleBuffer<SIZE, DATA_T>::count();
         }
 
@@ -53,6 +55,17 @@ namespace utl {
         {
             return CircleBuffer<SIZE, DATA_T>::clear();
         }
+
+        INDEX_T count() const
+        {
+			return CircleBuffer<SIZE, DATA_T>::count();
+        }
+
+		inline unsigned size() 
+        { 
+			return CircleBuffer<SIZE, DATA_T>::size();
+        }
+
     };
 }
 
