@@ -14,6 +14,7 @@ namespace utl
     private:
         TIME_MS_T delay;
         TIME_MS_T start_ms;
+        bool      started;
 
     public:
         Timer(const TIME_MS_T delay = 0);
