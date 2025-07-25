@@ -2,12 +2,28 @@
 
 #define FSM_GC_EVENTS_COUNT 15
 
+#if defined(_MSC_VER)
+    #include <io.h>
+#endif
+#include <cstdio>
 #include <string>
 #include <fcntl.h>
 #include <gtest/gtest.h>
 
 #include "fsm_gc.h"
 #include "gutils.h"
+
+
+class FSM_GC_Fixture: public testing::Test
+{
+public:
+    void SetUp() override {}
+
+    void TearDown() override 
+    {
+        fsm_gc_enable_all_messages();
+    }
+};
 
 
 // Test 1: Initialization with valid parameters
@@ -19,7 +35,7 @@ FSM_GC_CREATE_TABLE(
   {&FSM_GC_SUITE_ValidInit_state1, &FSM_GC_SUITE_ValidInit_event1, &FSM_GC_SUITE_ValidInit_state1, NULL}
 )
 void _FSM_GC_SUITE_ValidInit_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, ValidInit)
+TEST(FSM_GC_Fixture, ValidInit)
 {
   fsm_gc_init(&FSM_GC_SUITE_ValidInit_fsm, FSM_GC_SUITE_ValidInit_fsm_table, 1);
   ASSERT_TRUE(FSM_GC_SUITE_ValidInit_fsm._initialized);
@@ -27,7 +43,7 @@ GTEST_TEST(FSM_GC_SUITE, ValidInit)
 }
 
 // Test 2: Initialization with NULL FSM pointer
-GTEST_TEST(FSM_GC_SUITE, InitNullFSM)
+TEST(FSM_GC_Fixture, InitNullFSM)
 {
   fsm_gc_init(nullptr, nullptr, 0);
   // Expect no crash or assertion (if debug enabled)
@@ -47,7 +63,7 @@ static bool action_called = false;
 void _FSM_GC_SUITE_StateTransition_state1(void) {}
 void _FSM_GC_SUITE_StateTransition_state2(void) {}
 void _FSM_GC_SUITE_StateTransition_action1(void) { action_called = true; }
-GTEST_TEST(FSM_GC_SUITE, StateTransition)
+TEST(FSM_GC_Fixture, StateTransition)
 {
   action_called = false;
   fsm_gc_init(&FSM_GC_SUITE_StateTransition_fsm, FSM_GC_SUITE_StateTransition_fsm_table, 1);
@@ -66,7 +82,7 @@ FSM_GC_CREATE_TABLE(
   {&FSM_GC_SUITE_EventOverflow_state1, &FSM_GC_SUITE_EventOverflow_event1, &FSM_GC_SUITE_EventOverflow_state1, NULL}
 )
 void _FSM_GC_SUITE_EventOverflow_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, EventOverflow)
+TEST(FSM_GC_Fixture, EventOverflow)
 {
   fsm_gc_init(&FSM_GC_SUITE_EventOverflow_fsm, FSM_GC_SUITE_EventOverflow_fsm_table, 1);
   for (int i = 0; i < FSM_GC_EVENTS_COUNT + 1; i++) {
@@ -84,7 +100,7 @@ FSM_GC_CREATE_TABLE(
   {&FSM_GC_SUITE_ClearEvents_state1, &FSM_GC_SUITE_ClearEvents_event1, &FSM_GC_SUITE_ClearEvents_state1, NULL}
 )
 void _FSM_GC_SUITE_ClearEvents_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, ClearEvents)
+TEST(FSM_GC_Fixture, ClearEvents)
 {
   fsm_gc_init(&FSM_GC_SUITE_ClearEvents_fsm, FSM_GC_SUITE_ClearEvents_fsm_table, 1);
   fsm_gc_push_event(&FSM_GC_SUITE_ClearEvents_fsm, &FSM_GC_SUITE_ClearEvents_event1);
@@ -101,7 +117,7 @@ FSM_GC_CREATE_TABLE(
 )
 void _FSM_GC_SUITE_IsStateCheck_state1(void) {}
 void _FSM_GC_SUITE_IsStateCheck_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, IsStateCheck)
+TEST(FSM_GC_Fixture, IsStateCheck)
 {
   fsm_gc_init(&FSM_GC_SUITE_IsStateCheck_fsm, FSM_GC_SUITE_IsStateCheck_fsm_table, 1);
   ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_IsStateCheck_fsm, &FSM_GC_SUITE_IsStateCheck_state1));
@@ -120,7 +136,7 @@ FSM_GC_CREATE_TABLE(
 )
 void _FSM_GC_SUITE_EventPriority_state1(void) {}
 void _FSM_GC_SUITE_EventPriority_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, EventPriority)
+TEST(FSM_GC_Fixture, EventPriority)
 {
   fsm_gc_init(&FSM_GC_SUITE_EventPriority_fsm, FSM_GC_SUITE_EventPriority_fsm_table, 2);
   fsm_gc_push_event(&FSM_GC_SUITE_EventPriority_fsm, &FSM_GC_SUITE_EventPriority_lowPrio);
@@ -140,7 +156,7 @@ FSM_GC_CREATE_TABLE(
   {&FSM_GC_SUITE_NoTransition_state1, nullptr, &FSM_GC_SUITE_NoTransition_state1, NULL}
 )
 void _FSM_GC_SUITE_NoTransition_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, NoTransition)
+TEST(FSM_GC_Fixture, NoTransition)
 {
   fsm_gc_init(&FSM_GC_SUITE_NoTransition_fsm, FSM_GC_SUITE_NoTransition_fsm_table, 1);
   fsm_gc_push_event(&FSM_GC_SUITE_NoTransition_fsm, &FSM_GC_SUITE_NoTransition_event1);
@@ -159,7 +175,7 @@ FSM_GC_CREATE_TABLE(
 )
 void _FSM_GC_SUITE_NullAction_state1(void) {}
 void _FSM_GC_SUITE_NullAction_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, NullAction)
+TEST(FSM_GC_Fixture, NullAction)
 {
   fsm_gc_init(&FSM_GC_SUITE_NullAction_fsm, FSM_GC_SUITE_NullAction_fsm_table, 1);
   fsm_gc_push_event(&FSM_GC_SUITE_NullAction_fsm, &FSM_GC_SUITE_NullAction_event1);
@@ -179,7 +195,7 @@ FSM_GC_CREATE_TABLE(
   )
 void _FSM_GC_SUITE_ConsecutiveTransitions_state1(void) {}
 void _FSM_GC_SUITE_ConsecutiveTransitions_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, ConsecutiveTransitions)
+TEST(FSM_GC_Fixture, ConsecutiveTransitions)
 {
   fsm_gc_init(&FSM_GC_SUITE_ConsecutiveTransitions_fsm, FSM_GC_SUITE_ConsecutiveTransitions_fsm_table, 2);
   fsm_gc_push_event(&FSM_GC_SUITE_ConsecutiveTransitions_fsm, &FSM_GC_SUITE_ConsecutiveTransitions_event1);
@@ -202,7 +218,7 @@ FSM_GC_CREATE_TABLE(
   {&FSM_GC_SUITE_EventIndexUniqueness_state1, &FSM_GC_SUITE_EventIndexUniqueness_event2, &FSM_GC_SUITE_EventIndexUniqueness_state1, NULL}
 )
 void _FSM_GC_SUITE_EventIndexUniqueness_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, EventIndexUniqueness)
+TEST(FSM_GC_Fixture, EventIndexUniqueness)
 {
   fsm_gc_init(&FSM_GC_SUITE_EventIndexUniqueness_fsm, FSM_GC_SUITE_EventIndexUniqueness_fsm_table, 2);
   ASSERT_NE(
@@ -220,7 +236,7 @@ FSM_GC_CREATE_TABLE(
 )
 static bool state_function_called = false;
 void _FSM_GC_SUITE_StateFunctionExecution_state1(void) { state_function_called = true; }
-GTEST_TEST(FSM_GC_SUITE, StateFunctionExecution)
+TEST(FSM_GC_Fixture, StateFunctionExecution)
 {
   state_function_called = false;
   fsm_gc_init(&FSM_GC_SUITE_StateFunctionExecution_fsm, FSM_GC_SUITE_StateFunctionExecution_fsm_table, 1);
@@ -240,7 +256,7 @@ FSM_GC_CREATE_TABLE(
 )
 void _FSM_GC_SUITE_ProcessCycle_stateA(void) {}
 void _FSM_GC_SUITE_ProcessCycle_stateB(void) {}
-GTEST_TEST(FSM_GC_SUITE, ProcessCycle)
+TEST(FSM_GC_Fixture, ProcessCycle)
 {
   fsm_gc_init(&FSM_GC_SUITE_ProcessCycle_fsm, FSM_GC_SUITE_ProcessCycle_fsm_table, 2);
   
@@ -272,7 +288,7 @@ void _FSM_GC_SUITE_StateDrivenEvents_state1(void) {
   fsm_gc_push_event(&FSM_GC_SUITE_StateDrivenEvents_fsm, &FSM_GC_SUITE_StateDrivenEvents_trigger);
 }
 void _FSM_GC_SUITE_StateDrivenEvents_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, StateDrivenEvents)
+TEST(FSM_GC_Fixture, StateDrivenEvents)
 {
   fsm_gc_init(&FSM_GC_SUITE_StateDrivenEvents_fsm, FSM_GC_SUITE_StateDrivenEvents_fsm_table, 1);
   
@@ -296,7 +312,7 @@ FSM_GC_CREATE_TABLE(
 )
 static int state_exec_count = 0;
 void _FSM_GC_SUITE_EmptyQueueProcessing_state1(void) { state_exec_count++; }
-GTEST_TEST(FSM_GC_SUITE, EmptyQueueProcessing)
+TEST(FSM_GC_Fixture, EmptyQueueProcessing)
 {
     state_exec_count = 0;
     fsm_gc_init(&FSM_GC_SUITE_EmptyQueueProcessing_fsm, FSM_GC_SUITE_EmptyQueueProcessing_fsm_table, 1);
@@ -325,7 +341,7 @@ FSM_GC_CREATE_TABLE(
 )
 void _FSM_GC_SUITE_PriorityLoop_state1(void) {}
 void _FSM_GC_SUITE_PriorityLoop_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, PriorityLoop)
+TEST(FSM_GC_Fixture, PriorityLoop)
 {
     fsm_gc_init(&FSM_GC_SUITE_PriorityLoop_fsm, FSM_GC_SUITE_PriorityLoop_fsm_table, 4);
     
@@ -355,7 +371,7 @@ FSM_GC_CREATE_TABLE(
 )
 void _FSM_GC_SUITE_TerminationCondition_state1(void) {}
 void _FSM_GC_SUITE_TerminationCondition_state2(void) {}
-GTEST_TEST(FSM_GC_SUITE, TerminationCondition)
+TEST(FSM_GC_Fixture, TerminationCondition)
 {
     fsm_gc_init(&FSM_GC_SUITE_TerminationCondition_fsm, FSM_GC_SUITE_TerminationCondition_fsm_table, 2);
     
@@ -386,7 +402,7 @@ FSM_GC_CREATE_TABLE(
     { &FSM_GC_SUITE_CheckEventsCount_state1, &FSM_GC_SUITE_CheckEventsCount_event1, &FSM_GC_SUITE_CheckEventsCount_state1, NULL }
 )
 void _FSM_GC_SUITE_CheckEventsCount_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, CheckEventsCount)
+TEST(FSM_GC_Fixture, CheckEventsCount)
 {
     fsm_gc_init(&FSM_GC_SUITE_CheckEventsCount_fsm, FSM_GC_SUITE_CheckEventsCount_fsm_table, 1);
     ASSERT_EQ(__arr_len(__concat(__events_buf_, FSM_GC_SUITE_CheckEventsCount_fsm)), FSM_GC_EVENTS_COUNT);
@@ -394,6 +410,85 @@ GTEST_TEST(FSM_GC_SUITE, CheckEventsCount)
 
 
 #if !defined(FSM_GC_NO_DEBUG) && (defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE))
+
+static void _change_io(int* pipefd, int* old_stdout, uint8_t* buffer, const size_t buffer_size)
+{
+    memset(buffer, 0, buffer_size);
+#if defined(_MSC_VER)
+    if (_pipe(pipefd, buffer_size, O_BINARY) == -1) {
+        FAIL() << "Failed to create pipe";
+    }
+    *old_stdout = _dup(_fileno(stdout));
+    (void)_dup2(pipefd[1], _fileno(stdout));
+#elif defined(__GNUC__)
+    if (pipe(pipefd) == -1) {
+        FAIL() << "Failed to create pipe";
+    }
+    // дублируем stdout в pipefd[1]
+    *old_stdout = dup(STDOUT_FILENO);
+    if (dup2(pipefd[1], STDOUT_FILENO) == -1) {
+        FAIL() << "Failed to redirect stdout";
+    }
+#else
+    #error "change stdout error"
+#endif
+}
+
+static void _close_io(int* const pipefd, int* const old_stdout)
+{
+#if defined(_MSC_VER)
+    (void)_dup2(*old_stdout, _fileno(stdout));
+    _close(*old_stdout);
+#elif defined(__GNUC__)
+    dup2(*old_stdout, STDOUT_FILENO);
+    close(*old_stdout);
+#else
+#error "close stdout error"
+#endif
+}
+
+static void _read_and_close_io(
+    int* const pipefd, 
+    int* const old_stdout, 
+    uint8_t* const buffer, 
+    const size_t buffer_size
+) {
+    buffer[0] = '\0';
+
+    fflush(stdout);
+
+    _close_io(pipefd, old_stdout);
+
+#if defined(_MSC_VER)
+    _close(pipefd[1]);
+    int bytes_read = _read(pipefd[0], buffer, buffer_size - 1);
+    if (bytes_read > 0) {
+        buffer[bytes_read] = '\0';
+    }
+#elif defined(__GNUC__)
+    // закрываем конец записи, чтобы последующий read вернул EOF
+    close(pipefd[1]);
+
+    ssize_t total = 0;
+    while (true) {
+        ssize_t bytes = read(pipefd[0], buffer + total, buffer_size - 1 - total);
+        if (bytes > 0) {
+            total += bytes;
+            if ((size_t)total >= buffer_size - 1) break;
+        }
+        else {
+            // либо EOF (bytes == 0), либо ошибка/нет данных (bytes == -1)
+            break;
+        }
+    }
+    buffer[total] = '\0';
+#else
+    #error "read stdout error"
+#endif
+
+    gprint("\r\nREAD DATA: \r\n%s\r\n", (char*)buffer);
+}
+
 FSM_GC_CREATE(FSM_GC_SUITE_CheckMatchesStates_fsm)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckMatchesStates_state1, _FSM_GC_SUITE_CheckMatchesStates_state1)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_CheckMatchesStates_state2, _FSM_GC_SUITE_CheckMatchesStates_state1)
@@ -404,38 +499,18 @@ FSM_GC_CREATE_TABLE(
     { &FSM_GC_SUITE_CheckMatchesStates_state2, &FSM_GC_SUITE_CheckMatchesStates_event1, &FSM_GC_SUITE_CheckMatchesStates_state2, NULL }
 )
 void _FSM_GC_SUITE_CheckMatchesStates_state1(void) {}
-GTEST_TEST(FSM_GC_SUITE, CheckMatchesStates)
+TEST(FSM_GC_Fixture, CheckMatchesStates)
 {
-    // Перехват stdout с помощью pipe
-    uint8_t buffer[1024] = "";
-    int pipefd[2];
-#if defined(_MSC_VER)
-    _pipe(pipefd, sizeof(buffer), O_BINARY);
-    int old_stdout = _dup(_fileno(stdout));
-    _dup2(pipefd[1], _fileno(stdout));
-#elif defined(__GNUC__)
-    pipe(pipefd);
-    int old_stdout = dup(STDOUT_FILENO);
-    dup2(pipefd[1], STDOUT_FILENO);
-#else
-#   error "change stdout error"
-#endif
+    uint8_t buffer[1024] = {};
+    int pipefd[2]        = {};
+    int old_stdout       = 0;
+    
+    _change_io(pipefd, &old_stdout, buffer,  sizeof(buffer));
 
     std::cout << "FSM_GC_SUITE CheckMatchesStates ";
     fsm_gc_init(&FSM_GC_SUITE_CheckMatchesStates_fsm, FSM_GC_SUITE_CheckMatchesStates_fsm_table, 2);
     
-    fflush(stdout);
-#if defined(_MSC_VER)
-    // Чтение из pipe
-    _read(pipefd[0], buffer, sizeof(buffer));
-    // Восстановление stdout
-    _dup2(old_stdout, _fileno(stdout));
-#elif defined(__GNUC__)
-    // Чтение из pipe
-    read(pipefd[0], buffer, sizeof(buffer));
-    // Восстановление stdout
-    dup2(old_stdout, STDOUT_FILENO);
-#endif
+    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
 
     const uint8_t str1[] = "\"FSM_GC_SUITE_CheckMatchesStates_fsm\" has been initialized";
     const uint8_t str2[] = "WARNING! \"FSM_GC_SUITE_CheckMatchesStates_fsm\" has matches functions states FSM_GC_SUITE_CheckMatchesStates_state1{";
@@ -444,6 +519,79 @@ GTEST_TEST(FSM_GC_SUITE, CheckMatchesStates)
     ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str2, strlen((char*)str2)));
     ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str3, strlen((char*)str3)));
 }
+
+FSM_GC_CREATE(FSM_GC_SUITE_DisableAllMessages_fsm)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_DisableAllMessages_state1, _FSM_GC_SUITE_DisableAllMessages_state1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_DisableAllMessages_state2, _FSM_GC_SUITE_DisableAllMessages_state1)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_DisableAllMessages_event1, 0)
+FSM_GC_CREATE_TABLE(
+    FSM_GC_SUITE_DisableAllMessages_fsm_table,
+    { &FSM_GC_SUITE_DisableAllMessages_state1, &FSM_GC_SUITE_DisableAllMessages_event1, &FSM_GC_SUITE_DisableAllMessages_state1, NULL },
+    { &FSM_GC_SUITE_DisableAllMessages_state2, &FSM_GC_SUITE_DisableAllMessages_event1, &FSM_GC_SUITE_DisableAllMessages_state2, NULL }
+)
+void _FSM_GC_SUITE_DisableAllMessages_state1(void) {}
+TEST(FSM_GC_Fixture, DisableAllMessages)
+{
+    uint8_t buffer[1024] = "";
+    int pipefd[2];
+    int old_stdout;
+
+    _change_io(pipefd, &old_stdout, buffer,  sizeof(buffer));
+
+    // Отключаем все сообщения
+    fsm_gc_disable_all_messages();
+
+    fsm_gc_init(&FSM_GC_SUITE_DisableAllMessages_fsm, FSM_GC_SUITE_DisableAllMessages_fsm_table, 2);
+
+    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    // Проверяем, что не содержится ни одно ключевое сообщение
+    const uint8_t str[] = "has been initialized";
+    ASSERT_FALSE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
+}
+
+FSM_GC_CREATE(FSM_GC_SUITE_DisableEnableMessagesForInstance_fsm)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_DisableEnableMessagesForInstance_state1, _FSM_GC_SUITE_DisableEnableMessagesForInstance_state1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_DisableEnableMessagesForInstance_state2, _FSM_GC_SUITE_DisableEnableMessagesForInstance_state1)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_DisableEnableMessagesForInstance_event1, 0)
+FSM_GC_CREATE_TABLE(
+    FSM_GC_SUITE_DisableEnableMessagesForInstance_fsm_table,
+    { &FSM_GC_SUITE_DisableEnableMessagesForInstance_state1, &FSM_GC_SUITE_DisableEnableMessagesForInstance_event1, &FSM_GC_SUITE_DisableEnableMessagesForInstance_state1, NULL },
+    { &FSM_GC_SUITE_DisableEnableMessagesForInstance_state2, &FSM_GC_SUITE_DisableEnableMessagesForInstance_event1, &FSM_GC_SUITE_DisableEnableMessagesForInstance_state2, NULL }
+)
+void _FSM_GC_SUITE_DisableEnableMessagesForInstance_state1(void) {}
+TEST(FSM_GC_Fixture, DisableEnableMessagesForInstance)
+{
+    uint8_t buffer[1024] = "";
+    int pipefd[2];
+    int old_stdout;
+    
+    _change_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    // Отключим сообщения только для FSM
+    fsm_gc_disable_all_messages();
+    fsm_gc_init(nullptr, nullptr, 1);
+    fsm_gc_init(&FSM_GC_SUITE_DisableEnableMessagesForInstance_fsm, FSM_GC_SUITE_DisableEnableMessagesForInstance_fsm_table, 2);
+
+    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    const uint8_t str[] = "has been initialized";
+    ASSERT_FALSE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
+    ASSERT_EQ(strlen((char*)buffer), 0);
+
+    // Теперь включим сообщения и проверим снова
+    _change_io(pipefd, &old_stdout, buffer,  sizeof(buffer));
+
+    fsm_gc_enable_all_messages();
+    fsm_gc_init(nullptr, nullptr, 1);
+    fsm_gc_init(&FSM_GC_SUITE_DisableEnableMessagesForInstance_fsm, FSM_GC_SUITE_DisableEnableMessagesForInstance_fsm_table, 2);
+
+    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
+    ASSERT_NE(strlen((char*)buffer), 0);
+}
+
 #endif
 
 // TODO: add DEBUG messages fixture and tests
