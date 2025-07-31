@@ -9,8 +9,6 @@ extern "C" {
 #endif
 
 
-#include <stdio.h>
-#include <string.h>
 #include <stdbool.h>
 
 #include "gtime.h"
@@ -21,111 +19,26 @@ extern "C" {
     #define GPRINT_ENABLED
 
     #if TIME_MS_T == uint32_t
-        #define __G_TIME_PRINT_LEN "lu"
+        #define __G_TIME_PRINT_FORMAT "lu"
     #else
-        #define __G_TIME_PRINT_LEN "llu"
-    #endif
-
-    #ifndef printMessage
-       #if defined(__MINGW32__) || defined(_MSC_VER)
-           #define printMessage(format, ...) printf(format,  ##__VA_ARGS__);
-       #elif defined(__GNUC__)
-            #if __cplusplus >= 202002L
-                #define printMessage(format, ...) printf(format __VA_OPT__(,) __VA_ARGS__);
-            #else
-                #define printMessage(format, ...) printf(format, ##__VA_ARGS__);
-            #endif
-       #else
-           #define printMessage(format, ...) { }
-           #error Please check compiler
-       #endif
-    #endif
-
-    void __g_print_offset();
-    void __g_print_tag(const char* tag);
-
-    #ifndef printTagLog
-        #if defined(__MINGW32__) || defined(_MSC_VER)
-            #define printTagLog(tag, format, ...)  { \
-                __g_print_tag(tag); \
-                printMessage(format "\n", ##__VA_ARGS__); \
-            }
-        #elif defined(__GNUC__)
-            #if __cplusplus >= 202002L
-                #define printTagLog(tag, format, ...)  { \
-                    __g_print_tag(tag); \
-                    printMessage(format "\n" __VA_OPT__(,) __VA_ARGS__); \
-                }
-            #else
-                #define printTagLog(tag, format, ...)  { \
-                    __g_print_tag(tag); \
-                    printMessage(format "\n", ##__VA_ARGS__); \
-                }
-            #endif
-        #endif
-   #endif
-
-    #ifndef printLog
-        #if defined(__MINGW32__) || defined(_MSC_VER)
-            #define printPretty(format, ...) { \
-                __g_print_offset(); \
-                printMessage(format, ##__VA_ARGS__); \
-            }
-        #elif defined(__GNUC__)
-            #if __cplusplus >= 202002L
-                #define printPretty(format, ...) { \
-                    __g_print_offset(); \
-                    printMessage(format __VA_OPT__(,) __VA_ARGS__); \
-                }
-            #else
-                #define printPretty(format, ...) { \
-                    __g_print_offset(); \
-                    printMessage(format, ##__VA_ARGS__); \
-                }
-            #endif
-        #endif
-    #endif
-
-    #ifndef gprint
-        #if defined(__MINGW32__) || defined(_MSC_VER)
-            #define gprint(format, ...) printMessage(format, ## __VA_ARGS__);
-        #elif defined(__GNUC__)
-            #if __cplusplus >= 202002L
-                #define gprint(format, ...) printMessage(format __VA_OPT__(,) __VA_ARGS__);
-            #else
-                #define gprint(format, ...) printMessage(format, ##__VA_ARGS__);
-            #endif
-        #endif
+        #define __G_TIME_PRINT_FORMAT "llu"
     #endif
     
     bool __g_print_msg_filter_check(const char*, TIME_MS_T);
     #ifndef gprintMsgFilter
-        #define gprintMsgFilter(PRINT, TIME) if (__g_print_msg_filter_check(__STR_DEF__(PRINT), TIME)) { PRINT }
+        #define gprintMsgFilter(PRINT, TIME) if (__g_print_msg_filter_check(__STR_DEF__(PRINT), TIME)) { PRINT; }
     #endif
 
 #else
 
-    #ifndef printMessage
-        #define printMessage(format, ...) { }
-    #endif
-
-    #ifndef printTagLog
-        #define printTagLog(tag, format, ...)  { }
-    #endif
-
-    #ifndef printLog
-        #define printPretty(format, ...) { }
-    #endif
-
-    #ifndef gprint
-        #define gprint(format, ...) { }
-    #endif
-
-    #ifndef gprintMsgFilter
-        #define gprintMsgFilter(PRINT, TIME) {}
-    #endif
+    #define gprintMsgFilter(PRINT, TIME) {}
 
 #endif
+
+
+void gprint(const char* format, ...);
+void printTagLog(const char* TAG, const char* format, ...);
+void printPretty(const char* format, ...);
 
 
 #ifdef __cplusplus
