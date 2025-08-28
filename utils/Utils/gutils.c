@@ -40,8 +40,9 @@ uint32_t gtimer_remaining(gtimer_t* tm)
     return tm->delay - (getMillis() - tm->start);
 }
 
-#if defined(_DEBUG) || defined(DEBUG)
-void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) {
+#if defined(GPRINT_ENABLED)
+void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len) 
+{
     const uint8_t cols_count = 16;
     uint32_t i = 0;
     printPretty("- offset -    0  1  2  3  4  5  6  7 |  8  9  A  B  C  D  E  F | 0123456789ABCDEF\n");
@@ -62,7 +63,7 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
                 break;
             }
             char c = buf[i * cols_count + j];
-            if (c > 31 && c < 0xFF) {
+            if ((uint8_t)c > 31) {
                 gprint("%c", (char)c);
             } else {
             	gprint(".");
@@ -102,16 +103,19 @@ uint8_t util_get_number_len(int number)
     return counter;
 }
 
-uint32_t util_small_pow(const uint32_t number, uint32_t degree)
+uint32_t util_small_pow(uint32_t number, uint32_t degree)
 {
-	if (!degree) {
-		return 1;
-	}
-	uint32_t res = number;
-	while (--degree) {
-		res *= number;
-	}
-	return res;
+	uint32_t result = 1;
+    while (degree) {
+        if (degree % 2 == 0) {
+            degree /= 2;
+            number *= number;
+        } else {
+            degree--;
+            result *= number;
+        }
+    }
+    return result;
 }
 
 int util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2)
