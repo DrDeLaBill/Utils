@@ -60,12 +60,14 @@ extern "C" {
 
 #ifndef __proportion
 #   define __proportion(VAL, RNG1L, RNG1H, RNG2L, RNG2H) ( \
-        RNG2L + ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)) \
+        (__abs_dif(RNG1H, RNG1L) > 0) ? \
+            (RNG2L + ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L))) : \
+            0 \
 )
 #endif
 
 #ifndef __percent
-#   define __percent(PART, MAX) (((PART) * 100) / (MAX))
+#   define __percent(PART, MAX) ( MAX > 0 ? ((PART) * 100) / (MAX) : 0)
 #endif
 
 #ifndef __rm_mod
