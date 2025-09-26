@@ -13,13 +13,15 @@ extern "C" {
 
 
 #if defined(USE_HAL_DRIVER) || defined(ARDUINO)
-#   define TIME_MS_T uint32_t 
+    #define TIME_MS_T uint32_t 
 #else
-#   define TIME_MS_T uint64_t
+    #define TIME_MS_T uint64_t
 #endif
 
 
 TIME_MS_T getMillis();
+
+uint64_t getMicroseconds();
 
 
 #ifdef __cplusplus
