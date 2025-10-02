@@ -21,11 +21,11 @@ namespace utl
 
     CodeStopwatch::~CodeStopwatch()
     {
-    	TIME_MS_T cur_time = getMillis();
-        TIME_MS_T delta = __abs_dif(cur_time, start);
+    	g_time_t cur_time = getMillis();
+        g_time_t delta = __abs_dif(cur_time, start);
 #ifdef DEBUG
         if (delta > this->trig_time) {
-            printPretty("Code execution time for %s identifier: %" __G_TIME_PRINT_FORMAT " ms\n", this->identifier, delta);
+            printPretty("Code execution time for %s identifier: %lu ms\n", this->identifier, delta);
         }
 #endif
     }

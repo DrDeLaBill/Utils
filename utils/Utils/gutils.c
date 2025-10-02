@@ -9,7 +9,7 @@
 #include "glog.h"
 
 
-void gtimer_start(gtimer_t* tm, TIME_MS_T delay) {
+void gtimer_start(gtimer_t* tm, uint32_t delay) {
 	tm->start = getMillis();
 	tm->delay = delay;
 }
@@ -20,7 +20,7 @@ void gtimer_reload(gtimer_t* tm)
 }
 
 bool gtimer_wait(gtimer_t* tm) {
-    return ((TIME_MS_T)((TIME_MS_T)getMillis() - (TIME_MS_T)tm->start)) < ((TIME_MS_T)tm->delay);
+    return (getMillis() - tm->start) < tm->delay;
 }
 
 void gtimer_reset(gtimer_t* tm)
@@ -37,7 +37,7 @@ uint32_t gtimer_remaining(gtimer_t* tm)
     if (tm->start > getMillis()) {
     	return 0;
     }
-    return tm->delay - (getMillis() - tm->start);
+    return (uint32_t)(tm->delay - (getMillis() - tm->start));
 }
 
 #if defined(GPRINT_ENABLED)
@@ -82,10 +82,10 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
 }
 #endif
 
-bool util_wait_event(bool (*condition) (void), TIME_MS_T time)
+bool util_wait_event(bool (*condition) (void), g_time_t time_ms)
 {
-    TIME_MS_T start_time = getMillis();
-    while (__abs_dif(start_time, getMillis()) < time) {
+    g_time_t start_time = getMillis();
+    while (__abs_dif(start_time, getMillis()) < time_ms) {
         if (condition()) {
             return true;
         }

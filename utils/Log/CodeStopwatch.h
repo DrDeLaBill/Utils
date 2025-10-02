@@ -19,8 +19,8 @@ namespace utl
     private:
         static constexpr unsigned IDENTIFIER_LEN = 6;
         char identifier[IDENTIFIER_LEN];
-        TIME_MS_T start;
-        TIME_MS_T trig_time;
+        g_time_t start;
+        g_time_t trig_time;
     };
 }
 

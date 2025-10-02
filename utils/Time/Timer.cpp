@@ -7,7 +7,7 @@
 
 namespace utl
 {
-    Timer::Timer(const TIME_MS_T delay):
+    Timer::Timer(const uint32_t delay):
         delay(delay), start_ms(0), started(false)
 	{}
 
@@ -34,54 +34,53 @@ namespace utl
         if (!this->started) {
             return false;
         }
-        return this->start_ms + this->delay > getMillis();
+        return (uint32_t)(this->start_ms + this->delay > getMillis());
     }
     
-    TIME_MS_T Timer::deadline()
+    uint32_t Timer::deadline()
     {
         if (!this->started) {
             return 0;
         }
-        TIME_MS_T end_ms = end();
+        g_time_t end_ms = end();
         if (getMillis() > end_ms) {
             return 0;
         }
-        return end_ms - getMillis();
+        return (uint32_t)(end_ms - getMillis());
     }
     
-    TIME_MS_T Timer::passed()
+    uint32_t Timer::passed()
     {
         if (!this->started) {
             return 0;
         }
         if (getMillis() > this->start_ms) {
-            return getMillis() - this->start_ms;
+            return (uint32_t)(getMillis() - this->start_ms);
         }
         return 0;
     }
     
-    TIME_MS_T Timer::getStart()
+    uint32_t Timer::getStart()
     {
         if (!this->started) {
             return 0;
         }
-        return this->start_ms;
+        return (uint32_t)(this->start_ms);
     }
 
-    TIME_MS_T Timer::end()
+    uint32_t Timer::end()
     {
         if (!this->started) {
             return 0;
         }
-    	return this->start_ms + this->delay;
+    	return (uint32_t)(this->start_ms + this->delay);
     }
-
-    TIME_MS_T Timer::getDelay()
+    uint32_t Timer::getDelay()
     {
-        return this->delay;
+        return (uint32_t)(this->delay);
     }
 
-	void Timer::changeDelay(const TIME_MS_T delay_ms)
+	void Timer::changeDelay(const uint32_t delay_ms)
     {
     	this->delay = delay_ms;
     }

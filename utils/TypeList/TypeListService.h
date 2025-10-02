@@ -10,15 +10,73 @@
 
 namespace utl 
 {
+	namespace prvt {
+		template<bool condition, unsigned SizeIfTrue, class SizeIfFalse>
+		struct StaticSizeIf
+		{
+			static constexpr unsigned SIZE = SizeIfTrue;
+		};
+
+		template<unsigned SizeIfTrue, class SizeIfFalse>
+		struct StaticSizeIf<false, SizeIfTrue, SizeIfFalse>
+		{
+			static constexpr unsigned SIZE = SizeIfFalse::SIZE;
+		};
+	}
+
+    template<unsigned VALUE, unsigned MULTIPLIER, unsigned START_VALUE = MULTIPLIER>
+    struct SizeMultiplierSelector
+    {
+        static constexpr bool isTargetMult = VALUE > START_VALUE == 0 && START_VALUE % MULTIPLIER == 0;
+        static constexpr unsigned SIZE =
+            prvt::StaticSizeIf<
+                isTargetMult,
+                START_VALUE,
+                SizeMultiplierSelector<VALUE, MULTIPLIER, START_VALUE * MULTIPLIER>
+            >::SIZE;
+    };
+
+	namespace prvt
+	{
+		template<bool condition, class TypeIfTrue, class TypeIfFalse>
+		struct StaticTypeIf
+		{
+			typedef TypeIfTrue TYPE;
+		};
+
+		template<class TypeIfTrue, class TypeIfFalse>
+		struct StaticTypeIf<false, TypeIfTrue, TypeIfFalse>
+		{
+			typedef TypeIfFalse TYPE;
+		};
+	}
+
+	template<unsigned SIZE>
+	struct TypeSelector
+	{
+		static constexpr bool isLE8bit  = SIZE <= std::numeric_limits<uint8_t>::max();
+		static constexpr bool isLE16bit = SIZE <= std::numeric_limits<uint16_t>::max();
+
+		typedef typename prvt::StaticTypeIf<
+			isLE8bit,
+			uint8_t,
+			typename prvt::StaticTypeIf<
+				isLE16bit,
+				uint16_t,
+				uint32_t
+			>::TYPE
+		>::TYPE TYPE;
+	};
+
     // Get type list length
     template<class... TypeList>
     constexpr std::size_t size(unit_t<TypeList...>) {
-    	return 1 + size(typename unit_t<TypeList...>::TAIL{});
+        return 1 + size(typename unit_t<TypeList...>::TAIL{});
     }
 
     template<class Head>
     constexpr std::size_t size(unit_t<Head, null_type_t>) {
-    	return 1;
+        return 1;
     }
     
     template<class... TypeList>
@@ -36,6 +94,4 @@ namespace utl
     }
 
     // TODO: операторы сравнения
-
-	// TODO: https://github.com/ALSCode/FSM/blob/master/fsm/typelist.hpp
 }

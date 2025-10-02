@@ -61,7 +61,7 @@ extern "C" {
 #ifndef __proportion
 #   define __proportion(VAL, RNG1L, RNG1H, RNG2L, RNG2H) ( \
         (__abs_dif(RNG1H, RNG1L) > 0) ? \
-            (RNG2L + ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L))) : \
+            (RNG2L - ((VAL < RNG1L ? 1 : -1) * (__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L))) : \
             0 \
 )
 #endif
@@ -69,7 +69,7 @@ extern "C" {
 #ifndef __proportion_inv
 #   define __proportion_inv(VAL, RNG1L, RNG1H, RNG2L, RNG2H) ( \
         (__abs_dif(RNG1H, RNG1L) > 0) ? \
-            (RNG2L + (__abs_dif(RNG2L, RNG2H) - ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)))) : \
+            (RNG2L + (__abs_dif(RNG2L, RNG2H) + ((VAL < RNG1L ? 1 : -1) * (__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)))) : \
             0 \
 )
 #endif
@@ -111,12 +111,12 @@ extern "C" {
 
 
 typedef struct _gtimer_t {
-    TIME_MS_T start;
-    TIME_MS_T delay;
+    g_time_t start;
+    g_time_t delay;
 } gtimer_t;
 
 
-void gtimer_start(gtimer_t* tm, TIME_MS_T waitMs);
+void gtimer_start(gtimer_t* tm, uint32_t waitMs);
 void gtimer_reload(gtimer_t* tm);
 bool gtimer_wait(gtimer_t* tm);
 uint32_t gtimer_remaining(gtimer_t* tm);
@@ -135,7 +135,7 @@ typedef enum _ALIGN_MODE {
 
 
 void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len);
-bool     util_wait_event(bool (*condition) (void), TIME_MS_T time);
+bool     util_wait_event(bool (*condition) (void), g_time_t time_ms);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(uint32_t number, uint32_t degree);
 int      util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2);

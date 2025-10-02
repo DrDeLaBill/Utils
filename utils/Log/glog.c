@@ -31,7 +31,7 @@ void __g_print_tag(const char* tag)
 {
     const int GLOG_TAG_MAX_SIZE = 5;
     size_t offset = (uint16_t)(strlen(tag) > GLOG_TAG_MAX_SIZE + 1 ? 1 : GLOG_TAG_MAX_SIZE - (int)strlen(tag));
-    gprint("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) __G_TIME_PRINT_FORMAT "->", getMillis() % __GLOG_MILLIS_TIME_DIV_);
+    gprint("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) "lu->", (uint32_t)(getMillis() % __GLOG_MILLIS_TIME_DIV_));
     gprint("%s:%*s", tag, offset, "");
 }
 
@@ -51,7 +51,7 @@ typedef struct __g_print_msg_filter_t {
 g_print_msg_filter_t g_print_msg_filters[__GPRINT_MSG_FILTER_CNT] = {0};
 circle_buf_gc_t g_print_msg_filters_buf = {0};
 
-bool  __g_print_msg_filter_check(const char* msg, TIME_MS_T delay_ms)
+bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
 {
     static bool initialized = false;
     if (!initialized) {

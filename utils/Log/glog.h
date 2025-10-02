@@ -17,14 +17,8 @@ extern "C" {
 #if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
 
     #define GPRINT_ENABLED
-
-    #if TIME_MS_T == uint32_t
-        #define __G_TIME_PRINT_FORMAT "lu"
-    #else
-        #define __G_TIME_PRINT_FORMAT "llu"
-    #endif
     
-    bool __g_print_msg_filter_check(const char*, TIME_MS_T);
+    bool __g_print_msg_filter_check(const char*, uint32_t);
     #ifndef gprintMsgFilter
         #define gprintMsgFilter(PRINT, TIME) if (__g_print_msg_filter_check(__STR_DEF__(PRINT), TIME)) { PRINT; }
     #endif

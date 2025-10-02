@@ -9,43 +9,11 @@
 #include <cstring>
 
 #include "bmacro.h"
+#include "TypeListService.h"
 
 
 namespace utl 
 {
-	
-	namespace prvt
-	{
-		template<bool condition, class TypeIfTrue, class TypeIfFalse>
-		struct StaticTypeIf
-		{
-			typedef TypeIfTrue TYPE;
-		};
-
-		template<class TypeIfTrue, class TypeIfFalse>
-		struct StaticTypeIf<false, TypeIfTrue, TypeIfFalse>
-		{
-			typedef TypeIfFalse TYPE;
-		};
-
-		template<unsigned SIZE>
-		struct TypeSelector
-		{
-			static constexpr bool isLE8bit  = SIZE <= std::numeric_limits<uint8_t>::max();
-			static constexpr bool isLE16bit = SIZE <= std::numeric_limits<uint16_t>::max();
-
-			typedef typename StaticTypeIf<
-				isLE8bit,
-				uint8_t,
-				typename StaticTypeIf<
-					isLE16bit,
-					uint16_t,
-					uint32_t
-				>::TYPE
-			>::TYPE TYPE;
-		};
-	}
-	
 	template<unsigned SIZE, class DATA_T=uint8_t>
 	class CircleBuffer
 	{
@@ -54,7 +22,7 @@ namespace utl
 
 	protected:
 	
-		using INDEX_T = typename prvt::TypeSelector<SIZE>::TYPE;
+		using INDEX_T = typename TypeSelector<SIZE>::TYPE;
 	
 		static const INDEX_T m_mask = SIZE - 1;
 		
