@@ -61,7 +61,7 @@ extern "C" {
 #ifndef __proportion
 #   define __proportion(VAL, RNG1L, RNG1H, RNG2L, RNG2H) ( \
         (__abs_dif(RNG1H, RNG1L) > 0) ? \
-            (RNG2L - ((VAL < RNG1L ? 1 : -1) * (__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L))) : \
+            (RNG2L - (VAL < RNG1L ? 1 : -1) * ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L))) : \
             0 \
 )
 #endif
@@ -69,7 +69,7 @@ extern "C" {
 #ifndef __proportion_inv
 #   define __proportion_inv(VAL, RNG1L, RNG1H, RNG2L, RNG2H) ( \
         (__abs_dif(RNG1H, RNG1L) > 0) ? \
-            (RNG2L + (__abs_dif(RNG2L, RNG2H) + ((VAL < RNG1L ? 1 : -1) * (__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)))) : \
+            (RNG2L + (__abs_dif(RNG2L, RNG2H) + (VAL < RNG1L ? 1 : -1) * ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)))) : \
             0 \
 )
 #endif

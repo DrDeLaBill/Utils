@@ -38,7 +38,17 @@ g_time_t getMillis()
 
     return (overflow_count * U64_MAX) + current_ticks;
 #elif defined(ARDUINO)
-    return millis();
+    static g_time_t previous_ticks = 0;
+    static g_time_t overflow_count = 0;
+
+    g_time_t current_ticks = millis();
+
+    if (current_ticks < previous_ticks) {
+        overflow_count++;
+    }
+    previous_ticks = current_ticks;
+
+    return (overflow_count * U64_MAX) + current_ticks;
 #elif defined(__GNUC__)
     struct timeval time;
     gettimeofday(&time, NULL);
@@ -52,7 +62,7 @@ g_time_t getMillis()
 
 g_time_t getMicrosecondes()
 {
-#if defined(USE_HAL_DRIVER)
+#if defined(USE_HAL_DRIVER) || defined(ARDUINO)
     g_time_t ticks   = getMillis();
     g_time_t systick = SysTick->VAL;
     g_time_t load    = SysTick->LOAD;
@@ -61,8 +71,6 @@ g_time_t getMicrosecondes()
     micros += (load - systick) / (SystemCoreClock / 1000000ULL);
 
     return micros;
-#elif defined(ARDUINO)
-    return micros();
 #elif defined(__GNUC__)
     struct timeval time;
     gettimeofday(&time, NULL);
