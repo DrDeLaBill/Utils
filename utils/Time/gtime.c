@@ -20,7 +20,7 @@
 #endif
 
 
-#define U64_MAX (4294967296ULL)
+#define U32_MAX ((g_time_t)0xFFFFFFFF)
 
 
 g_time_t getMillis()
@@ -29,26 +29,28 @@ g_time_t getMillis()
     static g_time_t previous_ticks = 0;
     static g_time_t overflow_count = 0;
 
+    __disable_irq();
     g_time_t current_ticks = HAL_GetTick();
-
     if (current_ticks < previous_ticks) {
         overflow_count++;
     }
     previous_ticks = current_ticks;
+    __enable_irq();
 
-    return (overflow_count * U64_MAX) + current_ticks;
+    return (overflow_count * U32_MAX) + current_ticks;
 #elif defined(ARDUINO)
     static g_time_t previous_ticks = 0;
     static g_time_t overflow_count = 0;
 
+    __disable_irq();
     g_time_t current_ticks = millis();
-
     if (current_ticks < previous_ticks) {
         overflow_count++;
     }
     previous_ticks = current_ticks;
+    __enable_irq();
 
-    return (overflow_count * U64_MAX) + current_ticks;
+    return (overflow_count * U32_MAX) + current_ticks;
 #elif defined(__GNUC__)
     struct timeval time;
     gettimeofday(&time, NULL);
@@ -60,7 +62,7 @@ g_time_t getMillis()
 #endif
 }
 
-g_time_t getMicrosecondes()
+g_time_t getMicroseconds()
 {
 #if defined(USE_HAL_DRIVER) || defined(ARDUINO)
     g_time_t ticks   = getMillis();

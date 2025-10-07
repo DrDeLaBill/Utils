@@ -17,7 +17,7 @@ typedef uint64_t g_time_t;
 
 g_time_t getMillis();
 
-g_time_t getMicrosecondes();
+g_time_t getMicroseconds();
 
 
 #ifdef __cplusplus

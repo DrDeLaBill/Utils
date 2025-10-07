@@ -1,8 +1,11 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef __TYPELIST_BUILDER__
+#define __TYPELIST_BUILDER__
 
-#include <variant>
+
+#if __cplusplus > 201402L
+	#include <variant>
 
 
 namespace utl
@@ -177,3 +180,9 @@ namespace utl
 	    using VARIANT = std::variant<null_type_t>;
 	};
 }
+
+
+#endif
+
+
+#endif

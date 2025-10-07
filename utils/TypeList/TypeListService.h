@@ -1,6 +1,7 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#pragma once
+#ifndef __TYPELIST_SERVICE__
+#define __TYPELIST_SERVICE__
 
 
 #include <cstddef>
@@ -68,6 +69,7 @@ namespace utl
 		>::TYPE TYPE;
 	};
 
+#if __cplusplus > 201402L
     // Get type list length
     template<class... TypeList>
     constexpr std::size_t size(unit_t<TypeList...>) {
@@ -94,4 +96,8 @@ namespace utl
     }
 
     // TODO: операторы сравнения
+#endif
 }
+
+
+#endif
