@@ -4,6 +4,7 @@
 #define __TYPELIST_SERVICE__
 
 
+#include <limits>
 #include <cstddef>
 
 #include "TypeListBuilder.h"
@@ -57,6 +58,7 @@ namespace utl
 	{
 		static constexpr bool isLE8bit  = SIZE <= std::numeric_limits<uint8_t>::max();
 		static constexpr bool isLE16bit = SIZE <= std::numeric_limits<uint16_t>::max();
+		static constexpr bool isLE32bit = SIZE <= std::numeric_limits<uint32_t>::max();
 
 		typedef typename prvt::StaticTypeIf<
 			isLE8bit,
@@ -64,7 +66,11 @@ namespace utl
 			typename prvt::StaticTypeIf<
 				isLE16bit,
 				uint16_t,
-				uint32_t
+				typename prvt::StaticTypeIf<
+					isLE32bit,
+					uint32_t,
+					uint64_t
+				>::TYPE
 			>::TYPE
 		>::TYPE TYPE;
 	};
