@@ -25,17 +25,17 @@ namespace utl
 		};
 	}
 
-    template<unsigned VALUE, unsigned MULTIPLIER, unsigned START_VALUE = MULTIPLIER>
-    struct SizeMultiplierSelector
-    {
-        static constexpr bool isTargetMult = VALUE > START_VALUE == 0 && START_VALUE % MULTIPLIER == 0;
-        static constexpr unsigned SIZE =
-            prvt::StaticSizeIf<
-                isTargetMult,
-                START_VALUE,
-                SizeMultiplierSelector<VALUE, MULTIPLIER, START_VALUE * MULTIPLIER>
-            >::SIZE;
-    };
+	template<unsigned VALUE, unsigned MULTIPLIER, unsigned START_VALUE = MULTIPLIER>
+	struct SizeMultiplierSelector
+	{
+		static constexpr bool isTargetMult = (VALUE < START_VALUE) && ((START_VALUE % MULTIPLIER) == 0);
+		static constexpr unsigned SIZE =
+			prvt::StaticSizeIf<
+				isTargetMult,
+				START_VALUE,
+				SizeMultiplierSelector<VALUE, MULTIPLIER, START_VALUE * MULTIPLIER>
+			>::SIZE;
+	};
 
 	namespace prvt
 	{
@@ -69,7 +69,6 @@ namespace utl
 		>::TYPE TYPE;
 	};
 
-#if __cplusplus > 201402L
     // Get type list length
     template<class... TypeList>
     constexpr std::size_t size(unit_t<TypeList...>) {
@@ -96,7 +95,6 @@ namespace utl
     }
 
     // TODO: операторы сравнения
-#endif
 }
 
 

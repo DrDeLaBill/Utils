@@ -6,6 +6,7 @@
 
 #if __cplusplus > 201402L
 	#include <variant>
+#endif
 
 
 namespace utl
@@ -109,6 +110,7 @@ namespace utl
 		using RESULT = null_type_t;
 	};
 
+#if __cplusplus > 201402L
 	// Variant factory
 	template<class... Types>
 	struct variant_factory { };
@@ -179,10 +181,8 @@ namespace utl
 	{
 	    using VARIANT = std::variant<null_type_t>;
 	};
-}
-
-
 #endif
+}
 
 
 #endif
