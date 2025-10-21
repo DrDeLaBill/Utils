@@ -41,14 +41,16 @@ void __g_print_offset()
 }
 
 
-#define __GPRINT_MSG_FILTER_CNT (20)
+#if !defined(GPRINT_MSG_FILTER_CNT)
+    #define GPRINT_MSG_FILTER_CNT (20)
+#endif
 
 typedef struct __g_print_msg_filter_t {
     size_t*  ptr;
     gtimer_t timer;
 } g_print_msg_filter_t;
 
-g_print_msg_filter_t g_print_msg_filters[__GPRINT_MSG_FILTER_CNT] = {0};
+g_print_msg_filter_t g_print_msg_filters[GPRINT_MSG_FILTER_CNT] = {0};
 circle_buf_gc_t g_print_msg_filters_buf = {0};
 
 bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
