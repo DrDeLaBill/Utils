@@ -12,6 +12,16 @@ extern "C" {
 #include <stdint.h>
 #include <stdbool.h>
 
+#include "gutils.h"
+
+
+#define CIRCLE_BUFFER_GC_HEADER_INIT(SIZE, TYPE, CIRCLE_BUF_NAME) \
+    TYPE __concat(__circle_buf_array_, CIRCLE_BUF_NAME)[SIZE]; \
+    circle_buf_gc_t CIRCLE_BUF_NAME;
+
+#define CIRCLE_BUFFER_GC_SRC_INIT(CIRCLE_BUF_NAME) \
+    circle_buf_gc_init(&CIRCLE_BUF_NAME, (uint8_t*)&__concat(__circle_buf_array_, CIRCLE_BUF_NAME), sizeof(*__concat(__circle_buf_array_, CIRCLE_BUF_NAME)), __arr_len(__concat(__circle_buf_array_, CIRCLE_BUF_NAME)));
+
 
 typedef struct _circle_buf_gc_t {
     uint32_t m_bedacode;

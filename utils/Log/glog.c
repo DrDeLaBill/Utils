@@ -50,19 +50,18 @@ typedef struct __g_print_msg_filter_t {
     gtimer_t timer;
 } g_print_msg_filter_t;
 
-g_print_msg_filter_t g_print_msg_filters[GPRINT_MSG_FILTER_CNT] = {0};
-circle_buf_gc_t g_print_msg_filters_buf = {0};
+CIRCLE_BUFFER_GC_HEADER_INIT(GPRINT_MSG_FILTER_CNT, g_print_msg_filter_t, g_print_msg_filters);
 
 bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
 {
     static bool initialized = false;
     if (!initialized) {
-        circle_buf_gc_init(&g_print_msg_filters_buf, (uint8_t*)&g_print_msg_filters, sizeof(g_print_msg_filter_t), __arr_len(g_print_msg_filters));
+        CIRCLE_BUFFER_GC_SRC_INIT(g_print_msg_filters);
         initialized = true;
     }
     size_t* msg_hash = (size_t*)msg;
-    for (unsigned i = 0; i < circle_buf_gc_count(&g_print_msg_filters_buf); i++) {
-        g_print_msg_filter_t* ptr = ((g_print_msg_filter_t*)circle_buf_gc_index(&g_print_msg_filters_buf, i));
+    for (unsigned i = 0; i < circle_buf_gc_count(&g_print_msg_filters); i++) {
+        g_print_msg_filter_t* ptr = ((g_print_msg_filter_t*)circle_buf_gc_index(&g_print_msg_filters, i));
         if (ptr->ptr != msg_hash) {
             continue;
         }
@@ -72,14 +71,14 @@ bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
         }
         return false;
     }
-    if (circle_buf_gc_full(&g_print_msg_filters_buf)) {
+    if (circle_buf_gc_full(&g_print_msg_filters)) {
         printTagLog("INFO", "Message filter buffer is full");
-        circle_buf_gc_pop_front(&g_print_msg_filters_buf);
+        circle_buf_gc_pop_front(&g_print_msg_filters);
     }
     g_print_msg_filter_t filter = {0};
     gtimer_start(&filter.timer, delay_ms);
     filter.ptr = msg_hash;
-    circle_buf_gc_push_back(&g_print_msg_filters_buf, (uint8_t*)&filter);
+    circle_buf_gc_push_back(&g_print_msg_filters, (uint8_t*)&filter);
     return true;
 }
 
