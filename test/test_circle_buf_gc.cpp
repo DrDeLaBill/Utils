@@ -617,3 +617,29 @@ TEST(UtilsFixture, test_index_after_operations)
     ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 0) == 200);
     ASSERT_TRUE(*(uint32_t*)circle_buf_gc_index(&cb, 1) == 300);
 }
+
+TEST(UtilsFixture, test_float) 
+{
+    const unsigned TEST_BUFFER_LEN = 10;
+    CIRCLE_BUFFER_GC_HEADER_INIT(TEST_BUFFER_LEN, float, cb);
+
+    CIRCLE_BUFFER_GC_SRC_INIT(cb);
+
+    float start = 1.0f;
+    float value = start;
+    for (unsigned i = 0; i < TEST_BUFFER_LEN * 2; i++) {
+        if (!circle_buf_gc_full(&cb)) {
+            circle_buf_gc_push_back(&cb, (uint8_t*)&value);
+        }
+        value += 1.0f;
+    }
+
+    value = start;
+    for (unsigned i = 0; i < TEST_BUFFER_LEN; i++) {
+        float tmp = *(float*)circle_buf_gc_pop_front(&cb);
+        printf("%02.f == %02.f\n", tmp, value);
+        ASSERT_EQ((int)tmp, (int)value);
+        ASSERT_TRUE(__abs_dif(tmp, value) <= 1.0f);
+        value += 1.0f;
+    }
+}
