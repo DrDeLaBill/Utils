@@ -38,6 +38,60 @@ namespace utl
 			>::SIZE;
 	};
 
+	template<typename T, T NUMBER>
+	struct NumbersCount
+	{
+		static constexpr size_t SIZE = 1 + NumbersCount<T, NUMBER / 10>::SIZE;
+	};
+
+	template<>
+	struct NumbersCount<uint8_t, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<int8_t, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<short, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<unsigned short, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<int32_t, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<long long, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<unsigned, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
+	template<>
+	struct NumbersCount<long long unsigned, 0>
+	{
+		static constexpr size_t SIZE = 0;
+	};
+
 	namespace prvt
 	{
 		template<bool condition, class TypeIfTrue, class TypeIfFalse>

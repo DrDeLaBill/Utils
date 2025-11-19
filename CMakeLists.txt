@@ -55,11 +55,11 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     if(MSVC)
         message(STATUS "Add MSVC warnings")
         add_compile_options(
-            /Wall /W4 /we5240 /we4649 /we4330 /we4926
+            /Wall /W4 /we5240 /we4649 /we4330 /we4926 /Zc:__cplusplus /std:c++17
         )
     elseif("${CMAKE_CXX_COMPILER_ID}" MATCHES "GNU")
         message(STATUS "Add GCC warnings")
-        add_compile_options(-Wall -Wextra -pedantic -Wmissing-include-dirs)
+        add_compile_options(-Wall -Wextra -pedantic -Wmissing-include-dirs -std=gnu++17)
         if (DEBUG)
             message(STATUS "Build gsystem with DEBUG")
             set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -DDEBUG")
@@ -83,6 +83,14 @@ if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
     message(STATUS "C++ FLAGS    : ${CMAKE_CXX_FLAGS}")
     message(STATUS "ASM FLAGS    : ${CMAKE_ASM_FLAGS}")
     message(STATUS "Linker FLAGS : ${CMAKE_LINKER_FLAGS}")
+    
+    # Set project properties
+    set_target_properties(
+        ${PROJECT_NAME} PROPERTIES
+        CXX_STANDARD 17
+        CXX_STANDARD_REQUIRED ON
+        LINKER_LANGUAGE CXX
+    )
 
 else()
 

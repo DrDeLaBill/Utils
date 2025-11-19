@@ -78,7 +78,7 @@ g_time_t getMicroseconds()
     gettimeofday(&time, NULL);
     return ((g_time_t)(time.tv_sec) * 1000000) + ((g_time_t)(time.tv_usec));
 #elif defined(_MSC_VER)
-    return (v)clock() * (1000000 / CLOCKS_PER_SEC);
+    return (g_time_t)clock() * (1000000 / CLOCKS_PER_SEC);
 #else
     return 0;
 #endif

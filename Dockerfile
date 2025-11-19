@@ -1,4 +1,4 @@
-ARG CI_REGISTRY=ghcr.io/drdelabill/stm_builder:latest
+ARG CI_REGISTRY=ghcr.io/drdelabill/stm_builder:f5acd123ae2bc0d9231b05e7638a2e5eeb6034b7
 
 FROM $CI_REGISTRY AS builder
 
