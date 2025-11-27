@@ -41,14 +41,26 @@ g_time_t getMillis()
 #elif defined(ARDUINO)
     static g_time_t previous_ticks = 0;
     static g_time_t overflow_count = 0;
+    static bool irq_disabled = false;
+    bool _self_irq_disabled = false;
 
-    __disable_irq();
+    uint32_t prev_basepri = __get_BASEPRI();
+    if (!irq_disabled) {
+        irq_disabled = true;
+        _self_irq_disabled = true;
+        __set_BASEPRI(0x40);
+    }
+
     g_time_t current_ticks = millis();
     if (current_ticks < previous_ticks) {
         overflow_count++;
     }
     previous_ticks = current_ticks;
-    __enable_irq();
+
+    if (_self_irq_disabled) {
+        irq_disabled = false;
+        __set_BASEPRI(prev_basepri);
+    }
 
     return (overflow_count * U32_MAX) + current_ticks;
 #elif defined(__GNUC__)
@@ -64,7 +76,7 @@ g_time_t getMillis()
 
 g_time_t getMicroseconds()
 {
-#if defined(USE_HAL_DRIVER) || defined(ARDUINO)
+#if defined(USE_HAL_DRIVER)
     g_time_t ticks   = getMillis();
     g_time_t systick = SysTick->VAL;
     g_time_t load    = SysTick->LOAD;
@@ -73,6 +85,31 @@ g_time_t getMicroseconds()
     micros += (load - systick) / (SystemCoreClock / 1000000ULL);
 
     return micros;
+#elif defined(ARDUINO)
+    static g_time_t previous_ticks = 0;
+    static g_time_t overflow_count = 0;
+    static bool irq_disabled = false;
+    bool _self_irq_disabled = false;
+
+    uint32_t prev_basepri = __get_BASEPRI();
+    if (!irq_disabled) {
+        irq_disabled = true;
+        _self_irq_disabled = true;
+        __set_BASEPRI(0x40);
+    }
+
+    g_time_t current_ticks = micros();
+    if (current_ticks < previous_ticks) {
+        overflow_count++;
+    }
+    previous_ticks = current_ticks;
+
+    if (_self_irq_disabled) {
+        irq_disabled = false;
+        __set_BASEPRI(prev_basepri);
+    }
+
+    return (overflow_count * U32_MAX) + current_ticks;
 #elif defined(__GNUC__)
     struct timeval time;
     gettimeofday(&time, NULL);
