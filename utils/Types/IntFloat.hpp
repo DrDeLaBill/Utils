@@ -22,8 +22,8 @@ public:
     static constexpr type_t EPSILON = 10;
 
 private:
-    static constexpr int64_t INTEGER_TYPE_MAX = std::numeric_limits<int64_t>::max();
-    static constexpr int64_t MAX_MULTIPLE_CNT = utl::NumbersCount<int64_t, INTEGER_TYPE_MAX>::SIZE - 1;
+    static constexpr type_t INTEGER_TYPE_MAX = std::numeric_limits<type_t>::max();
+    static constexpr type_t MAX_MULTIPLE_CNT = utl::NumbersCount<type_t, INTEGER_TYPE_MAX>::SIZE - 1;
 
     type_t integer;
     type_t fract;
@@ -42,7 +42,7 @@ private:
         return resolution;
     }
 
-    type_t numbers_count(int64_t value) const
+    type_t numbers_count(type_t value) const
     {
         type_t count = 0;
         while (value) {
@@ -159,10 +159,10 @@ public:
     {
         IntFloat result(0, 0, 0);
         
-        int64_t resolution = calc_fract_resolution(*this, other);
-        int64_t fract_del = FRACT_RESOLUTION / resolution;
-        int64_t this_value = (int64_t)integer * resolution + fract / fract_del;
-        int64_t other_value = (int64_t)other.integer * resolution + other.fract / fract_del;
+        type_t resolution = calc_fract_resolution(*this, other);
+        type_t fract_del = FRACT_RESOLUTION / resolution;
+        type_t this_value = (type_t)integer * resolution + fract / fract_del;
+        type_t other_value = (type_t)other.integer * resolution + other.fract / fract_del;
 
         type_t this_number_cnt = numbers_count(this_value);
         type_t other_number_cnt = numbers_count(other_value);
@@ -182,14 +182,14 @@ public:
             resolution = 1;
         }
         
-        int64_t product = this_value * other_value;
+        type_t product = this_value * other_value;
         
-        int64_t resolution_del = resolution * resolution;
+        type_t resolution_del = resolution * resolution;
         result.integer = (type_t)(product / resolution_del);
         if (FRACT_RESOLUTION >= resolution_del) {
-            result.fract = (type_t)((product % resolution_del) * ((int64_t)FRACT_RESOLUTION / resolution_del));
+            result.fract = (type_t)((product % resolution_del) * ((type_t)FRACT_RESOLUTION / resolution_del));
         } else {
-            result.fract = (type_t)((product % resolution_del) / (resolution_del / (int64_t)FRACT_RESOLUTION));
+            result.fract = (type_t)((product % resolution_del) / (resolution_del / (type_t)FRACT_RESOLUTION));
         }
         
         return result;
@@ -197,10 +197,10 @@ public:
     
     IntFloat operator*=(const IntFloat& other)
     {
-        int64_t resolution = calc_fract_resolution(*this, other);
-        int64_t fract_del = FRACT_RESOLUTION / resolution;
-        int64_t this_value = (int64_t)integer * resolution + fract / fract_del;
-        int64_t other_value = (int64_t)other.integer * resolution + other.fract / fract_del;
+        type_t resolution = calc_fract_resolution(*this, other);
+        type_t fract_del = FRACT_RESOLUTION / resolution;
+        type_t this_value = (type_t)integer * resolution + fract / fract_del;
+        type_t other_value = (type_t)other.integer * resolution + other.fract / fract_del;
 
         type_t this_number_cnt = numbers_count(this_value);
         type_t other_number_cnt = numbers_count(other_value);
@@ -220,14 +220,14 @@ public:
             resolution = 1;
         }
         
-        int64_t product = this_value * other_value;
+        type_t product = this_value * other_value;
         
-        int64_t resolution_del = resolution * resolution;
+        type_t resolution_del = resolution * resolution;
         this->integer = (type_t)(product / resolution_del);
         if (FRACT_RESOLUTION >= resolution_del) {
-            this->fract = (type_t)((product % resolution_del) * ((int64_t)FRACT_RESOLUTION / resolution_del));
+            this->fract = (type_t)((product % resolution_del) * ((type_t)FRACT_RESOLUTION / resolution_del));
         } else {
-            this->fract = (type_t)((product % resolution_del) / (resolution_del / (int64_t)FRACT_RESOLUTION));
+            this->fract = (type_t)((product % resolution_del) / (resolution_del / (type_t)FRACT_RESOLUTION));
         }
         
         return *this;
@@ -241,13 +241,13 @@ public:
             return result;
         }
 
-        int64_t resolution = calc_fract_resolution(*this, other);
-        int64_t fract_del = FRACT_RESOLUTION / resolution;
-        int64_t this_value = (int64_t)integer * resolution + fract / fract_del;
-        int64_t other_value = (int64_t)other.integer * resolution + other.fract / fract_del;
+        type_t resolution = calc_fract_resolution(*this, other);
+        type_t fract_del = FRACT_RESOLUTION / resolution;
+        type_t this_value = (type_t)integer * resolution + fract / fract_del;
+        type_t other_value = (type_t)other.integer * resolution + other.fract / fract_del;
         
-        int64_t mult1 = FRACT_RESOLUTION;
-        int64_t mult2 = 1;
+        type_t mult1 = FRACT_RESOLUTION;
+        type_t mult2 = 1;
         if (numbers_count(this_value) + numbers_count(FRACT_RESOLUTION) > MAX_MULTIPLE_CNT) {
             type_t this_count = numbers_count(this_value);
             while (mult1 > 1 && this_count + numbers_count(mult1) > MAX_MULTIPLE_CNT) {
@@ -255,10 +255,10 @@ public:
                 mult2 *= 10;
             }
         }
-        int64_t quotient = ((this_value * mult1) / other_value) * mult2;
+        type_t quotient = ((this_value * mult1) / other_value) * mult2;
         
-        result.integer = (type_t)(quotient / (int64_t)FRACT_RESOLUTION);
-        result.fract = (type_t)(quotient % (int64_t)FRACT_RESOLUTION);
+        result.integer = (type_t)(quotient / (type_t)FRACT_RESOLUTION);
+        result.fract = (type_t)(quotient % (type_t)FRACT_RESOLUTION);
         
         return result;
     }
@@ -271,15 +271,15 @@ public:
             return *this;
         }
 
-        int64_t resolution = calc_fract_resolution(*this, other);
-        int64_t fract_del = FRACT_RESOLUTION / resolution;
-        int64_t this_value = (int64_t)integer * resolution + fract / fract_del;
-        int64_t other_value = (int64_t)other.integer * resolution + other.fract / fract_del;
+        type_t resolution = calc_fract_resolution(*this, other);
+        type_t fract_del = FRACT_RESOLUTION / resolution;
+        type_t this_value = (type_t)integer * resolution + fract / fract_del;
+        type_t other_value = (type_t)other.integer * resolution + other.fract / fract_del;
         
-        int64_t quotient = (this_value * FRACT_RESOLUTION) / other_value;
+        type_t quotient = (this_value * FRACT_RESOLUTION) / other_value;
         
-        this->integer = (type_t)(quotient / (int64_t)FRACT_RESOLUTION);
-        this->fract = (type_t)(quotient % (int64_t)FRACT_RESOLUTION);
+        this->integer = (type_t)(quotient / (type_t)FRACT_RESOLUTION);
+        this->fract = (type_t)(quotient % (type_t)FRACT_RESOLUTION);
         
         return *this;
     }
@@ -330,8 +330,8 @@ public:
         return (float)integer + (float)((float)fract / (float)FRACT_RESOLUTION);
     }
      
-    int64_t toInt64() const {
-        return (int64_t)integer * FRACT_RESOLUTION + fract;
+    type_t toInt64() const {
+        return (type_t)integer * FRACT_RESOLUTION + fract;
     }
     
     static IntFloat zero() { return IntFloat(0, 0, 0); }
@@ -339,19 +339,23 @@ public:
     static IntFloat two() { return IntFloat(2, 0, 0); }
     static IntFloat half() { return IntFloat(0, 5, 10); }
 
-    static IntFloat pi() { 
+    static IntFloat pi()
+    {
         return IntFloat(3, 141592654, IntFloat::FRACT_RESOLUTION); // π ≈ 3.141592654
     }
     
-    static IntFloat half_pi() { 
+    static IntFloat half_pi()
+    {
         return IntFloat(1, 570796327, IntFloat::FRACT_RESOLUTION); // π/2 ≈ 1.570796327
     }
     
-    static IntFloat quarter_pi() { 
+    static IntFloat quarter_pi()
+    { 
         return IntFloat(0, 785398163, IntFloat::FRACT_RESOLUTION); // π/4 ≈ 0.785398163
     }
     
-    static IntFloat gravity_earth() { 
+    static IntFloat gravity_earth()
+    {
         return IntFloat(9, 80665, 100000); // g = 9.80665g
     }
     
