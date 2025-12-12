@@ -17,18 +17,13 @@ extern "C" {
 #if defined(_DEBUG) || defined(DEBUG) || defined(GBEDUG_FORCE)
 
     #define GPRINT_ENABLED
-    
-    bool __g_print_msg_filter_check(const char*, uint32_t);
-    #ifndef gprintMsgFilter
-        #define gprintMsgFilter(PRINT, TIME) if (__g_print_msg_filter_check(__STR_DEF__(PRINT), TIME)) { PRINT; }
-    #endif
-
-#else
-
-    #define gprintMsgFilter(PRINT, TIME) {}
 
 #endif
 
+bool __g_print_msg_filter_check(const char*, uint32_t);
+#ifndef gprintMsgFilter
+    #define gprintMsgFilter(PRINT, TIME) { if (__g_print_msg_filter_check(__STR_DEF__(PRINT), TIME)) { PRINT; } }
+#endif
 
 void gprint(const char* format, ...);
 void printTagLog(const char* TAG, const char* format, ...);

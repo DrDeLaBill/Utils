@@ -17,7 +17,7 @@ static bool disable_all_messages = false;
 
 #endif
 
-size_t _fsm_gc_events_iterator = 1;
+static size_t _fsm_gc_events_iterator = 1;
 
 
 
@@ -44,7 +44,9 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 
     for (unsigned i = 0; i < fsm->_table_size; i++) {
         if (fsm->_table[i].event) {
-            fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
+            if (!fsm->_table[i].event->index) {
+                fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
+            }
         } 
 #ifdef FSM_GC_BEDUG
         else if (fsm->_enable_msg && !disable_all_messages) {

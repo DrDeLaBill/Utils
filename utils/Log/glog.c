@@ -13,37 +13,10 @@
 #include "circle_buf_gc.h"
 
 
-#ifdef GPRINT_ENABLED
-
-#define __GLOG_MILLIS_SYMBOLS_CNT_ 8
-#define __GLOG_MILLIS_TIME_DIV_    100000000
-#define __GLOG_TOSTRING_(x)        __STR_DEF__(x)
-#define __GLOG_PRETTY_LOG_OFFSET_  (__GLOG_MILLIS_SYMBOLS_CNT_ + 8)
-
-
-static void printMessage(const char* format, va_list args);
-
-static void __g_print_offset();
-static void __g_print_tag(const char* tag);
-
-
-void __g_print_tag(const char* tag)
-{
-    const int GLOG_TAG_MAX_SIZE = 5;
-    size_t offset = (uint16_t)(strlen(tag) > GLOG_TAG_MAX_SIZE + 1 ? 1 : GLOG_TAG_MAX_SIZE - (int)strlen(tag));
-    gprint("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) "lu->", (uint32_t)(getMillis() % __GLOG_MILLIS_TIME_DIV_));
-    gprint("%s:%*s", tag, offset, "");
-}
-
-void __g_print_offset()
-{
-    gprint("%*s", __GLOG_PRETTY_LOG_OFFSET_, "");
-}
-
-
 #if !defined(GPRINT_MSG_FILTER_CNT)
     #define GPRINT_MSG_FILTER_CNT (20)
 #endif
+
 
 typedef struct __g_print_msg_filter_t {
     size_t*  ptr;
@@ -80,6 +53,34 @@ bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
     filter.ptr = msg_hash;
     circle_buf_gc_push_back(&g_print_msg_filters, (uint8_t*)&filter);
     return true;
+}
+
+
+#ifdef GPRINT_ENABLED
+
+#define __GLOG_MILLIS_SYMBOLS_CNT_ 8
+#define __GLOG_MILLIS_TIME_DIV_    100000000
+#define __GLOG_TOSTRING_(x)        __STR_DEF__(x)
+#define __GLOG_PRETTY_LOG_OFFSET_  (__GLOG_MILLIS_SYMBOLS_CNT_ + 8)
+
+
+static void printMessage(const char* format, va_list args);
+
+static void __g_print_offset();
+static void __g_print_tag(const char* tag);
+
+
+void __g_print_tag(const char* tag)
+{
+    const int GLOG_TAG_MAX_SIZE = 5;
+    size_t offset = (uint16_t)(strlen(tag) > GLOG_TAG_MAX_SIZE + 1 ? 1 : GLOG_TAG_MAX_SIZE - (int)strlen(tag));
+    gprint("%0" __GLOG_TOSTRING_(__GLOG_MILLIS_SYMBOLS_CNT_) "lu->", (uint32_t)(getMillis() % __GLOG_MILLIS_TIME_DIV_));
+    gprint("%s:%*s", tag, offset, "");
+}
+
+void __g_print_offset()
+{
+    gprint("%*s", __GLOG_PRETTY_LOG_OFFSET_, "");
 }
 
 
@@ -122,4 +123,4 @@ void printMessage(const char* format, ...) {}
 void printTagLog(const char* TAG, const char* format, ...) {}
 void printPretty(const char* format, ...) {}
 
-#endif
+#endif // #ifdef GPRINT_ENABLED

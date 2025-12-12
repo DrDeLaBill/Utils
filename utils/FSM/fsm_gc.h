@@ -74,9 +74,6 @@ typedef struct _fsm_gc_t {
 } fsm_gc_t;
 
 
-extern size_t _fsm_gc_events_iterator;
-
-
 #ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE_STATE(NAME, FUNC)      static const char __concat(__bedug_state_name, NAME)[] = __STR_DEF__(NAME); \
                                                 static void FUNC(void); \
@@ -163,12 +160,6 @@ void fsm_gc_clear(fsm_gc_t* fsm);
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state);
 void fsm_gc_enable_messages(fsm_gc_t* fsm);
 void fsm_gc_disable_messages(fsm_gc_t* fsm);
-
-#ifdef FSM_GC_BEDUG
-unsigned _fsm_gc_get_state_debug_number(const char* name);
-unsigned _fsm_gc_get_event_debug_number(const char* name);
-#endif
-
 
 
 #ifdef __cplusplus
