@@ -21,6 +21,41 @@ static size_t _fsm_gc_events_iterator = 1;
 
 
 
+static bool _log_enabled(const fsm_gc_t* fsm)
+{
+    if (!fsm) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
+#endif
+        return false;
+    }
+#ifdef FSM_GC_BEDUG
+    return fsm->_enable_msg && !disable_all_messages;
+#else
+    return false;
+#endif
+}
+
+static bool _check_initialized(fsm_gc_t* const fsm)
+{
+    if (!fsm) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
+#endif
+        return false;
+    }
+    if (!fsm->_initialized) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_fsm_not_i, "FSM has not initialized");
+        BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_fsm_not_i, "FSM state_f, table and event must not be NULL");
+        fsm->_fsm_not_i = true;
+#endif
+        return false;
+    }
+    return true;
+}
+
+
 void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 {
     if (!fsm) {
@@ -29,18 +64,27 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 #endif
         return;
     }
+
+    fsm->_initialized = false;
+
     if (!size || !table) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_e_fsm_tt || disable_all_messages, "Empty FSM transition table");
+        BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_e_fsm_tt, "Empty FSM transition table");
         fsm->_e_fsm_tt = true;
 #endif
         return;
     }
-    fsm->_initialized = true;
+
     fsm->_table       = table;
     fsm->_table_size  = size;
     fsm->_state       = fsm->_table[0].source;
-    circle_buf_gc_init(fsm->_events, (uint8_t*)fsm->_events_buf, sizeof(*fsm->_events_buf), fsm->_events_length);
+
+    if (!circle_buf_gc_init(fsm->_events, (uint8_t*)fsm->_events_buf, sizeof(*fsm->_events_buf), fsm->_events_length)) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_e_fsm_tt, "FSM events queue initialize error");
+#endif
+        return;
+    }
 
     for (unsigned i = 0; i < fsm->_table_size; i++) {
         if (fsm->_table[i].event) {
@@ -49,16 +93,15 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             }
         } 
 #ifdef FSM_GC_BEDUG
-        else if (fsm->_enable_msg && !disable_all_messages) {
+        else if (_log_enabled(fsm)) { // TODO: optimize init like in gstate.c
             printTagLog(FSM_GC_TAG, "\"%s\" empty event", fsm->_name);
         }
-        if (disable_all_messages) {
+        if (!_log_enabled(fsm)) {
             continue;
         }
         for (unsigned j = i + 1; j < fsm->_table_size; j++) {
             if (fsm->_table[i].source != fsm->_table[j].source &&
-                fsm->_table[i].source->state == fsm->_table[j].source->state &&
-                fsm->_enable_msg
+                fsm->_table[i].source->state == fsm->_table[j].source->state
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -71,8 +114,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 );
             }
             if (fsm->_table[i].source != fsm->_table[j].target &&
-                fsm->_table[i].source->state == fsm->_table[j].target->state &&
-                fsm->_enable_msg
+                fsm->_table[i].source->state == fsm->_table[j].target->state
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -85,8 +127,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 );
             }
             if (fsm->_table[i].action != fsm->_table[j].action &&
-                fsm->_table[i].action->action == fsm->_table[j].action->action &&
-                fsm->_enable_msg
+                fsm->_table[i].action->action == fsm->_table[j].action->action
             ) {
                 printTagLog(
                     FSM_GC_TAG, 
@@ -100,8 +141,7 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             }
             if (fsm->_table[i].source == fsm->_table[j].source &&
                 fsm->_table[i].target == fsm->_table[j].target &&
-                fsm->_table[i].action == fsm->_table[j].action &&
-                fsm->_enable_msg
+                fsm->_table[i].action == fsm->_table[j].action
             ) {
                 printTagLog(
                     FSM_GC_TAG,
@@ -122,10 +162,12 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     }
 
 #ifdef FSM_GC_BEDUG
-    if (fsm->_enable_msg && !disable_all_messages) {
+    if (_log_enabled(fsm)) {
         printTagLog(FSM_GC_TAG, "\"%s\" has been initialized", fsm->_name);
     }
 #endif
+
+    fsm->_initialized = true;
 }
 
 void fsm_gc_disable_all_messages()
@@ -143,40 +185,17 @@ void fsm_gc_enable_all_messages()
 }
 
 void fsm_gc_reset(fsm_gc_t* fsm)
-{  
-    if (!fsm) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
-#endif
+{
+    if (!_check_initialized(fsm)) {
         return;
     }
-    if (!fsm->_initialized || !fsm->_state || !fsm->_table) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM has not initialized");
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM state, table and event must not be NULL");
-        fsm->_fsm_not_i = true;
-#endif
-        return;
-    }
-    
     circle_buf_gc_free(fsm->_events);
     fsm->_state = fsm->_table[0].source;
 }
 
 void fsm_gc_process(fsm_gc_t* fsm) 
 {
-    if (!fsm) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
-#endif
-        return;
-    }
-    if (!fsm->_initialized || !fsm->_state || !fsm->_table) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM has not initialized");
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM state, table and event must not be NULL");
-        fsm->_fsm_not_i = true;
-#endif
+    if (!_check_initialized(fsm)) {
         return;
     }
 
@@ -220,7 +239,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
     }
 
 #ifdef FSM_GC_BEDUG
-    if (fsm->_enable_msg && !disable_all_messages) {
+    if (_log_enabled(fsm)) {
 		printTagLog(
 			FSM_GC_TAG,
 			"\"%s\" transition: %s{%s} -> %s -> %s",
@@ -247,29 +266,21 @@ void fsm_gc_process(fsm_gc_t* fsm)
 
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 {
-    if (!fsm) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
-#endif
+    if (!_check_initialized(fsm)) {
         return;
     }
+
     if (!event) {
 #ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(!fsm->_enable_msg || disable_all_messages, "Empty FSM event pointer");
 #endif
         return;
     }
-    if (!fsm->_initialized) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM has not initialized");
-        fsm->_fsm_not_i = true;
-#endif
-        return;
-    }
+    
     circle_buf_gc_push_back(fsm->_events, (uint8_t*)event);
 
 #ifdef FSM_GC_BEDUG
-    if (fsm->_enable_msg && !disable_all_messages) {
+    if (_log_enabled(fsm)) {
 		printTagLog(
 			FSM_GC_TAG, \
 			"\"%s\" push %02u event: %s",
@@ -283,24 +294,14 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 
 void fsm_gc_clear(fsm_gc_t* fsm)
 {
-    if (!fsm) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
-#endif
-        return;
-    }
-    if (!fsm->_initialized) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM has not initialized");
-        fsm->_fsm_not_i = true;
-#endif
+    if (!_check_initialized(fsm)) {
         return;
     }
 
     circle_buf_gc_free(fsm->_events);
 
 #ifdef FSM_GC_BEDUG
-    if (fsm->_enable_msg && !disable_all_messages) {
+    if (_log_enabled(fsm)) {
 		printTagLog(
 			FSM_GC_TAG, \
 			"\"%s\" clear",
@@ -312,28 +313,18 @@ void fsm_gc_clear(fsm_gc_t* fsm)
 
 bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 {
-    if (!fsm) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
-#endif
+    if (!_check_initialized(fsm)) {
         return false;
     }
     if (!state) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || disable_all_messages, "Empty FSM state pointer");
-#endif
-        return false;
-    }
-    if (!fsm->_initialized) {
-#ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM has not initialized");
-        fsm->_fsm_not_i = true;
+        BEDUG_ASSERT(!_log_enabled(fsm), "Empty FSM state pointer");
 #endif
         return false;
     }
     if (!fsm->_state) {
 #ifdef FSM_GC_BEDUG
-        BEDUG_ASSERT(!fsm->_enable_msg || !fsm->_fsm_not_i || disable_all_messages, "FSM bad state");
+        BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_fsm_not_i, "FSM bad state");
         fsm->_fsm_not_i = true;
 #endif
         return false;
@@ -343,7 +334,12 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 
 void fsm_gc_enable_messages(fsm_gc_t* fsm)
 {
-    (void)fsm;
+    if (!fsm) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
+#endif
+        return;
+    }
 #ifdef FSM_GC_BEDUG
 	fsm->_enable_msg = true;
 #endif
@@ -351,7 +347,12 @@ void fsm_gc_enable_messages(fsm_gc_t* fsm)
 
 void fsm_gc_disable_messages(fsm_gc_t* fsm)
 {
-    (void)fsm;
+    if (!fsm) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
+#endif
+        return;
+    }
 #ifdef FSM_GC_BEDUG
 	fsm->_enable_msg = false;
 #endif

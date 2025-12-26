@@ -105,6 +105,11 @@ namespace utl
 			return m_data[(m_writeCount - 1) & m_mask];
 		}
 
+		const DATA_T* get()
+		{
+			return m_data;
+		}
+
 		bool empty() const
 		{
 			return m_writeCount == m_readCount;

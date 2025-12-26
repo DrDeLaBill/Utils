@@ -17,7 +17,7 @@ typedef struct _queue_gc_t {
 } queue_gc_t;
 
 
-void queue_gc_init(queue_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length);
+bool queue_gc_init(queue_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length);
 unsigned queue_gc_count(const queue_gc_t* p);
 void queue_gc_free(queue_gc_t* p);
 

@@ -25,7 +25,7 @@ TEST(UtilsFixture, test_circle_buf_init_valid_params)
     const unsigned length = 25;
 
     // Act
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Assert
     ASSERT_TRUE(buf.m_data == data);
@@ -42,18 +42,18 @@ TEST(UtilsFixture, test_circle_buf_init_null_params)
 {
     // Arrange
     circle_buf_gc_t buf;
+    uint32_t array[1] = {};
     const unsigned unit_size = 4;
     const unsigned length = 25;
 
     // Act & Assert
-    circle_buf_gc_init(NULL, NULL, unit_size, length);  // Should not crash
+    ASSERT_FALSE(circle_buf_gc_init(NULL, NULL, unit_size, length));  // Should not crash
     
-    circle_buf_gc_init(&buf, NULL, unit_size, length);
-    ASSERT_TRUE(buf.m_data == NULL);
-    ASSERT_TRUE(buf.m_unit_size == 0);
-    ASSERT_TRUE(buf.m_length == 0);
-    ASSERT_TRUE(buf.m_read_idx == 0); 
-    ASSERT_TRUE(buf.m_write_cnt == 0);
+    ASSERT_FALSE(circle_buf_gc_init(&buf, NULL, unit_size, length));
+    
+    ASSERT_FALSE(circle_buf_gc_init(NULL, (uint8_t*)array, unit_size, length));
+
+    ASSERT_TRUE(circle_buf_gc_init(&buf, (uint8_t*)array, unit_size, length));
 }
 
 // Verify behavior at exact buffer capacity
@@ -64,7 +64,7 @@ TEST(UtilsFixture, test_circle_buf_gc_full_at_capacity)
     uint8_t data[100];
     const unsigned unit_size = 4;
     const unsigned length = 25;
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     
     uint8_t sample_data[4] = {1, 2, 3, 4};
 
@@ -91,7 +91,7 @@ TEST(UtilsFixture, test_circle_buf_lifo_order_with_push_back_and_pop_back)
     uint8_t item3[4] = {9, 10, 11, 12};
     uint8_t* popped_item;
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, item1);
@@ -123,7 +123,7 @@ TEST(UtilsFixture, verify_unit_size_respected_in_operations)
     uint8_t* output_data;
 
     // Act
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     circle_buf_gc_push_back(&buf, input_data);
     output_data = circle_buf_gc_pop_front(&buf);
 
@@ -145,7 +145,7 @@ TEST(UtilsFixture, test_circle_buf_fifo_order)
     uint8_t item3[4] = {9, 10, 11, 12};
     uint8_t* popped_item;
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, item1);
@@ -174,7 +174,7 @@ TEST(UtilsFixture, test_circle_buf_access_empty_buffer)
     uint8_t data[100];
     const unsigned unit_size = 4;
     const unsigned length = 25;
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act & Assert
     ASSERT_TRUE(circle_buf_gc_front(&buf) == NULL);
@@ -189,7 +189,7 @@ TEST(UtilsFixture, test_circle_buf_pop_from_empty)
     uint8_t data[100];
     const unsigned unit_size = 4;
     const unsigned length = 25;
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     uint8_t* result_front = circle_buf_gc_pop_front(&buf);
@@ -208,7 +208,7 @@ TEST(UtilsFixture, test_push_back_null_data_pointer_no_effect)
     uint8_t data[100];
     const unsigned unit_size = 4;
     const unsigned length = 25;
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     unsigned initial_write_cnt = buf.m_write_cnt;
 
     // Act
@@ -227,7 +227,7 @@ TEST(UtilsFixture, test_free_buffer_and_reuse)
     uint8_t data[100];
     const unsigned unit_size = 4;
     const unsigned length = 25;
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     
     uint8_t sample_data[4] = {1, 2, 3, 4};
     circle_buf_gc_push_back(&buf, sample_data);
@@ -264,7 +264,7 @@ TEST(UtilsFixture, test_circle_buf_mixed_push_pop_operations)
     uint8_t item5[4] = {17, 18, 19, 20};
     uint8_t item6[4] = {21, 22, 23, 24};
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, item1);
@@ -308,7 +308,7 @@ TEST(UtilsFixture, test_pop_elements_from_front_and_back_of_non_empty_buffer)
     uint8_t element3 = 3;
     uint8_t* popped_element;
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, &element1);
@@ -342,7 +342,7 @@ TEST(UtilsFixture, test_push_front_non_full_buffer)
     const unsigned length = 25;
     uint8_t element[4] = {1, 2, 3, 4};
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_front(&buf, element);
@@ -365,7 +365,7 @@ TEST(UtilsFixture, test_access_front_and_back_elements_of_non_empty_buffer)
     uint8_t element1[4] = {1, 2, 3, 4};
     uint8_t element2[4] = {5, 6, 7, 8};
     
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     
     // Act
     circle_buf_gc_push_back(&buf, element1);
@@ -394,7 +394,7 @@ TEST(UtilsFixture, test_circle_buf_alternating_push_front_back)
     uint8_t element5[4] = {17, 18, 19, 20};
     uint8_t* result;
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, element1);
@@ -435,7 +435,7 @@ TEST(UtilsFixture, test_push_to_full_buffer_overwrites_oldest_element)
     uint8_t element3[4] = {9, 10, 11, 12};
     uint8_t new_element[4] = {13, 14, 15, 16};
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, element1);
@@ -457,7 +457,7 @@ TEST(UtilsFixture, test_circle_buf_gc_circular_wrapping)
     uint8_t data[10];
     const unsigned unit_size = 1;
     const unsigned length = 10;
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     
     uint8_t input_data[10] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
     
@@ -492,7 +492,7 @@ TEST(UtilsFixture, test_circle_buf_count_with_push_pop_operations)
     const unsigned length = 25;
     uint8_t sample_data[4] = {1, 2, 3, 4};
     
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
     
     // Act & Assert
     ASSERT_TRUE(circle_buf_gc_count(&buf) == 0);
@@ -521,7 +521,7 @@ TEST(UtilsFixture, test_push_back_to_non_full_buffer)
     uint8_t element[4] = {1, 2, 3, 4};
     uint8_t expected[4] = {1, 2, 3, 4};
 
-    circle_buf_gc_init(&buf, data, unit_size, length);
+    ASSERT_TRUE(circle_buf_gc_init(&buf, data, unit_size, length));
 
     // Act
     circle_buf_gc_push_back(&buf, element);
@@ -540,7 +540,7 @@ TEST(UtilsFixture, test_index_basic)
     uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
     circle_buf_gc_t cb;
 
-    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+    ASSERT_TRUE(circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE));
 
     // Заполнение буфера
     uint32_t data[] = {10, 20, 30, 40, 50};
@@ -562,7 +562,7 @@ TEST(UtilsFixture, test_index_out_of_bounds)
     uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
     circle_buf_gc_t cb;
 
-    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+    ASSERT_TRUE(circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE));
 
     // Попытка получить элемент из пустого буфера
     ASSERT_TRUE(circle_buf_gc_index(&cb, 0) == NULL);
@@ -583,7 +583,7 @@ TEST(UtilsFixture, test_index_wraparound)
     uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
     circle_buf_gc_t cb;
 
-    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+    ASSERT_TRUE(circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE));
 
     // Создаем ситуацию с перемещением read_idx
     uint32_t data[TEST_BUFFER_SIZE + 2] = {1, 2, 3, 4, 5, 6, 7};
@@ -604,7 +604,7 @@ TEST(UtilsFixture, test_index_after_operations)
     uint8_t buffer[TEST_BUFFER_SIZE * TEST_UNIT_SIZE];
     circle_buf_gc_t cb;
 
-    circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE);
+    ASSERT_TRUE(circle_buf_gc_init(&cb, buffer, TEST_UNIT_SIZE, TEST_BUFFER_SIZE));
 
     // Добавляем и удаляем элементы
     uint32_t values[] = {100, 200, 300};

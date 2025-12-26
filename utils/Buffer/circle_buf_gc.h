@@ -33,7 +33,7 @@ typedef struct _circle_buf_gc_t {
 } circle_buf_gc_t;
 
 
-void circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length);
+bool circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length);
 unsigned circle_buf_gc_count(const circle_buf_gc_t* p);
 void circle_buf_gc_free(circle_buf_gc_t* p);
 

@@ -3,9 +3,9 @@
 #include "queue_gc.h"
 
 
-void queue_gc_init(queue_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length)
+bool queue_gc_init(queue_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length)
 {
-    circle_buf_gc_init(&p->buf, ptr, unit_size, length);
+    return circle_buf_gc_init(&p->buf, ptr, unit_size, length);
 }
 
 unsigned queue_gc_count(const queue_gc_t* p)

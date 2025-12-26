@@ -12,21 +12,25 @@
 static unsigned _ptr_index_from_read(const circle_buf_gc_t* p, unsigned index);
 
 
-void circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length)
+bool circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, unsigned length)
 {
     if (!p) {
-        BEDUG_ASSERT(false, "bad buffer");
-        return;
+        BEDUG_ASSERT(false, "bad circle buffer");
+        return false;
     }
+    if (!ptr || !unit_size || !length) {
+        BEDUG_ASSERT(false, "bad items buffer");
+        return false;
+    }
+
     memset((uint8_t*)p, 0, sizeof(circle_buf_gc_t));
-    if (!ptr) {
-        BEDUG_ASSERT(false, "bad buffer");
-        return;
-    }
+
     p->m_bedacode  = BEDACODE;
     p->m_data      = ptr;
     p->m_unit_size = unit_size;
     p->m_length    = length;
+
+    return true;
 }
 
 unsigned circle_buf_gc_count(const circle_buf_gc_t* p) 

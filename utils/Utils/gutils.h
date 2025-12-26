@@ -42,6 +42,10 @@ extern "C" {
 #   define __max(num1, num2) ((num1) > (num2) ? (num1) : (num2))
 #endif
 
+#ifndef __sign
+#   define __sign(num) (((num) > 0) ? 1 : (((num) < 0) ? -1 : 0))
+#endif
+
 #ifndef __get_bit
 #    define __get_bit(REG, NUM) (((REG) >> (NUM)) & 0x1UL)
 #endif
