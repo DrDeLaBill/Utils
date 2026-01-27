@@ -19,7 +19,7 @@ extern "C" {
 
 
 #ifndef __abs
-#    define __abs(num1) (((num1) > 0) ? (num1) : ((num1) * -1))
+#    define __abs(num1) (((num1) > 0) ? (num1) : (-(num1)))
 #endif
 
 #ifndef __abs_dif
@@ -75,6 +75,12 @@ extern "C" {
         (__abs_dif(RNG1H, RNG1L) > 0) ? \
             (RNG2L + (__abs_dif(RNG2L, RNG2H) + (VAL < RNG1L ? 1 : -1) * ((__abs_dif(RNG1L, VAL) * __abs_dif(RNG2H, RNG2L)) / __abs_dif(RNG1H, RNG1L)))) : \
             0 \
+)
+#endif
+
+#ifndef __constrain
+#   define __constrain(VAL, MIN, MAX) ( \
+        (VAL) < (MIN) ? (MIN) : ( (VAL) > (MAX) ? (MAX) : (VAL) ) \
 )
 #endif
 
