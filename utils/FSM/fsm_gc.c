@@ -52,6 +52,13 @@ static bool _check_initialized(fsm_gc_t* const fsm)
 #endif
         return false;
     }
+    if (!circle_buf_gc_initialized(fsm->_events)) {
+#ifdef FSM_GC_BEDUG
+        BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_fsm_not_i, "FSM events queue has not initialized");
+        fsm->_fsm_not_i = true;
+#endif
+        return false;
+    }
     return true;
 }
 
@@ -285,7 +292,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 			FSM_GC_TAG, \
 			"\"%s\" push %02u event: %s",
 			fsm->_name,
-			circle_buf_gc_count(fsm->_events),
+			circle_buf_gc_initialized(fsm->_events) ? circle_buf_gc_count(fsm->_events) : 0,
 			event->_name
 		);
     }

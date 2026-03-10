@@ -37,6 +37,7 @@ bool circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, un
 unsigned circle_buf_gc_count(const circle_buf_gc_t* p);
 void circle_buf_gc_free(circle_buf_gc_t* p);
 
+bool circle_buf_gc_initialized(const circle_buf_gc_t* p);
 bool circle_buf_gc_empty(const circle_buf_gc_t* p);
 bool circle_buf_gc_full(const circle_buf_gc_t* p);
 

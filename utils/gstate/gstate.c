@@ -42,6 +42,13 @@ static bool _check_initialized(gstate_t* const gstate)
 #endif
         return false;
     }
+    if (!circle_buf_gc_initialized(gstate->_states_queue)) {
+#ifdef GSTATE_BEDUG
+        BEDUG_ASSERT(!_log_enabled(gstate) || !gstate->_gstate_not_i, "GSTATE states queue has not initialized");
+        gstate->_gstate_not_i = true;
+#endif
+        return false;
+    }
     return true;
 }
 
