@@ -661,6 +661,37 @@ TEST(FSM_GC_Fixture, BrokenTableZeroSizeCheck)
     ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[2].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1.index);
 }
 
+FSM_GC_CREATE(EventsSortCheck_fsm)
+FSM_GC_CREATE_EVENT(EventsSortCheck_event1, 10)
+FSM_GC_CREATE_EVENT(EventsSortCheck_event2, 20)
+FSM_GC_CREATE_EVENT(EventsSortCheck_event3, 5)
+FSM_GC_CREATE_EVENT(EventsSortCheck_event4, 10)
+FSM_GC_CREATE_STATE(EventsSortCheck_state1, _EventsSortCheck_state1)
+FSM_GC_CREATE_STATE(EventsSortCheck_state2, _EventsSortCheck_state2)
+FSM_GC_CREATE_TABLE(
+    EventsSortCheck_fsm_table,
+	{&EventsSortCheck_state1, &EventsSortCheck_event1, &EventsSortCheck_state2, NULL},
+	{&EventsSortCheck_state1, &EventsSortCheck_event2, &EventsSortCheck_state2, NULL},
+	{&EventsSortCheck_state2, &EventsSortCheck_event1, &EventsSortCheck_state1, NULL},
+	{&EventsSortCheck_state2, &EventsSortCheck_event3, &EventsSortCheck_state1, NULL}
+)
+void _EventsSortCheck_state1(void) {}
+void _EventsSortCheck_state2(void) {}
+TEST(FSM_GC_Fixture, EventsSortCheck)
+{
+	fsm_gc_init(&EventsSortCheck_fsm, EventsSortCheck_fsm_table, 4);
+
+    fsm_gc_push_event(&EventsSortCheck_fsm, &EventsSortCheck_event1);
+    fsm_gc_push_event(&EventsSortCheck_fsm, &EventsSortCheck_event2);
+    fsm_gc_push_event(&EventsSortCheck_fsm, &EventsSortCheck_event3);
+    fsm_gc_push_event(&EventsSortCheck_fsm, &EventsSortCheck_event4);
+
+    ASSERT_TRUE(EventsSortCheck_fsm._events_queue[0] == &EventsSortCheck_event2);
+    ASSERT_TRUE(EventsSortCheck_fsm._events_queue[1] == &EventsSortCheck_event1);
+    ASSERT_TRUE(EventsSortCheck_fsm._events_queue[2] == &EventsSortCheck_event4);
+    ASSERT_TRUE(EventsSortCheck_fsm._events_queue[3] == &EventsSortCheck_event3);
+}
+
 #endif
 
 // TODO: add DEBUG messages fixture and tests

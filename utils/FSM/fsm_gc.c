@@ -326,8 +326,8 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     fsm->_events_queue[fsm->_events_cnt++] = event;
 
     for (unsigned i = 0; i < fsm->_events_cnt; i++) {
-        for (unsigned j = i; j < fsm->_events_cnt; j++) {
-            if (fsm->_events_queue[i]->priority > fsm->_events_queue[j]->priority) {
+        for (unsigned j = i + 1; j < fsm->_events_cnt; j++) {
+            if (fsm->_events_queue[i]->priority >= fsm->_events_queue[j]->priority) {
                 continue;
             }
             fsm_gc_event_t* tmp = fsm->_events_queue[i];
