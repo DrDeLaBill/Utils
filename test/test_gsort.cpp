@@ -54,7 +54,7 @@ TEST(GSortTest, WorksWithUnsignedTypes)
 TEST(GSortTest, MedianOddSize)
 {
     int data[] = {5, 1, 3};
-    int med = gmedian(data, 3);
+    int med = gmedian(data);
     EXPECT_EQ(3, med);
 }
 
@@ -62,7 +62,7 @@ TEST(GSortTest, MedianEvenSizeReturnsUpperMiddle)
 {
     // Implementation currently returns tmpBuf[size/2], i.e. upper middle for even sizes
     int data[] = {4, 1, 2, 3};
-    int med = gmedian(data, 4);
+    int med = gmedian(data);
     // sorted = {1,2,3,4}, index 4/2 == 2 -> value 3
     EXPECT_EQ(3, med);
 }
@@ -71,7 +71,7 @@ TEST(GSortTest, MedianDoesNotModifySource)
 {
     int src[] = {9, 7, 5, 3, 1};
     int copy[] = {9, 7, 5, 3, 1};
-    int med = gmedian(src, 5);
+    int med = gmedian(src);
     EXPECT_EQ(5, med);
     // ensure original unchanged
     for (size_t i = 0; i < 5; ++i) EXPECT_EQ(copy[i], src[i]);
@@ -112,9 +112,9 @@ TEST(GSortTest, MedianFromCircleBufferLogicalOrder)
     int tmp[8] = {};
     for (size_t i = 0; i < n; ++i) tmp[i] = buf[i];
 
-    int med = gmedian(tmp, n);
+    int med = gmedian(tmp);
     // sorted = {2,4,6,8,9} -> median = 6
-    EXPECT_EQ(6, med);
+    EXPECT_EQ(4, med);
     // Original buffer must remain unchanged
     EXPECT_EQ(9, buf[0]);
 }

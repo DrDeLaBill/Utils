@@ -51,18 +51,17 @@ typedef struct _fsm_gc_action_t {
 } fsm_gc_action_t;
 
 typedef struct _fsm_gc_transition_t {
-    fsm_gc_state_t*  const source;
-    fsm_gc_event_t*  const event;
-    fsm_gc_state_t*  const target;
-    fsm_gc_action_t* const action;
+    fsm_gc_state_t*  source;
+    fsm_gc_event_t*  event;
+    fsm_gc_state_t*  target;
+    fsm_gc_action_t* action;
 } fsm_gc_transition_t;
 
 typedef struct _fsm_gc_t {
     bool                 _initialized;
     fsm_gc_state_t*      _state;
-    uint8_t              _events_length;
-    fsm_gc_event_t*      _events_buf;
-    circle_buf_gc_t*     _events;
+    fsm_gc_event_t*      _events_queue[FSM_GC_EVENTS_COUNT];
+    size_t               _events_cnt;
     fsm_gc_transition_t* _table;
     size_t               _table_size;
 #ifdef FSM_GC_BEDUG
@@ -120,14 +119,11 @@ typedef struct _fsm_gc_t {
 
 #ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE(FSM_NAME)            static const char __concat(__bedug_fsm_name_, FSM_NAME)[] = __STR_DEF__(FSM_NAME); \
-                                              static fsm_gc_event_t  __concat(__events_buf_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0,""}}; \
-                                              static circle_buf_gc_t __concat(__events_, FSM_NAME) = { 0, NULL, 0, 0, 0, 0 };\
                                               static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \
-                                                  /* ._events_length = */ __arr_len(__concat(__events_buf_, FSM_NAME)), \
-                                                  /* ._events_buf = */    __concat(__events_buf_, FSM_NAME), \
-                                                  /* ._events = */        &__concat(__events_, FSM_NAME), \
+                                                  /* ._events_queue = */  {0}, \
+                                                  /* ._events_cnt = */    0, \
                                                   /* ._table = */         NULL, \
                                                   /* ._table_size = */    0, \
                                                   /* _e_fsm_tt = */       false, \
@@ -136,14 +132,11 @@ typedef struct _fsm_gc_t {
                                                   /* _enable_msg = */     true \
                                               };
 #else
-#   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_event_t  __concat(__events_buf_, FSM_NAME)[FSM_GC_EVENTS_COUNT] = {{0,0}}; \
-                                              static circle_buf_gc_t __concat(__events_, FSM_NAME) = { 0, NULL, 0, 0, 0, 0 };\
-                                              static fsm_gc_t FSM_NAME = { \
+#   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \
-                                                  /* ._events_length = */ __arr_len(__concat(__events_buf_, FSM_NAME)), \
-                                                  /* ._events_buf = */    __concat(__events_buf_, FSM_NAME), \
-                                                  /* ._events = */        &__concat(__events_, FSM_NAME), \
+                                                  /* ._events_queue = */  {0}, \
+                                                  /* ._events_cnt = */    0, \
                                                   /* ._table = */         NULL, \
                                                   /* ._table_size = */    0 \
                                               };

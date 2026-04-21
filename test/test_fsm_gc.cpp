@@ -1,7 +1,5 @@
 /* Copyright © 2025 Georgy E. All rights reserved. */
 
-#define FSM_GC_EVENTS_COUNT 15
-
 #if defined(_MSC_VER)
     #include <io.h>
 #endif
@@ -88,7 +86,7 @@ TEST(FSM_GC_Fixture, EventOverflow)
   for (int i = 0; i < FSM_GC_EVENTS_COUNT + 1; i++) {
     fsm_gc_push_event(&FSM_GC_SUITE_EventOverflow_fsm, &FSM_GC_SUITE_EventOverflow_event1);
   }
-  ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_EventOverflow_fsm._events), FSM_GC_EVENTS_COUNT);
+  ASSERT_EQ(FSM_GC_SUITE_EventOverflow_fsm._events_cnt, FSM_GC_EVENTS_COUNT);
 }
 
 // Test 5: Clear event queue
@@ -105,15 +103,16 @@ TEST(FSM_GC_Fixture, ClearEvents)
   fsm_gc_init(&FSM_GC_SUITE_ClearEvents_fsm, FSM_GC_SUITE_ClearEvents_fsm_table, 1);
   fsm_gc_push_event(&FSM_GC_SUITE_ClearEvents_fsm, &FSM_GC_SUITE_ClearEvents_event1);
   fsm_gc_clear(&FSM_GC_SUITE_ClearEvents_fsm);
-  ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_ClearEvents_fsm._events), 0);
+  ASSERT_EQ(FSM_GC_SUITE_ClearEvents_fsm._events_cnt, 0);
 }
 // Test 6: Check current state
 FSM_GC_CREATE(FSM_GC_SUITE_IsStateCheck_fsm)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_IsStateCheck_event1, 0)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_IsStateCheck_state1, _FSM_GC_SUITE_IsStateCheck_state1)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_IsStateCheck_state2, _FSM_GC_SUITE_IsStateCheck_state2)
 FSM_GC_CREATE_TABLE(
   FSM_GC_SUITE_IsStateCheck_fsm_table,
-  {&FSM_GC_SUITE_IsStateCheck_state1, nullptr, &FSM_GC_SUITE_IsStateCheck_state2, NULL}
+  {&FSM_GC_SUITE_IsStateCheck_state1, &FSM_GC_SUITE_IsStateCheck_event1, &FSM_GC_SUITE_IsStateCheck_state2, NULL}
 )
 void _FSM_GC_SUITE_IsStateCheck_state1(void) {}
 void _FSM_GC_SUITE_IsStateCheck_state2(void) {}
@@ -144,7 +143,7 @@ TEST(FSM_GC_Fixture, EventPriority)
   fsm_gc_process(&FSM_GC_SUITE_EventPriority_fsm);
   ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_EventPriority_fsm, &FSM_GC_SUITE_EventPriority_state2));
   // High-priority event should be processed first
-  ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_EventPriority_fsm._events), 1);
+  ASSERT_EQ(FSM_GC_SUITE_EventPriority_fsm._events_cnt, 1);
 }
 
 // Test 8: No valid transition for current state/event
@@ -161,7 +160,8 @@ TEST(FSM_GC_Fixture, NoTransition)
   fsm_gc_init(&FSM_GC_SUITE_NoTransition_fsm, FSM_GC_SUITE_NoTransition_fsm_table, 1);
   fsm_gc_push_event(&FSM_GC_SUITE_NoTransition_fsm, &FSM_GC_SUITE_NoTransition_event1);
   fsm_gc_process(&FSM_GC_SUITE_NoTransition_fsm);
-  ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_NoTransition_fsm, &FSM_GC_SUITE_NoTransition_state1));
+  ASSERT_FALSE(fsm_gc_is_state(&FSM_GC_SUITE_NoTransition_fsm, &FSM_GC_SUITE_NoTransition_state1));
+  ASSERT_FALSE(FSM_GC_SUITE_NoTransition_fsm._initialized);
 }
 
 // Test 9: Transition with NULL action
@@ -229,10 +229,11 @@ TEST(FSM_GC_Fixture, EventIndexUniqueness)
 
 // Test 12: State function execution during processing
 FSM_GC_CREATE(FSM_GC_SUITE_StateFunctionExecution_fsm)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_StateFunctionExecution_event1, 0)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_StateFunctionExecution_state1, _FSM_GC_SUITE_StateFunctionExecution_state1)
 FSM_GC_CREATE_TABLE(
   FSM_GC_SUITE_StateFunctionExecution_fsm_table,
-  {&FSM_GC_SUITE_StateFunctionExecution_state1, nullptr, &FSM_GC_SUITE_StateFunctionExecution_state1, NULL}
+  {&FSM_GC_SUITE_StateFunctionExecution_state1, &FSM_GC_SUITE_StateFunctionExecution_event1, &FSM_GC_SUITE_StateFunctionExecution_state1, NULL}
 )
 static bool state_function_called = false;
 void _FSM_GC_SUITE_StateFunctionExecution_state1(void) { state_function_called = true; }
@@ -266,7 +267,7 @@ TEST(FSM_GC_Fixture, ProcessCycle)
   }
   
   // Process in loop until all events are handled
-  while (circle_buf_gc_count(FSM_GC_SUITE_ProcessCycle_fsm._events) > 0) {
+  while (FSM_GC_SUITE_ProcessCycle_fsm._events_cnt > 0) {
     fsm_gc_process(&FSM_GC_SUITE_ProcessCycle_fsm);
   }
   
@@ -305,10 +306,11 @@ TEST(FSM_GC_Fixture, StateDrivenEvents)
 
 // Test 15: Continuous processing with empty event queue
 FSM_GC_CREATE(FSM_GC_SUITE_EmptyQueueProcessing_fsm)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_EmptyQueueProcessing_event1, 0)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_EmptyQueueProcessing_state1, _FSM_GC_SUITE_EmptyQueueProcessing_state1)
 FSM_GC_CREATE_TABLE(
     FSM_GC_SUITE_EmptyQueueProcessing_fsm_table,
-    {&FSM_GC_SUITE_EmptyQueueProcessing_state1, nullptr, &FSM_GC_SUITE_EmptyQueueProcessing_state1, NULL}
+    {&FSM_GC_SUITE_EmptyQueueProcessing_state1, &FSM_GC_SUITE_EmptyQueueProcessing_event1, &FSM_GC_SUITE_EmptyQueueProcessing_state1, NULL}
 )
 static int state_exec_count = 0;
 void _FSM_GC_SUITE_EmptyQueueProcessing_state1(void) { state_exec_count++; }
@@ -351,7 +353,7 @@ TEST(FSM_GC_Fixture, PriorityLoop)
     fsm_gc_push_event(&FSM_GC_SUITE_PriorityLoop_fsm, &FSM_GC_SUITE_PriorityLoop_lowPrio);
 
     // Process until queue empty
-    while (circle_buf_gc_count(FSM_GC_SUITE_PriorityLoop_fsm._events) > 0) {
+    while (FSM_GC_SUITE_PriorityLoop_fsm._events_cnt > 0) {
         fsm_gc_process(&FSM_GC_SUITE_PriorityLoop_fsm);
     }
     
@@ -390,7 +392,7 @@ TEST(FSM_GC_Fixture, TerminationCondition)
     
     ASSERT_TRUE(target_reached);
     // Ensure remaining events were cleared
-    ASSERT_EQ(circle_buf_gc_count(FSM_GC_SUITE_TerminationCondition_fsm._events), 4);
+    ASSERT_EQ(FSM_GC_SUITE_TerminationCondition_fsm._events_cnt, 4);
 }
 
 // Test 18: Check events count
@@ -405,7 +407,7 @@ void _FSM_GC_SUITE_CheckEventsCount_state1(void) {}
 TEST(FSM_GC_Fixture, CheckEventsCount)
 {
     fsm_gc_init(&FSM_GC_SUITE_CheckEventsCount_fsm, FSM_GC_SUITE_CheckEventsCount_fsm_table, 1);
-    ASSERT_EQ(__arr_len(__concat(__events_buf_, FSM_GC_SUITE_CheckEventsCount_fsm)), FSM_GC_EVENTS_COUNT);
+    ASSERT_EQ(__arr_len(FSM_GC_SUITE_CheckEventsCount_fsm._events_queue), FSM_GC_EVENTS_COUNT);
 }
 
 
@@ -507,7 +509,6 @@ TEST(FSM_GC_Fixture, CheckMatchesStates)
     
     _change_io(pipefd, &old_stdout, buffer,  sizeof(buffer));
 
-    std::cout << "FSM_GC_SUITE CheckMatchesStates ";
     fsm_gc_init(&FSM_GC_SUITE_CheckMatchesStates_fsm, FSM_GC_SUITE_CheckMatchesStates_fsm_table, 2);
     
     _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
@@ -590,6 +591,74 @@ TEST(FSM_GC_Fixture, DisableEnableMessagesForInstance)
 
     ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
     ASSERT_NE(strlen((char*)buffer), 0);
+}
+
+FSM_GC_CREATE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_event1, 0)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_event2, 1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state1, _FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state2, _FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state2)
+FSM_GC_CREATE_TABLE(
+    FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm_table,
+    {NULL,                                          &FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_event1, &FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state2, NULL},
+    {&FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state2, NULL,                                          &FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state1, NULL},
+    {&FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state1, &FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_event2, NULL,                                          NULL}
+)
+void _FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state1(void) {}
+void _FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_state2(void) {}
+TEST(FSM_GC_Fixture, FullBrokenTableZeroSizeCheck)
+{
+    uint8_t buffer[1024] = "";
+    int pipefd[2];
+    int old_stdout;
+
+    _change_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    fsm_gc_init(&FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm, FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm_table, 3);
+
+    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    const uint8_t str[] = " WARNING! \"FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm\" has been initialized with empty transition table";
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
+    ASSERT_FALSE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm._initialized);
+    ASSERT_TRUE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm._table_size == 0);
+}
+
+FSM_GC_CREATE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1, 0)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2, 1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1, _FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2, _FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2)
+FSM_GC_CREATE_TABLE(
+    FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm_table,
+    {NULL,                                          &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2, NULL},
+    {&FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1, NULL},
+    {&FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2, NULL,                                          &FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1, NULL},
+    {&FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2, NULL,                                          NULL},
+    {&FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2, NULL},
+    {&FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1, &FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2, NULL}
+)
+void _FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1(void) {}
+void _FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2(void) {}
+TEST(FSM_GC_Fixture, BrokenTableZeroSizeCheck)
+{
+    uint8_t buffer[2048] = "";
+    int pipefd[2];
+    int old_stdout;
+
+    _change_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    fsm_gc_init(&FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm, FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm_table, 6);
+
+    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+
+    const uint8_t str[] = "\"FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm\" has been initialized with 3 transitions";
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._initialized);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table_size == 3);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[0].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2.index);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[1].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2.index);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[2].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1.index);
 }
 
 #endif

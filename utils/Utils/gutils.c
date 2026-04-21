@@ -147,6 +147,9 @@ uint8_t* util_memfind(uint8_t* buf, const size_t buf_size, const uint8_t* patter
         if (buf_size - i < pattern_size) {
             return NULL;
         }
+        if (buf[i] != pattern[0]) {
+            continue;
+        }
         if (!memcmp(buf + i, pattern, pattern_size)) {
             return &buf[i];
         }

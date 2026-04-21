@@ -41,7 +41,15 @@ namespace utl
 	template<typename T, T NUMBER>
 	struct NumbersCount
 	{
-		static constexpr size_t SIZE = (NUMBER == 0 ? 0 : 1 + NumbersCount<T, NUMBER / 10>::SIZE);
+		static constexpr size_t calculate_size()
+		{
+			if constexpr (NUMBER == 0) {
+				return 0;
+			} else {
+				return 1 + NumbersCount<T, NUMBER / 10>::calculate_size();
+			}
+		}
+		static constexpr size_t SIZE = calculate_size();
 	};
 
 	namespace prvt

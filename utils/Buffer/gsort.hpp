@@ -30,13 +30,13 @@ void gsort(T* buf, const size_t size)
     }
 }
 
-template<class T>
-T gmedian(const T* buf, const size_t size)
+template<typename T, size_t SIZE>
+T gmedian(const T(&buf)[SIZE])
 {
-    T tmpBuf[size] = {};
-    memcpy((uint8_t*)tmpBuf, (uint8_t*)buf, size * sizeof(buf[0]));
-    gsort(tmpBuf, size);
-    return tmpBuf[size / 2];
+    T tmpBuf[SIZE] = {};
+    memcpy((uint8_t*)tmpBuf, (uint8_t*)buf, SIZE * sizeof(buf[0]));
+    gsort(tmpBuf, SIZE);
+    return tmpBuf[SIZE / 2];
 }
 
 
