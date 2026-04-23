@@ -1,6 +1,6 @@
-ARG CI_REGISTRY=gcc:12.2.0-bullseye
+ARG BASE_IMAGE=gcc:12.2.0-bullseye
 
-FROM $CI_REGISTRY AS builder
+FROM $BASE_IMAGE AS builder
 
 ENV APP_ROOT=/app
 ENV SRC_ROOT=$APP_ROOT/src
