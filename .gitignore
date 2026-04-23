@@ -53,6 +53,5 @@ backup_*.ioc
 makefile
 
 # For current project
-search.cmake
 *.jl
 .qodo/*
