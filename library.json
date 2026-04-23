@@ -1,0 +1,40 @@
+{
+  "name": "UtilsLib",
+  "version": "1.0.0",
+  "description": "Cross-platform utility functions",
+  "keywords": ["stm32", "nrf52", "linux"],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DrDeLaBill/Utils.git"
+  },
+  "frameworks": ["arduino", "stm32cube", "zephyr"],
+  "platforms": ["ststm32", "nordicnrf52", "native"],
+  "build": {
+    "flags": [
+      "-I utils/Archive",
+      "-I utils/Buffer",
+      "-I utils/Debug",
+      "-I utils/FSM",
+      "-I utils/gpid",
+      "-I utils/Log",
+      "-I utils/Time",
+      "-I utils/TypeList",
+      "-I utils/Types",
+      "-I utils/Utils"
+    ],
+    "srcFilter": [
+      "+<utils/Archive/>",
+      "+<utils/Buffer/>",
+      "+<utils/Debug/>",
+      "+<utils/FSM/>",
+      "+<utils/gpid/>",
+      "+<utils/Log/>",
+      "+<utils/Time/>",
+      "+<utils/TypeList/>",
+      "+<utils/Types/>",
+      "+<utils/Utils/>",
+      "-<test/>",
+      "-<build/>"
+    ]
+  }
+}
