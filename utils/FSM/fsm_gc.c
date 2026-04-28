@@ -52,13 +52,13 @@ static bool _check_initialized(fsm_gc_t* const fsm)
 }
 
 
-void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
+bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 {
     if (!fsm) {
 #ifdef FSM_GC_BEDUG
         BEDUG_ASSERT(disable_all_messages, "Empty FSM pointer");
 #endif
-        return;
+        return false;
     }
 
     fsm->_initialized = false;
@@ -68,13 +68,21 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
         BEDUG_ASSERT(!_log_enabled(fsm) || !fsm->_e_fsm_tt, "Empty FSM transition table");
         fsm->_e_fsm_tt = true;
 #endif
-        return;
+        return false;
     }
 
     fsm->_table      = table;
     fsm->_table_size = size;
     fsm->_state      = fsm->_table[0].source;
     fsm->_events_cnt = 0;
+
+    for (unsigned i = 0; i < fsm->_table_size; i++) {
+        if (fsm->_table[i].event) {
+            if (!fsm->_table[i].event->index) {
+                fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
+            }
+        }
+    }
 
 #ifdef FSM_GC_BEDUG
     // Check repeated and broken transitions
@@ -219,6 +227,8 @@ void fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     if (fsm->_table_size) {
         fsm->_initialized = true;
     }
+
+    return fsm->_initialized;
 }
 
 void fsm_gc_disable_all_messages()
