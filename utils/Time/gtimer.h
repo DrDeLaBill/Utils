@@ -9,7 +9,7 @@
 namespace utl
 {
 
-    class Timer
+    class GTimer
     {
     private:
         g_time_t delay;
@@ -17,7 +17,7 @@ namespace utl
         bool     started;
 
     public:
-        Timer(const uint32_t delay = 0);
+        GTimer(const uint32_t delay = 0);
         
         void start();
         void start(uint32_t delay_ms);

@@ -1,35 +1,35 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include "Timer.h"
+#include "gtimer.h"
 
 #include "gtime.h"
 
 
 namespace utl
 {
-    Timer::Timer(const uint32_t delay):
+    GTimer::GTimer(const uint32_t delay):
         delay(delay), start_ms(0), started(false)
 	{}
 
-    void Timer::start()
+    void GTimer::start()
     {
         this->start_ms = getMillis();
         this->started  = true;
     }
 
-    void Timer::start(uint32_t delay_ms)
+    void GTimer::start(uint32_t delay_ms)
     {
         this->changeDelay(delay_ms);
         this->start_ms = getMillis();
         this->started  = true;
     }
 
-    void Timer::reset()
+    void GTimer::reset()
     {
         this->started = false;
     }
 
-    bool Timer::wait()
+    bool GTimer::wait()
     {
         if (!this->started) {
             return false;
@@ -37,7 +37,7 @@ namespace utl
         return (uint32_t)(this->start_ms + this->delay > getMillis());
     }
     
-    uint32_t Timer::deadline()
+    uint32_t GTimer::deadline()
     {
         if (!this->started) {
             return 0;
@@ -49,7 +49,7 @@ namespace utl
         return (uint32_t)(end_ms - getMillis());
     }
     
-    uint32_t Timer::passed()
+    uint32_t GTimer::passed()
     {
         if (!this->started) {
             return 0;
@@ -60,7 +60,7 @@ namespace utl
         return 0;
     }
     
-    uint32_t Timer::getStart()
+    uint32_t GTimer::getStart()
     {
         if (!this->started) {
             return 0;
@@ -68,19 +68,19 @@ namespace utl
         return (uint32_t)(this->start_ms);
     }
 
-    uint32_t Timer::end()
+    uint32_t GTimer::end()
     {
         if (!this->started) {
             return 0;
         }
     	return (uint32_t)(this->start_ms + this->delay);
     }
-    uint32_t Timer::getDelay()
+    uint32_t GTimer::getDelay()
     {
         return (uint32_t)(this->delay);
     }
 
-	void Timer::changeDelay(const uint32_t delay_ms)
+	void GTimer::changeDelay(const uint32_t delay_ms)
     {
     	this->delay = delay_ms;
     }
