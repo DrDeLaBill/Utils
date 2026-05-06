@@ -51,7 +51,6 @@ static bool _check_initialized(fsm_gc_t* const fsm)
     return true;
 }
 
-
 bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 {
     if (!fsm) {
@@ -73,7 +72,6 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 
     fsm->_table      = table;
     fsm->_table_size = size;
-    fsm->_state      = fsm->_table[0].source;
     fsm->_events_cnt = 0;
 
     for (unsigned i = 0; i < fsm->_table_size; i++) {
@@ -192,6 +190,10 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
         }
         fsm->_table_size--;
     }
+    if (fsm->_table_size) {
+        fsm->_state = fsm->_table[0].source;
+        fsm->_init_state = fsm->_table[0].source;
+    }
 
     // Sort transitions by event priority
     for (unsigned i = 0; i < fsm->_table_size; i++) {
@@ -243,15 +245,6 @@ void fsm_gc_enable_all_messages()
 #ifdef FSM_GC_BEDUG
     disable_all_messages = false;
 #endif
-}
-
-void fsm_gc_reset(fsm_gc_t* fsm)
-{
-    if (!_check_initialized(fsm)) {
-        return;
-    }
-    fsm->_events_cnt = 0;
-    fsm->_state = fsm->_table[0].source;
 }
 
 void fsm_gc_process(fsm_gc_t* fsm) 
@@ -357,6 +350,15 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
 		);
     }
 #endif
+}
+
+void fsm_gc_reset(fsm_gc_t* fsm)
+{
+    if (!_check_initialized(fsm)) {
+        return;
+    }
+    fsm->_events_cnt = 0;
+    fsm->_state = fsm->_init_state;
 }
 
 void fsm_gc_clear(fsm_gc_t* fsm)

@@ -25,7 +25,6 @@ extern "C" {
 #include <stdbool.h>
 
 #include "gutils.h"
-#include "circle_buf_gc.h"
 
 
 typedef struct _gstate_state_t {
@@ -40,10 +39,11 @@ typedef struct _gstate_state_t {
 typedef struct _gstate_t {
     bool                 _initialized;
     gstate_state_t*      _curr_state;
+    gstate_state_t*      _init_state;
     size_t               _states_count;
-    gstate_state_t*      _states_list;
-    gstate_state_t*      _states_buf;
-    circle_buf_gc_t*     _states_queue;
+    gstate_state_t**     _states_list;
+    gstate_state_t*      _states_queue[GSTATE_BUFFER_COUNT];
+    size_t               _queue_cnt;
 #ifdef GSTATE_BEDUG
     bool                 _e_gstate_list;
     bool                 _gstate_not_i;
@@ -69,39 +69,37 @@ typedef struct _gstate_t {
                                                     };
 #endif
 
-#define GSTATE_CREATE_LIST(NAME, ...)               static gstate_state_t NAME[] = { __VA_ARGS__ };
+#define GSTATE_CREATE_LIST(NAME, ...)               static gstate_state_t* NAME[] = { __VA_ARGS__ };
 
 #ifdef GSTATE_BEDUG
     #define GSTATE_CREATE(GSTATE_NAME)              static const char __concat(__bedug_gstate_name_, GSTATE_NAME)[] = __STR_DEF__(GSTATE_NAME); \
-                                                    static gstate_state_t  __concat(__states_queue_buf_, GSTATE_NAME)[GSTATE_BUFFER_COUNT] = {{NULL,0,""}}; \
-                                                    static circle_buf_gc_t __concat(__states_queue_, GSTATE_NAME) = { 0, NULL, 0, 0, 0, 0 };\
                                                     static gstate_t GSTATE_NAME = { \
                                                         /* ._initialized = */  false, \
                                                         /* ._curr_state = */   NULL, \
+                                                        /* ._init_state = */   NULL, \
                                                         /* ._states_count = */ 0, \
                                                         /* ._states_list = */  NULL, \
-                                                        /* ._states_buf = */   __concat(__states_queue_buf_, GSTATE_NAME), \
-                                                        /* ._states_queue = */ &__concat(__states_queue_, GSTATE_NAME), \
+                                                        /* ._states_queue = */ { NULL }, \
+                                                        /* ._queue_cnt =  */   0, \
                                                         /* _e_gstate_list = */ false, \
                                                         /* _gstate_not_i = */  false, \
                                                         /* _name = */          __concat(__bedug_gstate_name_, GSTATE_NAME), \
                                                         /* _enable_msg = */    true \
                                                     };
 #else
-    #define GSTATE_CREATE(GSTATE_NAME)              static gstate_state_t  __concat(__states_queue_buf_, GSTATE_NAME)[GSTATE_BUFFER_COUNT] = {{0,0}}; \
-                                                    static circle_buf_gc_t __concat(__states_queue_, GSTATE_NAME) = { 0, NULL, 0, 0, 0, 0 };\
-                                                    static gstate_t GSTATE_NAME = { \
+    #define GSTATE_CREATE(GSTATE_NAME)              static gstate_t GSTATE_NAME = { \
                                                         /* ._initialized = */  false, \
                                                         /* ._curr_state = */   NULL, \
+                                                        /* ._init_state = */   NULL, \
                                                         /* ._states_count = */ 0, \
                                                         /* ._states_list = */  NULL, \
-                                                        /* ._states_buf = */   __concat(__states_queue_buf_, GSTATE_NAME), \
-                                                        /* ._states_queue = */ &__concat(__states_queue_, GSTATE_NAME), \
+                                                        /* ._states_queue = */ { NULL }, \
+                                                        /* ._queue_cnt =  */   0, \
                                                     };
 #endif
 
 
-void gstate_init(gstate_t* gstate, gstate_state_t* states_list, size_t states_count);
+bool gstate_init(gstate_t* gstate, gstate_state_t** states_list, size_t states_count);
 void gstate_disable_all_messages();
 void gstate_enable_all_messages();
 void gstate_reset(gstate_t* gstate);

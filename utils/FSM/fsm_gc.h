@@ -60,6 +60,7 @@ typedef struct _fsm_gc_transition_t {
 typedef struct _fsm_gc_t {
     bool                 _initialized;
     fsm_gc_state_t*      _state;
+    fsm_gc_state_t*      _init_state;
     fsm_gc_event_t*      _events_queue[FSM_GC_EVENTS_COUNT];
     size_t               _events_cnt;
     fsm_gc_transition_t* _table;
@@ -122,6 +123,7 @@ typedef struct _fsm_gc_t {
                                               static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \
+                                                  /* ._init_state = */    NULL, \
                                                   /* ._events_queue = */  {0}, \
                                                   /* ._events_cnt = */    0, \
                                                   /* ._table = */         NULL, \
@@ -135,6 +137,7 @@ typedef struct _fsm_gc_t {
 #   define FSM_GC_CREATE(FSM_NAME)            static fsm_gc_t FSM_NAME = { \
                                                   /* ._initialized = */   false, \
                                                   /* ._state = */         NULL, \
+                                                  /* ._init_state = */    NULL, \
                                                   /* ._events_queue = */  {0}, \
                                                   /* ._events_cnt = */    0, \
                                                   /* ._table = */         NULL, \

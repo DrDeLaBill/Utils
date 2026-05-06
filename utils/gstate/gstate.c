@@ -17,14 +17,16 @@ static bool disable_all_messages = false;
 #endif
 
 
+#ifdef GSTATE_BEDUG
 static bool _log_enabled(const gstate_t* gstate)
 {
-#ifdef GSTATE_BEDUG
+    if (!gstate) {
+        BEDUG_ASSERT(disable_all_messages, "Empty GSTATE pointer");
+        return false;
+    }
     return gstate->_enable_msg && !disable_all_messages;
-#else
-    return false;
-#endif
 }
+#endif
 
 static bool _check_initialized(gstate_t* const gstate)
 {
@@ -42,23 +44,44 @@ static bool _check_initialized(gstate_t* const gstate)
 #endif
         return false;
     }
-    if (!circle_buf_gc_initialized(gstate->_states_queue)) {
+    return true;
+}
+
+static void _remove_state_by_idx(gstate_state_t** list, unsigned index, unsigned size)
+{
+    if (index + 1 < size) {
+        memcpy(
+            (void*)&list[index],
+            (void*)&list[index + 1],
+            sizeof(list[index]) * (size - index - 1)
+        );
+    }
+}
+
+static bool _check_state(const gstate_state_t* state)
+{
+    if (!state) {
 #ifdef GSTATE_BEDUG
-        BEDUG_ASSERT(!_log_enabled(gstate) || !gstate->_gstate_not_i, "GSTATE states queue has not initialized");
-        gstate->_gstate_not_i = true;
+        printTagLog(GSTATE_TAG, "WARNING! Empty state pointer");
+#endif
+        return false;
+    }
+    if (!state->state_f) {
+#ifdef GSTATE_BEDUG
+        printTagLog(GSTATE_TAG, "WARNING! Empty state function poimter");
 #endif
         return false;
     }
     return true;
 }
 
-void gstate_init(gstate_t* gstate, gstate_state_t* states_list, size_t states_count)
+bool gstate_init(gstate_t* gstate, gstate_state_t** states_list, size_t states_count)
 {
     if (!gstate) {
 #ifdef GSTATE_BEDUG
         BEDUG_ASSERT(disable_all_messages, "Empty GSTATE pointer");
 #endif
-        return;
+        return false;
     }
     gstate->_initialized = false;
 
@@ -67,59 +90,98 @@ void gstate_init(gstate_t* gstate, gstate_state_t* states_list, size_t states_co
         BEDUG_ASSERT(!_log_enabled(gstate) || !gstate->_e_gstate_list, "Empty GSTATE states list");
         gstate->_e_gstate_list = true;
 #endif
-        return;
-    }
-
-    if (!circle_buf_gc_init(gstate->_states_queue, (uint8_t*)gstate->_states_buf, sizeof(*gstate->_states_buf), GSTATE_BUFFER_COUNT)) {
-#ifdef GSTATE_BEDUG
-        BEDUG_ASSERT(!_log_enabled(gstate) || !gstate->_e_gstate_list, "States queue initialize error");
-#endif
-        return;
+        return false;
     }
 
     gstate->_states_list  = states_list;
     gstate->_states_count = states_count;
-    gstate->_curr_state   = &gstate->_states_list[0];
+    gstate->_queue_cnt    = 0;
 
-    for (unsigned i = 0; i < gstate->_states_count; i++) {
-        for (unsigned j = i + 1; j < gstate->_states_count; j++) {
-            if (
-                gstate->_states_list[i].state_f == gstate->_states_list[j].state_f ||
-                !gstate->_states_list[j].state_f
-            ) {
 #ifdef GSTATE_BEDUG
-                if (_log_enabled(gstate) && gstate->_states_list[j].state_f) {
-                    printTagLog(
-                        GSTATE_TAG, 
-                        "WARNING! \"%s\" has matches functions states %s{0x%08X} = %s{0x%08X}",
-                        gstate->_name,
-                        gstate->_states_list[i]._name,
-                        (size_t)(size_t*)gstate->_states_list[i].state_f,
-                        gstate->_states_list[j]._name,
-                        (size_t)(size_t*)gstate->_states_list[j].state_f
-                    );
-                } else if (_log_enabled(gstate)) {
-                    printTagLog(
-                        GSTATE_TAG, 
-                        "WARNING! \"%s\" has empty function state at index %u",
-                        gstate->_name,
-                        j
-                    );
-                }
-#endif
-                memcpy(&gstate->_states_list[j], &gstate->_states_list[j + 1], (gstate->_states_count - j - 1) * sizeof(gstate_state_t));
-                gstate->_states_count--;
+    // Check repeated and broken states
+    for (unsigned i = 0; i < gstate->_states_count; i++) {
+        if (!_log_enabled(gstate)) {
+            continue;
+        }
+        if (!_check_state(gstate->_states_list[i])) {
+            continue;
+        }
+        for (unsigned j = i + 1; j < gstate->_states_count; j++) {
+            if (!_check_state(gstate->_states_list[j])) {
+                continue;
+            }
+            if (gstate->_states_list[i]->state_f == gstate->_states_list[j]->state_f) {
+                printTagLog(
+                    GSTATE_TAG, 
+                    "WARNING! \"%s\" has matches functions states %s{0x%08X} = %s{0x%08X}",
+                    gstate->_name,
+                    gstate->_states_list[i]->_name,
+                    (size_t)(size_t*)gstate->_states_list[i]->state_f,
+                    gstate->_states_list[j]->_name,
+                    (size_t)(size_t*)gstate->_states_list[j]->state_f
+                );
             }
         }
     }
+#endif
+
+    // Remove invalid states and duplicates
+    for (unsigned i = 0; i < gstate->_states_count; i++) {
+        if (!_check_state(gstate->_states_list[i])) {
+            _remove_state_by_idx(gstate->_states_list, i, gstate->_states_count);
+            gstate->_states_count--;
+            continue;
+        }
+        for (unsigned j = i + 1; j < gstate->_states_count; j++) {
+            if (gstate->_states_list[i] == gstate->_states_list[j]) {
+                _remove_state_by_idx(gstate->_states_list, j, gstate->_states_count);
+                gstate->_states_count--;
+                continue;
+            }
+        }
+    }
+    if (gstate->_states_count) {
+        gstate->_curr_state = gstate->_states_list[0];
+        gstate->_init_state = gstate->_states_list[0];
+    }
+
+    // Sort states by priority
+    for (unsigned i = 0; i < gstate->_states_count; i++) {
+        for (unsigned j = i; j < gstate->_states_count - 1; j++) {
+            if (gstate->_states_list[j]->priority >= gstate->_states_list[j + 1]->priority) {
+                continue;
+            }
+            gstate_state_t* tmp = gstate->_states_list[j];
+            gstate->_states_list[j] = gstate->_states_list[j+1];
+            gstate->_states_list[j+1] = tmp;
+        }
+    }
+
 
 #ifdef GSTATE_BEDUG
     if (_log_enabled(gstate)) {
-        printTagLog(GSTATE_TAG, "\"%s\" has been initialized", gstate->_name);
+        if (gstate->_states_count) {
+            printTagLog(
+                GSTATE_TAG, 
+                "\"%s\" has been initialized with %u states",
+                gstate->_name,
+                gstate->_states_count
+            );
+        } else {
+            printTagLog(
+                GSTATE_TAG, 
+                "WARNING! \"%s\" has been initialized with empty states table",
+                gstate->_name
+            );
+        }
     }
 #endif
 
-    gstate->_initialized = true;
+    if (gstate->_states_count) {
+        gstate->_initialized = true;
+    }
+
+    return gstate->_initialized;
 }
 
 void gstate_disable_all_messages()
@@ -141,8 +203,8 @@ void gstate_reset(gstate_t* gstate)
     if (!_check_initialized(gstate)) {
         return;
     }
-    circle_buf_gc_free(gstate->_states_queue);
-    gstate->_curr_state = &gstate->_states_list[0];
+    gstate->_curr_state = gstate->_init_state;
+    gstate->_queue_cnt = 0;
 }
 
 void gstate_process(gstate_t* gstate) 
@@ -153,54 +215,34 @@ void gstate_process(gstate_t* gstate)
 
     gstate->_curr_state->state_f();
 
+    gstate_state_t* last = gstate->_curr_state;
     gstate_state_t* target = NULL;
-    while (circle_buf_gc_count(gstate->_states_queue)) {
-        const gstate_state_t* queue_item = (gstate_state_t*)circle_buf_gc_pop_back(gstate->_states_queue);
-        if (!queue_item) {
-            continue;
+    if (gstate->_queue_cnt) {
+        target = gstate->_states_queue[0];
+        if (!target) {
+            gstate->_queue_cnt--;
+            return;
         }
-        if (queue_item->state_f == gstate->_curr_state->state_f) {
-            continue;
-        }
-        for (unsigned i = 0; i < gstate->_states_count; i++) {
-            const gstate_state_t* item_state = &gstate->_states_list[i];
-            if (!item_state) {
-                continue;
-            }                  
-            if (!item_state->state_f) {
-                continue;
-            }
-            if (item_state->state_f != queue_item->state_f) {
-                continue;
-            }
-            if (!target) {
-                target = (gstate_state_t*)queue_item;
-                continue;
-            }
-            if (target->priority >= queue_item->priority) {
-                target = (gstate_state_t*)queue_item;
-                continue;
-            }
-        }
+        _remove_state_by_idx(gstate->_states_queue, 0, gstate->_queue_cnt);
+        gstate->_curr_state = target;
+        gstate->_queue_cnt--;
     }
-
-    if (!target) {
+    
+#ifdef GSTATE_BEDUG
+    if (!_log_enabled(gstate)) {
         return;
     }
-
-#ifdef GSTATE_BEDUG
-    if (_log_enabled(gstate)) {
-		printTagLog(
-			GSTATE_TAG,
-			"\"%s\" transition: %s -> %s",
-			gstate->_name,
-			gstate->_curr_state->_name,
-            target->_name
-		);
-    }
+    if (!target) {
+        return;
+    }  
+    printTagLog(
+        GSTATE_TAG,
+        "\"%s\" transition: %s -> %s",
+        gstate->_name,
+        last->_name,
+        target->_name
+    );
 #endif
-
-    gstate->_curr_state = target;
 }
 
 void gstate_request_state(gstate_t* gstate, gstate_state_t* target)
@@ -209,25 +251,52 @@ void gstate_request_state(gstate_t* gstate, gstate_state_t* target)
         return;
     }
 
-    if (!target) {
+    if (!_check_state(target)) {
+        return;
+    }
+
+    bool found = false;
+    for (unsigned i = 0; i < gstate->_states_count; i++) {
+        if (gstate->_states_list[i] == target) {
+            found = true;
+            break;
+        }
+    }
+    if (!found) {
 #ifdef GSTATE_BEDUG
-        BEDUG_ASSERT(!gstate->_enable_msg || disable_all_messages, "Empty GSTATE state pointer");
+        BEDUG_ASSERT(!gstate->_enable_msg || disable_all_messages, "Bad gstate function pointer");
 #endif
         return;
     }
     
-    circle_buf_gc_push_back(gstate->_states_queue, (uint8_t*)target);
+    if (gstate->_queue_cnt >= GSTATE_BUFFER_COUNT) {
+        _remove_state_by_idx(gstate->_states_queue, 0, gstate->_queue_cnt);
+        gstate->_queue_cnt = GSTATE_BUFFER_COUNT - 1;
+    }
+    gstate->_states_queue[gstate->_queue_cnt++] = target;
+
+    for (unsigned i = 0; i < gstate->_queue_cnt; i++) {
+        for (unsigned j = i + 1; j < gstate->_queue_cnt; j++) {
+            if (gstate->_states_queue[i]->priority >= gstate->_states_queue[j]->priority) {
+                continue;
+            }
+            gstate_state_t* tmp = gstate->_states_queue[i];
+            gstate->_states_queue[i] = gstate->_states_queue[j];
+            gstate->_states_queue[j] = tmp;
+        }
+    }
 
 #ifdef GSTATE_BEDUG
-    if (_log_enabled(gstate)) {
-		printTagLog(
-			GSTATE_TAG, \
-			"\"%s\" request %02u state: %s",
-			gstate->_name,
-			circle_buf_gc_count(gstate->_states_queue),
-			target->_name
-		);
+    if (!_log_enabled(gstate)) {
+        return;
     }
+    printTagLog(
+        GSTATE_TAG,
+        "\"%s\" request %02u state: %s",
+        gstate->_name,
+        gstate->_queue_cnt,
+        target->_name
+    );
 #endif
 }
 
@@ -237,7 +306,7 @@ void gstate_clear(gstate_t* gstate)
         return;
     }
 
-    circle_buf_gc_free(gstate->_states_queue);
+    gstate->_queue_cnt = 0;
 
 #ifdef GSTATE_BEDUG
     if (_log_enabled(gstate)) {
@@ -256,21 +325,19 @@ bool gstate_is_state(gstate_t* gstate, gstate_state_t* state)
         return false;
     }
     
-    if (!state) {
-#ifdef GSTATE_BEDUG
-        BEDUG_ASSERT(!_log_enabled(gstate), "Empty GSTATE state_f pointer");
-#endif
+    if (!_check_state(state)) {
         return false;
     }
     
-    if (!gstate->_curr_state) {
+    if (!_check_state(gstate->_curr_state)) {
 #ifdef GSTATE_BEDUG
         BEDUG_ASSERT(!_log_enabled(gstate) || !gstate->_gstate_not_i, "GSTATE bad state");
         gstate->_gstate_not_i = true;
 #endif
         return false;
     }
-    return gstate->_curr_state->state_f == state->state_f;
+
+    return gstate->_curr_state == state;
 }
 
 void gstate_enable_messages(gstate_t* gstate)
