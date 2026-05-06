@@ -222,8 +222,8 @@ TEST(FSM_GC_Fixture, EventIndexUniqueness)
 {
   ASSERT_TRUE(fsm_gc_init(&FSM_GC_SUITE_EventIndexUniqueness_fsm, FSM_GC_SUITE_EventIndexUniqueness_fsm_table, 2));
   ASSERT_NE(
-    FSM_GC_SUITE_EventIndexUniqueness_event1.index, 
-    FSM_GC_SUITE_EventIndexUniqueness_event2.index
+    &FSM_GC_SUITE_EventIndexUniqueness_event1, 
+    &FSM_GC_SUITE_EventIndexUniqueness_event2
   );
 }
 
@@ -683,9 +683,9 @@ TEST(FSM_GC_Fixture, BrokenTableZeroSizeCheck)
     ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
     ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._initialized);
     ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table_size == 3);
-    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[0].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2.index);
-    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[1].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2.index);
-    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[2].event->index == FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1.index);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[0].event == &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[1].event == &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event2);
+    ASSERT_TRUE(FSM_GC_SUITE_BrokenTableZeroSizeCheck_fsm._table[2].event == &FSM_GC_SUITE_BrokenTableZeroSizeCheck_event1);
 }
 
 FSM_GC_CREATE(EventsSortCheck_fsm)

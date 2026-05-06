@@ -73,14 +73,7 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     fsm->_table      = table;
     fsm->_table_size = size;
     fsm->_events_cnt = 0;
-
-    for (unsigned i = 0; i < fsm->_table_size; i++) {
-        if (fsm->_table[i].event) {
-            if (!fsm->_table[i].event->index) {
-                fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
-            }
-        }
-    }
+    
 
 #ifdef FSM_GC_BEDUG
     // Check repeated and broken transitions
@@ -120,17 +113,15 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 }
             }
             if (fsm->_table[i].event && fsm->_table[j].event) {
-                if (fsm->_table[i].event != fsm->_table[j].event &&
-                    fsm->_table[i].event->index == fsm->_table[j].event->index
-                ) {
+                if (fsm->_table[i].event == fsm->_table[j].event) {
                     printTagLog(
                         FSM_GC_TAG, 
-                        "WARNING! \"%s\" has matches functions events %s{idx-%u} = %s{idx-%u}",
+                        "WARNING! \"%s\" has matches functions events %s{0x%08X} = %s{0x%08X}",
                         fsm->_name,
                         fsm->_table[i].event->_name,
-                        fsm->_table[i].event->index,
+                        (size_t)(size_t*)fsm->_table[i].event,
                         fsm->_table[j].event->_name,
-                        fsm->_table[j].event->index
+                        (size_t)(size_t*)fsm->_table[i].event
                     );
                 }
             }
@@ -179,9 +170,6 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
     unsigned i = 0;
     while (i < fsm->_table_size) {
         if (fsm->_table[i].source && fsm->_table[i].event && fsm->_table[i].target) {
-            if (!fsm->_table[i].event->index) {
-                fsm->_table[i].event->index = ++_fsm_gc_events_iterator;
-            }
             i++;
             continue;
         }
@@ -265,7 +253,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
             if (fsm->_state->state != tr->source->state) {
                 continue;
             }
-            if (event->index != tr->event->index) {
+            if (event != tr->event) {
                 continue;
             }
             is_transition = true;

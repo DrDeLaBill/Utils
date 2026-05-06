@@ -29,7 +29,6 @@ extern "C" {
 
 
 typedef struct _fsm_gc_event_t {
-    size_t      index;
     size_t      priority;
 #ifdef FSM_GC_BEDUG
     const char* _name;
@@ -91,14 +90,12 @@ typedef struct _fsm_gc_t {
 #ifdef FSM_GC_BEDUG
 #   define FSM_GC_CREATE_EVENT(NAME, PRIO)      static const char __concat(__bedug_event_name, NAME)[] = __STR_DEF__(NAME); \
                                                 static fsm_gc_event_t NAME = { \
-                                                    0, \
                                                     PRIO, \
                                                     __concat(__bedug_event_name, NAME) \
                                                 };
 #else
 #   define FSM_GC_CREATE_EVENT(NAME, PRIO)      static fsm_gc_event_t NAME = { \
-                                                    0, \
-                                                    PRIO, \
+                                                    PRIO \
                                                 };
 #endif
 
