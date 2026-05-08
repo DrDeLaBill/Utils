@@ -36,7 +36,7 @@ typedef struct _fsm_gc_event_t {
 } fsm_gc_event_t;
 
 typedef struct _fsm_gc_state_t {
-    void        (*state) (void);
+    void        (*state_f) (void);
 #ifdef FSM_GC_BEDUG
     const char* _name;
 #endif

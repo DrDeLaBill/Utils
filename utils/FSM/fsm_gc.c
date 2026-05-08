@@ -86,6 +86,9 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
         if (!tr1->source) {
             printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty source", fsm->_name, i);
             tr1_err = true;
+        } else if (!tr1->source->state_f) {
+            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty state function", fsm->_name, i);
+            tr1_err = true;
         }
         if (!tr1->event) {
             printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty event", fsm->_name, i);
@@ -93,6 +96,9 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
         }
         if (!tr1->target) {
             printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty target", fsm->_name, i);
+            tr1_err = true;
+        } else if (!tr1->target->state_f) {
+            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty state function", fsm->_name, i);
             tr1_err = true;
         }
         if (tr1_err) {
@@ -102,7 +108,7 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             fsm_gc_transition_t* tr2 = &fsm->_table[j];
             if (tr1->source && tr2->source) {
                 if (tr1->source != tr2->source &&
-                    tr1->source->state == tr2->source->state
+                    tr1->source->state_f == tr2->source->state_f
                 ) {
                     printTagLog(
                         FSM_GC_TAG, 
@@ -117,7 +123,7 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
             }
             if (tr1->target && tr2->target) {
                 if (tr1->target != tr2->target &&
-                    tr1->target->state == tr2->target->state
+                    tr1->target->state_f == tr2->target->state_f
                 ) {
                     printTagLog(
                         FSM_GC_TAG, 
@@ -130,8 +136,12 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                     );
                 }
             }
-            if (tr1->event && tr2->event) {
-                if (tr1->event == tr2->event) {
+            if (tr1->event && tr2->event &&
+                tr1->source && tr2->source
+            ) {
+                if (tr1->event == tr2->event && 
+                    tr1->source == tr2->source
+                ) {
                     printTagLog(
                         FSM_GC_TAG, 
                         "WARNING! \"%s\" has matches functions events %s{0x%08X} = %s{0x%08X}",
@@ -169,15 +179,18 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
 #endif
 
     // Remove invalid transitions and set event index
-    unsigned i = 0;
-    while (i < fsm->_table_size) {
+    for (unsigned i = 0; i < fsm->_table_size;) {
         if (fsm->_table[i].source && fsm->_table[i].event && fsm->_table[i].target) {
-            i++;
-            continue;
+            if (fsm->_table[i].source->state_f && fsm->_table[i].target->state_f) {
+                i++;
+                continue;
+            }
         }
-        for (unsigned j = i; j < fsm->_table_size - 1; j++) {
-            fsm->_table[j] = fsm->_table[j+1];
-        }
+        memcpy(
+            &fsm->_table[i],
+            &fsm->_table[i+1],
+            sizeof(fsm_gc_transition_t) * (fsm->_table_size - i - 1)
+        );
         fsm->_table_size--;
     }
     if (fsm->_table_size) {
@@ -243,7 +256,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
         return;
     }
 
-    fsm->_state->state();
+    fsm->_state->state_f();
 
     bool is_transition = false;
     uint32_t table_idx = 0;
@@ -252,7 +265,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
         const fsm_gc_event_t* event = fsm->_events_queue[i];
         for (unsigned j = 0; j < fsm->_table_size; j++) {
             const fsm_gc_transition_t* tr = &fsm->_table[j];
-            if (fsm->_state->state != tr->source->state) {
+            if (fsm->_state->state_f != tr->source->state_f) {
                 continue;
             }
             if (event != tr->event) {
@@ -287,9 +300,11 @@ void fsm_gc_process(fsm_gc_t* fsm)
 #endif
 
     fsm->_state = fsm->_table[table_idx].target;
-    for (unsigned i = event_idx; i < fsm->_events_cnt - 1; i++) {
-        fsm->_events_queue[i] = fsm->_events_queue[i + 1];
-    }
+    memcpy(
+        (void*)&fsm->_events_queue[event_idx],
+        (void*)&fsm->_events_queue[event_idx + 1],
+        sizeof(fsm_gc_event_t*) * (fsm->_events_cnt - event_idx - 1)
+    );
     fsm->_events_cnt--;
 
     if (fsm->_table[table_idx].action) {
@@ -311,9 +326,11 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     }
     
     if (fsm->_events_cnt >= FSM_GC_EVENTS_COUNT) {
-        for (unsigned i = 0; i < FSM_GC_EVENTS_COUNT - 1; i++) {
-            fsm->_events_queue[i] = fsm->_events_queue[i+1];
-        }
+        memcpy(
+            (void*)&fsm->_events_queue[0],
+            (void*)&fsm->_events_queue[1],
+            sizeof(fsm_gc_event_t*) * (FSM_GC_EVENTS_COUNT - 1)
+        );
         fsm->_events_cnt = FSM_GC_EVENTS_COUNT - 1;
     }
     fsm->_events_queue[fsm->_events_cnt++] = event;
@@ -388,7 +405,7 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 #endif
         return false;
     }
-    return fsm->_state->state == state->state;
+    return fsm->_state->state_f == state->state_f;
 }
 
 void fsm_gc_enable_messages(fsm_gc_t* fsm)
