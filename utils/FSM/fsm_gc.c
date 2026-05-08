@@ -81,87 +81,89 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
         if (!_log_enabled(fsm)) {
             continue;
         }
+        bool tr1_err = false;
+        fsm_gc_transition_t* tr1 = &fsm->_table[i];
+        if (!tr1->source) {
+            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty source", fsm->_name, i);
+            tr1_err = true;
+        }
+        if (!tr1->event) {
+            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty event", fsm->_name, i);
+            tr1_err = true;
+        }
+        if (!tr1->target) {
+            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty target", fsm->_name, i);
+            tr1_err = true;
+        }
+        if (tr1_err) {
+            continue;
+        }
         for (unsigned j = i + 1; j < fsm->_table_size; j++) {
-            if (fsm->_table[i].source && fsm->_table[j].source) {
-                if (fsm->_table[i].source != fsm->_table[j].source &&
-                    fsm->_table[i].source->state == fsm->_table[j].source->state
+            fsm_gc_transition_t* tr2 = &fsm->_table[j];
+            if (tr1->source && tr2->source) {
+                if (tr1->source != tr2->source &&
+                    tr1->source->state == tr2->source->state
                 ) {
                     printTagLog(
                         FSM_GC_TAG, 
                         "WARNING! \"%s\" has matches functions states %s{0x%08X} = %s{0x%08X}",
                         fsm->_name,
-                        fsm->_table[i].source->_name,
-                        (size_t)(size_t*)fsm->_table[i].source,
-                        fsm->_table[j].source->_name,
-                        (size_t)(size_t*)fsm->_table[j].source
+                        tr1->source->_name,
+                        (size_t)(size_t*)tr1->source,
+                        tr2->source->_name,
+                        (size_t)(size_t*)tr2->source
                     );
                 }
             }
-            if (fsm->_table[i].target && fsm->_table[j].target) {
-                if (fsm->_table[i].target != fsm->_table[j].target &&
-                    fsm->_table[i].target->state == fsm->_table[j].target->state
+            if (tr1->target && tr2->target) {
+                if (tr1->target != tr2->target &&
+                    tr1->target->state == tr2->target->state
                 ) {
                     printTagLog(
                         FSM_GC_TAG, 
                         "WARNING! \"%s\" has matches functions states %s{0x%08X} = %s{0x%08X}",
                         fsm->_name,
-                        fsm->_table[i].target->_name,
-                        (size_t)(size_t*)fsm->_table[i].target,
-                        fsm->_table[j].target->_name,
-                        (size_t)(size_t*)fsm->_table[j].target
+                        tr1->target->_name,
+                        (size_t)(size_t*)tr1->target,
+                        tr2->target->_name,
+                        (size_t)(size_t*)tr2->target
                     );
                 }
             }
-            if (fsm->_table[i].event && fsm->_table[j].event) {
-                if (fsm->_table[i].event == fsm->_table[j].event) {
+            if (tr1->event && tr2->event) {
+                if (tr1->event == tr2->event) {
                     printTagLog(
                         FSM_GC_TAG, 
                         "WARNING! \"%s\" has matches functions events %s{0x%08X} = %s{0x%08X}",
                         fsm->_name,
-                        fsm->_table[i].event->_name,
-                        (size_t)(size_t*)fsm->_table[i].event,
-                        fsm->_table[j].event->_name,
-                        (size_t)(size_t*)fsm->_table[i].event
+                        tr1->event->_name,
+                        (size_t)(size_t*)tr1->event,
+                        tr2->event->_name,
+                        (size_t)(size_t*)tr1->event
                     );
                 }
             }
-            if (!fsm->_table[i].source || !fsm->_table[j].source ||
-                !fsm->_table[i].target || !fsm->_table[j].target ||
-                !fsm->_table[i].action || !fsm->_table[j].action
-            ) {
+            if (!tr2->source || !tr2->target || !tr2->action) {
                 continue;
             }
-            if (fsm->_table[i].source == fsm->_table[j].source &&
-                fsm->_table[i].target == fsm->_table[j].target &&
-                fsm->_table[i].action == fsm->_table[j].action
+            if (tr1->source == tr2->source &&
+                tr1->target == tr2->target &&
+                tr1->action == tr2->action
             ) {
                 printTagLog(
                     FSM_GC_TAG,
-                    "WARNING! \"%s\" has duplicate transitions [idx-%u == idx-%u] %s{0x%08X} -> %s{0x%08X} -> %s{0x%08X}",
+                    "WARNING! \"%s\" has duplicate transitions [idx-%u equals idx-%u] %s{0x%08X} -> %s{0x%08X} -> %s{0x%08X}",
                     fsm->_name,
                     i,
                     j,
-                    fsm->_table[j].source->_name,
-					(size_t)(size_t*)fsm->_table[j].source,
-                    fsm->_table[j].target->_name,
-					(size_t)(size_t*)fsm->_table[j].target,
-                    fsm->_table[j].action ? fsm->_table[j].action->_name : EMPTY,
-					(size_t)(size_t*)fsm->_table[j].action
+                    tr2->source->_name,
+					(size_t)(size_t*)tr2->source,
+                    tr2->target->_name,
+					(size_t)(size_t*)tr2->target,
+                    tr2->action ? tr2->action->_name : EMPTY,
+					(size_t)(size_t*)tr2->action
                 );
             }
-        }
-        if (fsm->_table[i].source && fsm->_table[i].event && fsm->_table[i].target) {
-            continue;
-        }
-        fsm_gc_transition_t broken = fsm->_table[i];
-        if (!broken.source) {
-            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty source", fsm->_name, i);
-        }
-        if (!broken.event) {
-            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty event", fsm->_name, i);
-        }
-        if (!broken.target) {
-            printTagLog(FSM_GC_TAG, "\"%s\" transition idx-%u has empty target", fsm->_name, i);
         }
     }
 #endif

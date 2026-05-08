@@ -1,6 +1,6 @@
 {
   "name": "gutils",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "Cross-platform utility functions",
   "keywords": ["stm32", "nrf52", "linux"],
   "repository": {

@@ -476,7 +476,7 @@ static void _close_io(int* const pipefd, int* const old_stdout)
 #endif
 }
 
-static void _read_and_close_io(
+static int _read_and_close_io(
     int* const pipefd, 
     int* const old_stdout, 
     uint8_t* const buffer, 
@@ -515,7 +515,9 @@ static void _read_and_close_io(
     #error "read stdout error"
 #endif
 
-    gprint("\r\nREAD DATA: \r\n%s\r\n", (char*)buffer);
+    int count = strlen((char*)buffer);
+    gprint("\r\nREAD %lu DATA BYTES: \r\n%s\r\n", count, (char*)buffer);
+    return count;
 }
 
 FSM_GC_CREATE(FSM_GC_SUITE_CheckMatchesStates_fsm)
@@ -643,10 +645,16 @@ TEST(FSM_GC_Fixture, FullBrokenTableZeroSizeCheck)
 
     ASSERT_FALSE(fsm_gc_init(&FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm, FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm_table, 3));
 
-    _read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer));
+    ASSERT_EQ(_read_and_close_io(pipefd, &old_stdout, buffer, sizeof(buffer)), 415);
 
-    const uint8_t str[] = " WARNING! \"FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm\" has been initialized with empty transition table";
-    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str, strlen((char*)str)));
+    const uint8_t str1[] = "\"FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm\" transition idx-0 has empty source";
+    const uint8_t str2[] = "\"FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm\" transition idx-1 has empty event";
+    const uint8_t str3[] = "\"FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm\" transition idx-2 has empty target";
+    const uint8_t str4[] = " WARNING! \"FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm\" has been initialized with empty transition table";
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str1, strlen((char*)str1)));
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str2, strlen((char*)str2)));
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str3, strlen((char*)str3)));
+    ASSERT_TRUE((bool)util_memfind(buffer, sizeof(buffer), str4, strlen((char*)str4)));
     ASSERT_FALSE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm._initialized);
     ASSERT_TRUE(FSM_GC_SUITE_FullBrokenTableZeroSizeCheck_fsm._table_size == 0);
 }
