@@ -120,19 +120,6 @@ extern "C" {
 #endif
 
 
-typedef struct _gtimer_t {
-    g_time_t start;
-    g_time_t delay;
-} gtimer_t;
-
-
-void gtimer_start(gtimer_t* tm, uint32_t waitMs);
-void gtimer_reload(gtimer_t* tm);
-bool gtimer_wait(gtimer_t* tm);
-uint32_t gtimer_remaining(gtimer_t* tm);
-void gtimer_reset(gtimer_t* tm);
-
-
 typedef enum _ALIGN_MODE {
     ALIGN_MODE_LEFT = 1,
     ALIGN_MODE_RIGHT,
@@ -145,7 +132,7 @@ typedef enum _ALIGN_MODE {
 
 
 void     util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t len);
-bool     util_wait_event(bool (*condition) (void), g_time_t time_ms);
+bool     util_wait_event(bool (*condition) (void), uint32_t time_ms);
 uint8_t  util_get_number_len(int number);
 uint32_t util_small_pow(uint32_t number, uint32_t degree);
 int      util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2);

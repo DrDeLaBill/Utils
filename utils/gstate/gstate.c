@@ -50,7 +50,7 @@ static bool _check_initialized(gstate_t* const gstate)
 static void _remove_state_by_idx(gstate_state_t** list, unsigned index, unsigned size)
 {
     if (index + 1 < size) {
-        memcpy(
+        memmove(
             (void*)&list[index],
             (void*)&list[index + 1],
             sizeof(list[index]) * (size - index - 1)
@@ -215,7 +215,9 @@ void gstate_process(gstate_t* gstate)
 
     gstate->_curr_state->state_f();
 
+#ifdef GSTATE_BEDUG
     gstate_state_t* last = gstate->_curr_state;
+#endif
     gstate_state_t* target = NULL;
     if (gstate->_queue_cnt) {
         target = gstate->_states_queue[0];

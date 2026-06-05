@@ -9,26 +9,6 @@
 #include "glog.h"
 
 
-void gtimer_start(gtimer_t* tm, uint32_t delay) {
-	tm->start = getMillis();
-	tm->delay = delay;
-}
-
-void gtimer_reload(gtimer_t* tm)
-{
-	tm->start = getMillis();
-}
-
-bool gtimer_wait(gtimer_t* tm) {
-    return (getMillis() - tm->start) < tm->delay;
-}
-
-void gtimer_reset(gtimer_t* tm)
-{
-	tm->delay = 0;
-	tm->start = 0;
-}
-
 uint32_t gtimer_remaining(gtimer_t* tm)
 {
     if (tm->start + tm->delay < getMillis()) {
@@ -82,9 +62,9 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
 }
 #endif
 
-bool util_wait_event(bool (*condition) (void), g_time_t time_ms)
+bool util_wait_event(bool (*condition) (void), uint32_t time_ms)
 {
-    g_time_t start_time = getMillis();
+    uint32_t start_time = getMillis();
     while (__abs_dif(start_time, getMillis()) < time_ms) {
         if (condition()) {
             return true;

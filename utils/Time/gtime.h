@@ -1,4 +1,4 @@
-/* Copyright © 2023 Georgy E. All rights reserved. */
+/* Copyright © 2026 Georgy E. All rights reserved. */
 
 #ifndef __G_TIME_H
 #define __G_TIME_H
@@ -10,14 +10,25 @@ extern "C" {
 
 
 #include <stdint.h>
+#include <stdbool.h>
 
 
-typedef uint64_t g_time_t;
+typedef struct _gtimer_t {
+    uint32_t start;
+    uint32_t delay;
+} gtimer_t;
 
 
-g_time_t getMillis();
+void gtimer_start(gtimer_t* tm, uint32_t waitMs);
+void gtimer_reload(gtimer_t* tm);
+bool gtimer_wait(gtimer_t* tm);
+uint32_t gtimer_remaining(gtimer_t* tm);
+void gtimer_reset(gtimer_t* tm);
 
-g_time_t getMicroseconds();
+
+uint32_t getMillis();
+uint64_t getMillis64bit();
+uint64_t getMicroseconds();
 
 
 #ifdef __cplusplus

@@ -105,7 +105,12 @@ void __g_print_tag(const char* tag)
 
 void printMessage(const char* format, va_list args)
 {
+#if CONFIG_PRINTK
+    extern void vprintk(const char *fmt, va_list ap);
+    vprintk(format, args);
+#else
     vprintf(format, args);
+#endif
 }
 
 #else 

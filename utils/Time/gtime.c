@@ -1,4 +1,4 @@
-/* Copyright © 2023 Georgy E. All rights reserved. */
+/* Copyright © 2026 Georgy E. All rights reserved. */
 
 #include "gtime.h"
 
@@ -6,13 +6,20 @@
 
 #include "bmacro.h"
 
-#if defined(ARDUINO)
-    #include <Arduino.h>
+#if defined(__ZEPHYR__)
+    #include <zephyr/kernel.h>
+#elif defined(ESP_PLATFORM)
+    #include "esp_timer.h"
 #elif defined(USE_HAL_DRIVER)
     #include "main.h"
-#elif defined(__GNUC__)
-    #include <stddef.h>
+#elif defined(ARDUINO)
+    #include <Arduino.h>
+#elif defined(INC_FREERTOS_H) || defined(FREERTOS)
+    #include "FreeRTOS.h"
+    #include "task.h"
+#elif defined(__GNUC__) && !defined(__arm__)
     #include <sys/time.h>
+    #include <stddef.h>
 #elif defined(_MSC_VER)
     #include <time.h>
 #else
@@ -20,103 +27,191 @@
 #endif
 
 
-#define U32_MAX ((g_time_t)0xFFFFFFFF)
-
-
-g_time_t getMillis()
+__attribute__((weak)) uint32_t getMillis()
 {
-#if defined(USE_HAL_DRIVER)
-    static g_time_t previous_ticks = 0;
-    static g_time_t overflow_count = 0;
+#if defined(__ZEPHYR__)
+
+    return k_uptime_get_32();
+    
+#elif defined(ESP_PLATFORM)
+
+    return (uint32_t)(esp_timer_get_time() / 1000ULL);
+    
+#elif defined(INC_FREERTOS_H) || defined(FREERTOS)
+
+    return (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
+    
+#elif defined(USE_HAL_DRIVER)
+
+    return HAL_GetTick();
+    
+#elif defined(ARDUINO)
+
+    return millis();
+    
+#elif defined(__GNUC__) && !defined(__arm__)
+
+    struct timeval time;
+    gettimeofday(&time, NULL);
+    return (uint32_t)(((time.tv_sec) * 1000) + ((time.tv_usec) / 1000));
+    
+#elif defined(_MSC_VER)
+
+    return (uint32_t)(clock() * (1000 / CLOCKS_PER_SEC));
+    
+#else
+
+    return 0;
+
+#endif
+}
+
+uint64_t getMillis64bit()
+{
+#if defined(__ZEPHYR__)
+
+    return (uint64_t)k_uptime_get();
+
+#elif defined(ESP_PLATFORM)
+
+    return (uint64_t)(esp_timer_get_time() / 1000ULL);
+
+#elif defined(USE_HAL_DRIVER)
+
+    static uint32_t previous_ticks = 0;
+    static uint32_t overflow_count = 0;
 
     __disable_irq();
-    g_time_t current_ticks = HAL_GetTick();
+    uint32_t current_ticks = HAL_GetTick();
     if (current_ticks < previous_ticks) {
         overflow_count++;
     }
     previous_ticks = current_ticks;
     __enable_irq();
 
-    return (overflow_count * U32_MAX) + current_ticks;
+    return (((uint64_t)overflow_count) << 32) | current_ticks;
+
 #elif defined(ARDUINO)
-    static g_time_t previous_ticks = 0;
-    static g_time_t overflow_count = 0;
-    static bool irq_disabled = false;
-    bool _self_irq_disabled = false;
 
-    uint32_t prev_basepri = __get_BASEPRI();
-    if (!irq_disabled) {
-        irq_disabled = true;
-        _self_irq_disabled = true;
-        __set_BASEPRI(0x40);
-    }
+    static uint32_t previous_ticks = 0;
+    static uint32_t overflow_count = 0;
 
-    g_time_t current_ticks = millis();
+    noInterrupts();
+    uint32_t current_ticks = millis();
     if (current_ticks < previous_ticks) {
         overflow_count++;
     }
     previous_ticks = current_ticks;
+    interrupts();
 
-    if (_self_irq_disabled) {
-        irq_disabled = false;
-        __set_BASEPRI(prev_basepri);
+    return (((uint64_t)overflow_count) << 32) | current_ticks;
+
+#elif defined(INC_FREERTOS_H) || defined(FREERTOS)
+
+    static uint32_t previous_ticks = 0;
+    static uint32_t overflow_count = 0;
+
+    taskENTER_CRITICAL();
+    uint32_t current_ticks = (uint32_t)(xTaskGetTickCount() * portTICK_PERIOD_MS);
+    if (current_ticks < previous_ticks) {
+        overflow_count++;
     }
+    previous_ticks = current_ticks;
+    taskEXIT_CRITICAL();
 
-    return (overflow_count * U32_MAX) + current_ticks;
-#elif defined(__GNUC__)
+    return (((uint64_t)overflow_count) << 32) | current_ticks;
+
+#elif defined(__GNUC__) && !defined(__arm__)
+
     struct timeval time;
     gettimeofday(&time, NULL);
-    return ((g_time_t)(time.tv_sec) * 1000) + ((g_time_t)(time.tv_usec) / 1000);
+    return ((uint64_t)(time.tv_sec) * 1000ULL) + ((uint64_t)(time.tv_usec) / 1000ULL);
+
 #elif defined(_MSC_VER)
-    return clock();
+
+    return (uint64_t)clock();
+
 #else
+
     return 0;
+
 #endif
 }
 
-g_time_t getMicroseconds()
+__attribute__((weak)) uint64_t getMicroseconds()
 {
-#if defined(USE_HAL_DRIVER)
-    g_time_t ticks   = getMillis();
-    g_time_t systick = SysTick->VAL;
-    g_time_t load    = SysTick->LOAD;
+#if defined(__ZEPHYR__)
 
-    g_time_t micros = (g_time_t)ticks * 1000ULL;
+    return (uint64_t)k_ticks_to_us_floor64(sys_clock_tick_get());
+
+#elif defined(ESP_PLATFORM)
+
+    return (uint64_t)esp_timer_get_time();
+
+#elif defined(USE_HAL_DRIVER)
+
+    uint32_t m0, m1, systick, load;
+    
+    do {
+        m0 = HAL_GetTick();
+        systick = SysTick->VAL;
+        load = SysTick->LOAD;
+        m1 = HAL_GetTick();
+    } while (m0 != m1);
+
+    uint64_t micros = (uint64_t)m0 * 1000ULL;
     micros += (load - systick) / (SystemCoreClock / 1000000ULL);
 
     return micros;
+
 #elif defined(ARDUINO)
-    static g_time_t previous_ticks = 0;
-    static g_time_t overflow_count = 0;
-    static bool irq_disabled = false;
-    bool _self_irq_disabled = false;
 
-    uint32_t prev_basepri = __get_BASEPRI();
-    if (!irq_disabled) {
-        irq_disabled = true;
-        _self_irq_disabled = true;
-        __set_BASEPRI(0x40);
-    }
+    static uint32_t previous_ticks = 0;
+    static uint32_t overflow_count = 0;
 
-    g_time_t current_ticks = micros();
+    noInterrupts();
+    uint32_t current_ticks = micros();
     if (current_ticks < previous_ticks) {
         overflow_count++;
     }
     previous_ticks = current_ticks;
+    interrupts();
 
-    if (_self_irq_disabled) {
-        irq_disabled = false;
-        __set_BASEPRI(prev_basepri);
-    }
+    return (((uint64_t)overflow_count) << 32) | current_ticks;
 
-    return (overflow_count * U32_MAX) + current_ticks;
-#elif defined(__GNUC__)
+#elif defined(__GNUC__) && !defined(__arm__)
+
     struct timeval time;
     gettimeofday(&time, NULL);
-    return ((g_time_t)(time.tv_sec) * 1000000) + ((g_time_t)(time.tv_usec));
+    return ((uint64_t)(time.tv_sec) * 1000000ULL) + ((uint64_t)(time.tv_usec));
+
 #elif defined(_MSC_VER)
-    return (g_time_t)clock() * (1000000 / CLOCKS_PER_SEC);
+
+    return (uint64_t)clock() * (1000000ULL / CLOCKS_PER_SEC);
+
 #else
+
     return 0;
+
 #endif
+}
+
+void gtimer_start(gtimer_t* tm, uint32_t delay) {
+	tm->start = getMillis();
+	tm->delay = delay;
+}
+
+void gtimer_reload(gtimer_t* tm)
+{
+	tm->start = getMillis();
+}
+
+bool gtimer_wait(gtimer_t* tm) {
+    return (getMillis() - tm->start) < tm->delay;
+}
+
+void gtimer_reset(gtimer_t* tm)
+{
+	tm->delay = 0;
+	tm->start = 0;
 }

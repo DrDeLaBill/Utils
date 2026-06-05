@@ -17,9 +17,6 @@ static bool disable_all_messages = false;
 
 #endif
 
-static size_t _fsm_gc_events_iterator = 1;
-
-
 
 #ifdef FSM_GC_BEDUG
 static bool _log_enabled(const fsm_gc_t* fsm)
@@ -186,7 +183,7 @@ bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size)
                 continue;
             }
         }
-        memcpy(
+        memmove(
             &fsm->_table[i],
             &fsm->_table[i+1],
             sizeof(fsm_gc_transition_t) * (fsm->_table_size - i - 1)
@@ -300,7 +297,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
 #endif
 
     fsm->_state = fsm->_table[table_idx].target;
-    memcpy(
+    memmove(
         (void*)&fsm->_events_queue[event_idx],
         (void*)&fsm->_events_queue[event_idx + 1],
         sizeof(fsm_gc_event_t*) * (fsm->_events_cnt - event_idx - 1)
@@ -326,7 +323,7 @@ void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event)
     }
     
     if (fsm->_events_cnt >= FSM_GC_EVENTS_COUNT) {
-        memcpy(
+        memmove(
             (void*)&fsm->_events_queue[0],
             (void*)&fsm->_events_queue[1],
             sizeof(fsm_gc_event_t*) * (FSM_GC_EVENTS_COUNT - 1)

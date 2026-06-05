@@ -2,7 +2,6 @@
 
 #include "gpid.hpp"
 
-#include <cmath>
 #include <algorithm>
 
 #include "glog.h"

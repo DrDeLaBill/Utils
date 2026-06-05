@@ -42,7 +42,7 @@ namespace utl
         if (!this->started) {
             return 0;
         }
-        g_time_t end_ms = end();
+        uint32_t end_ms = end();
         if (getMillis() > end_ms) {
             return 0;
         }

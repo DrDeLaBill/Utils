@@ -12,8 +12,8 @@ namespace utl
     class GTimer
     {
     private:
-        g_time_t delay;
-        g_time_t start_ms;
+        uint32_t delay;
+        uint32_t start_ms;
         bool     started;
 
     public:
