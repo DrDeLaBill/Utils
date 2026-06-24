@@ -2,8 +2,8 @@
 
 #include "CodeStopwatch.h"
 
-#include <cstring>
-#include <cstdint>
+#include <string.h>
+#include <stdint.h>
 
 #include "glog.h"
 #include "gutils.h"

@@ -51,6 +51,16 @@ void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len,
 	phrase[need_len] = 0;
 }
 
+static void _write_digits(char* dst, size_t max, unsigned value, unsigned count) 
+{
+    unsigned i = count;
+    dst[i] = '\0';
+    while (i--) {
+        dst[i] = '0' + (value % 10);
+        value /= 10;
+    }
+}
+
 // TODO: point_count = 100 fix
 void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned div, unsigned point_count, char point)
 {
@@ -84,19 +94,11 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 	if (div > dec) {
 		value /= (int)(div / dec);
 	}
-	char format[16] = "";
-	snprintf(
-		format,
-		sizeof(format) - 1,
-		"%c0%uld",
-		'%',
-		point_count
-	);
-	snprintf(
+	_write_digits(
 		target + len,
-		size - len - 1,
-		format,
-		value
+		size - len,
+		value,
+		point_count
 	);
 }
 

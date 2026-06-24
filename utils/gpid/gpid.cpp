@@ -2,8 +2,6 @@
 
 #include "gpid.hpp"
 
-#include <algorithm>
-
 #include "glog.h"
 #include "gutils.h"
 
@@ -75,9 +73,9 @@ void GPID::show()
     if (_debugEnabled) {
         gprintMsgFilter(
             gprint(
-                "%lu,%.01f,%d,%d,%d,%d,%u,%u\n",
+                "%lu,%d.%d,%d,%d,%d,%d,%u,%u\n",
                 (uint32_t)getMicroseconds(),
-                _debugErr,
+                (int)_debugErr, (int)(__abs(_debugErr) * 10.0f),
                 _debugPidOutput,
                 _debugKp,
                 _debugKi,
@@ -95,10 +93,11 @@ float GPID::update(
     float target
 ) {
     // ===========================
-    float dt = 1.0f / 1000.0f;
+    float dt = 0.0001f;
     uint64_t now_us = getMicroseconds();
     if (now_us > _lastRunTimeUs) {
-        dt = (float)(now_us - _lastRunTimeUs) / (float)(1000000.0f);
+        uint32_t delta_us = (uint32_t)(now_us - _lastRunTimeUs);
+        dt = (float)delta_us * 0.000001f;
     }
     _lastRunTimeUs = now_us;
     // ===========================
@@ -145,7 +144,7 @@ float GPID::update(
             // интегрирование
             float integral = err * dt;
             // проверка на движение от цели
-            if (sign(err) * sign(_pidIntegral) > 0.0f) {
+            if (__sign(err) * __sign(_pidIntegral) > 0.0f) {
                 _pidIntegral = _pidIntegral * (1.0f - _iTauAtatck) + integral;
             } else {
                 _pidIntegral = _pidIntegral * (1.0f - _iTauDecay) + integral;

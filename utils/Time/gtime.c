@@ -26,8 +26,11 @@
     #warning Please select the target STM32xxxx used in your application
 #endif
 
-
+#if defined(_MSC_VER)
+uint32_t getMillis()
+#elif defined(__GNUC__)
 __attribute__((weak)) uint32_t getMillis()
+#endif
 {
 #if defined(__ZEPHYR__)
 
@@ -138,7 +141,11 @@ uint64_t getMillis64bit()
 #endif
 }
 
+#if defined(_MSC_VER)
+uint64_t getMicroseconds()
+#elif defined(__GNUC__)
 __attribute__((weak)) uint64_t getMicroseconds()
+#endif
 {
 #if defined(__ZEPHYR__)
 

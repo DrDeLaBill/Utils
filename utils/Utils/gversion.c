@@ -32,23 +32,36 @@ char* gversion_to_string(const gversion_t* version)
 
 bool gversion_from_string(const char* str, const unsigned size, gversion_t* version)
 {
-    int major, minor, patch;
-    if (!str || !version) {
+    if (!str || !version || strlen(str) > size) {
         return false;
     }
-    if (strlen(str) > size) {
+    const char* p = str;
+    if (*p == 'v') {
+        p++;
+    }
+    int major = 0, minor = 0, patch = 0;
+    while (*p >= '0' && *p <= '9') {
+        major = major * 10 + (*p++ - '0');
+    }
+    if (*p++ != '.') {
         return false;
     }
-    char ch = 0;
-    int res = sscanf(str, "%d.%d.%d%c", &major, &minor, &patch, &ch);
-    if (res >= 3 && ch) {
+    if (*p < '0' || *p > '9') {
         return false;
     }
-    res = sscanf(str, "%d.%d.%d", &major, &minor, &patch);
-    if (res != 3) {
-        res = sscanf(str, "v%d.%d.%d", &major, &minor, &patch);
+    while (*p >= '0' && *p <= '9') {
+        minor = minor * 10 + (*p++ - '0');
     }
-    if (res != 3) {
+    if (*p++ != '.') {
+        return false;
+    }
+    if (*p < '0' || *p > '9') {
+        return false;
+    }
+    while (*p >= '0' && *p <= '9') {
+        patch = patch * 10 + (*p++ - '0');
+    }
+    if (*p != '\0' && *p != '\0') {
         return false;
     }
     version->major = (uint8_t)major;

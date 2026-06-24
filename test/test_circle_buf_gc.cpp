@@ -637,7 +637,7 @@ TEST(UtilsFixture, test_float)
     value = start;
     for (unsigned i = 0; i < TEST_BUFFER_LEN; i++) {
         float tmp = *(float*)circle_buf_gc_pop_front(&cb);
-        printf("%02.f == %02.f\n", tmp, value);
+        printf("%02d == %02d\n", (int)tmp, (int)value);
         ASSERT_EQ((int)tmp, (int)value);
         ASSERT_TRUE(__abs_dif(tmp, value) <= 1.0f);
         value += 1.0f;
