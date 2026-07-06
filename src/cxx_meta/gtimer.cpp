@@ -1,6 +1,6 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include "gtimer.h"
+#include "gtimer.hpp"
 
 #include "gtime.h"
 

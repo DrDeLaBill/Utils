@@ -1,6 +1,6 @@
 /* Copyright © 2023 Georgy E. All rights reserved. */
 
-#include "CodeStopwatch.h"
+#include "CodeStopwatch.hpp"
 
 #include <string.h>
 #include <stdint.h>

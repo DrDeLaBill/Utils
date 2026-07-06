@@ -122,6 +122,24 @@ TEST(FSM_GC_Fixture, IsStateCheck)
   ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_IsStateCheck_fsm, &FSM_GC_SUITE_IsStateCheck_state1));
   ASSERT_FALSE(fsm_gc_is_state(&FSM_GC_SUITE_IsStateCheck_fsm, &FSM_GC_SUITE_IsStateCheck_state2));
 }
+
+// Regression test: state identity must be based on state objects, not function pointers.
+FSM_GC_CREATE(FSM_GC_SUITE_StateIdentityFix_fsm)
+FSM_GC_CREATE_EVENT(FSM_GC_SUITE_StateIdentityFix_event1, 0)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_StateIdentityFix_state1, _FSM_GC_SUITE_StateIdentityFix_shared)
+FSM_GC_CREATE_STATE(FSM_GC_SUITE_StateIdentityFix_state2, _FSM_GC_SUITE_StateIdentityFix_shared)
+FSM_GC_CREATE_TABLE(
+  FSM_GC_SUITE_StateIdentityFix_fsm_table,
+  {&FSM_GC_SUITE_StateIdentityFix_state1, &FSM_GC_SUITE_StateIdentityFix_event1, &FSM_GC_SUITE_StateIdentityFix_state1, NULL}
+)
+void _FSM_GC_SUITE_StateIdentityFix_shared(void) {}
+TEST(FSM_GC_Fixture, StateIdentityFixStableWithSameFunctionPointer)
+{
+  ASSERT_TRUE(fsm_gc_init(&FSM_GC_SUITE_StateIdentityFix_fsm, FSM_GC_SUITE_StateIdentityFix_fsm_table, 1));
+  ASSERT_TRUE(fsm_gc_is_state(&FSM_GC_SUITE_StateIdentityFix_fsm, &FSM_GC_SUITE_StateIdentityFix_state1));
+  ASSERT_FALSE(fsm_gc_is_state(&FSM_GC_SUITE_StateIdentityFix_fsm, &FSM_GC_SUITE_StateIdentityFix_state2));
+}
+
 // Test 7: Handling multiple events with different priorities
 FSM_GC_CREATE(FSM_GC_SUITE_EventPriority_fsm)
 FSM_GC_CREATE_STATE(FSM_GC_SUITE_EventPriority_state1, _FSM_GC_SUITE_EventPriority_state1)
@@ -475,7 +493,7 @@ static void _change_io(int* pipefd, int* old_stdout, uint8_t* buffer, const size
 {
     memset(buffer, 0, buffer_size);
 #if defined(_MSC_VER)
-    if (_pipe(pipefd, buffer_size, O_BINARY) == -1) {
+  if (_pipe(pipefd, (unsigned int)buffer_size, O_BINARY) == -1) {
         FAIL() << "Failed to create pipe";
     }
     *old_stdout = _dup(_fileno(stdout));
@@ -496,6 +514,7 @@ static void _change_io(int* pipefd, int* old_stdout, uint8_t* buffer, const size
 
 static void _close_io(int* const pipefd, int* const old_stdout)
 {
+  (void)pipefd;
 #if defined(_MSC_VER)
     (void)_dup2(*old_stdout, _fileno(stdout));
     _close(*old_stdout);
@@ -521,7 +540,7 @@ static int _read_and_close_io(
 
 #if defined(_MSC_VER)
     _close(pipefd[1]);
-    int bytes_read = _read(pipefd[0], buffer, buffer_size - 1);
+  int bytes_read = _read(pipefd[0], buffer, (unsigned int)(buffer_size - 1));
     if (bytes_read > 0) {
         buffer[bytes_read] = '\0';
     }
@@ -546,9 +565,9 @@ static int _read_and_close_io(
     #error "read stdout error"
 #endif
 
-    int count = strlen((char*)buffer);
-    gprint("\r\nREAD %lu DATA BYTES: \r\n%s\r\n", count, (char*)buffer);
-    return count;
+    size_t count = strlen((char*)buffer);
+    gprint("\r\nREAD %lu DATA BYTES: \r\n%s\r\n", (unsigned long)count, (char*)buffer);
+    return (int)count;
 }
 
 FSM_GC_CREATE(FSM_GC_SUITE_CheckMatchesStates_fsm)
@@ -714,7 +733,11 @@ void _FSM_GC_SUITE_BrokenTableZeroSizeCheck_state1(void) {}
 void _FSM_GC_SUITE_BrokenTableZeroSizeCheck_state2(void) {}
 TEST(FSM_GC_Fixture, BrokenTableZeroSizeCheck)
 {
-    return;
+  volatile bool run_full_check = false;
+  if (!run_full_check) {
+    GTEST_SKIP() << "Temporarily skipped to keep deterministic CI behavior";
+  }
+
     uint8_t buffer[2048] = "";
     int pipefd[2];
     int old_stdout;

@@ -12,6 +12,8 @@
     #include "esp_timer.h"
 #elif defined(USE_HAL_DRIVER)
     #include "main.h"
+#elif defined(__AVR__) && !defined(ARDUINO)
+    // Bare-metal AVR: users should provide their own platform timing hooks.
 #elif defined(ARDUINO)
     #include <Arduino.h>
 #elif defined(INC_FREERTOS_H) || defined(FREERTOS)
@@ -51,6 +53,10 @@ __attribute__((weak)) uint32_t getMillis()
 #elif defined(ARDUINO)
 
     return millis();
+
+#elif defined(__AVR__) && !defined(ARDUINO)
+
+    return 0;
     
 #elif defined(__GNUC__) && !defined(__arm__)
 
@@ -108,6 +114,10 @@ uint64_t getMillis64bit()
     interrupts();
 
     return (((uint64_t)overflow_count) << 32) | current_ticks;
+
+#elif defined(__AVR__) && !defined(ARDUINO)
+
+    return 0;
 
 #elif defined(INC_FREERTOS_H) || defined(FREERTOS)
 
@@ -185,6 +195,10 @@ __attribute__((weak)) uint64_t getMicroseconds()
     interrupts();
 
     return (((uint64_t)overflow_count) << 32) | current_ticks;
+
+#elif defined(__AVR__) && !defined(ARDUINO)
+
+    return 0;
 
 #elif defined(__GNUC__) && !defined(__arm__)
 

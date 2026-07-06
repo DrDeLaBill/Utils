@@ -262,7 +262,7 @@ void fsm_gc_process(fsm_gc_t* fsm)
         const fsm_gc_event_t* event = fsm->_events_queue[i];
         for (unsigned j = 0; j < fsm->_table_size; j++) {
             const fsm_gc_transition_t* tr = &fsm->_table[j];
-            if (fsm->_state->state_f != tr->source->state_f) {
+            if (fsm->_state != tr->source) {
                 continue;
             }
             if (event != tr->event) {
@@ -402,7 +402,7 @@ bool fsm_gc_is_state(fsm_gc_t* fsm, fsm_gc_state_t* state)
 #endif
         return false;
     }
-    return fsm->_state->state_f == state->state_f;
+    return fsm->_state == state;
 }
 
 void fsm_gc_enable_messages(fsm_gc_t* fsm)

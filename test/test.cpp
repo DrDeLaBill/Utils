@@ -4,7 +4,7 @@
 #include <cassert>
 #include <gtest/gtest.h>
 
-#include "CodeStopwatch.h"
+#include "CodeStopwatch.hpp"
 
 
 static const char TAG[] = "TEST";
