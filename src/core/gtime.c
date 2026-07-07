@@ -29,9 +29,9 @@
 #endif
 
 #if defined(_MSC_VER)
-uint32_t getMillis()
+uint32_t getMillis(void)
 #elif defined(__GNUC__)
-__attribute__((weak)) uint32_t getMillis()
+__attribute__((weak)) uint32_t getMillis(void)
 #endif
 {
 #if defined(__ZEPHYR__)
@@ -75,7 +75,11 @@ __attribute__((weak)) uint32_t getMillis()
 #endif
 }
 
-uint64_t getMillis64bit()
+#if defined(_MSC_VER)
+uint64_t getMillis64bit(void)
+#elif defined(__GNUC__)
+__attribute__((weak)) uint64_t getMillis64bit(void)
+#endif
 {
 #if defined(__ZEPHYR__)
 
@@ -152,9 +156,9 @@ uint64_t getMillis64bit()
 }
 
 #if defined(_MSC_VER)
-uint64_t getMicroseconds()
+uint64_t getMicroseconds(void)
 #elif defined(__GNUC__)
-__attribute__((weak)) uint64_t getMicroseconds()
+__attribute__((weak)) uint64_t getMicroseconds(void)
 #endif
 {
 #if defined(__ZEPHYR__)

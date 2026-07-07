@@ -26,9 +26,9 @@ uint32_t gtimer_remaining(gtimer_t* tm);
 void gtimer_reset(gtimer_t* tm);
 
 
-uint32_t getMillis();
-uint64_t getMillis64bit();
-uint64_t getMicroseconds();
+uint32_t getMillis(void);
+uint64_t getMillis64bit(void);
+uint64_t getMicroseconds(void);
 
 
 #ifdef __cplusplus

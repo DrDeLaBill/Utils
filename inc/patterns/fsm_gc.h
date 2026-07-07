@@ -144,8 +144,8 @@ typedef struct _fsm_gc_t {
 
 
 bool fsm_gc_init(fsm_gc_t* fsm, fsm_gc_transition_t* table, unsigned size);
-void fsm_gc_disable_all_messages();
-void fsm_gc_enable_all_messages();
+void fsm_gc_disable_all_messages(void);
+void fsm_gc_enable_all_messages(void);
 void fsm_gc_reset(fsm_gc_t* fsm);
 void fsm_gc_process(fsm_gc_t* fsm);
 void fsm_gc_push_event(fsm_gc_t* fsm, fsm_gc_event_t* event);

@@ -184,14 +184,14 @@ bool gstate_init(gstate_t* gstate, gstate_state_t** states_list, size_t states_c
     return gstate->_initialized;
 }
 
-void gstate_disable_all_messages()
+void gstate_disable_all_messages(void)
 {
 #ifdef GSTATE_BEDUG
     disable_all_messages = true;
 #endif
 }
 
-void gstate_enable_all_messages()
+void gstate_enable_all_messages(void)
 {
 #ifdef GSTATE_BEDUG
     disable_all_messages = false;

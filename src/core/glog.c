@@ -63,7 +63,7 @@ bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
 #define __GLOG_PRETTY_LOG_OFFSET_  (__GLOG_MILLIS_SYMBOLS_CNT_ + 8)
 
 
-void __g_print_offset()
+void __g_print_offset(void)
 {
     gprint("%*s", __GLOG_PRETTY_LOG_OFFSET_, "");
 }

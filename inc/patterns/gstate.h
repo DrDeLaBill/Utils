@@ -100,8 +100,8 @@ typedef struct _gstate_t {
 
 
 bool gstate_init(gstate_t* gstate, gstate_state_t** states_list, size_t states_count);
-void gstate_disable_all_messages();
-void gstate_enable_all_messages();
+void gstate_disable_all_messages(void);
+void gstate_enable_all_messages(void);
 void gstate_reset(gstate_t* gstate);
 void gstate_process(gstate_t* gstate);
 void gstate_request_state(gstate_t* gstate, gstate_state_t* target);
