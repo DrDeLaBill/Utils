@@ -51,26 +51,30 @@ else()
     set(cpp_paths "")
     message(STATUS "C++ compiler is not available: .cpp/.hpp files are ignored")
 endif()
-FILE_PATHS_EXT(s_paths   "${CMAKE_CURRENT_SOURCE_DIR}/src" "s")
-set(${PROJECT_NAME}_SOURCES "${h_paths};${hpp_paths};${c_paths};${cpp_paths};${s_paths}")
-add_library(
-    ${PROJECT_NAME} 
-    STATIC 
-    ${${PROJECT_NAME}_SOURCES}
-)
 
-# Указываем директории с заголовочными файлами
-FILE_DIRECTORIES_EXT(h_dirs   "${CMAKE_CURRENT_SOURCE_DIR}/inc" "h")
+# 1. Собираем все пути
+FILE_PATHS_EXT(s_paths "${CMAKE_CURRENT_SOURCE_DIR}/src" "s")
+set(${PROJECT_NAME}_SOURCES "${h_paths};${hpp_paths};${c_paths};${cpp_paths};${s_paths}")
+
+FILE_DIRECTORIES_EXT(h_dirs "${CMAKE_CURRENT_SOURCE_DIR}/inc" "h")
 FILE_DIRECTORIES_EXT(hpp_dirs "${CMAKE_CURRENT_SOURCE_DIR}/inc" "hpp")
 set(${PROJECT_NAME}_INCLUDES "${h_dirs};${hpp_dirs}")
-target_include_directories(
-    ${PROJECT_NAME}
-    PUBLIC
-    ${${PROJECT_NAME}_INCLUDES}
-)
 
+# 2. Выполняем очистку ДО создания таргета, если библиотека подключается как подмодуль
+if(NOT ${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+    message(STATUS "Utils added as a library")
+    set(exclude_list ".cmake-c-only-probe;build_c_only_check")
+    EXCLUDE_DIRS(${PROJECT_NAME}_INCLUDES ${exclude_list})
+    EXCLUDE_PATHS(${PROJECT_NAME}_SOURCES ${exclude_list})
+endif()
 
+# 3. Создаем стандартный CMake-таргет
+add_library(${PROJECT_NAME} STATIC ${${PROJECT_NAME}_SOURCES})
+target_include_directories(${PROJECT_NAME} PUBLIC ${${PROJECT_NAME}_INCLUDES})
+
+# 4. Применяем специфичные настройки, если это standalone сборка
 if(${CMAKE_CURRENT_SOURCE_DIR} STREQUAL ${CMAKE_SOURCE_DIR})
+    message(STATUS "Utils generated as current project")
 
     if(NOT UTILS_HAS_CXX)
         message(FATAL_ERROR "Standalone build requires a C++ compiler")
@@ -122,6 +126,10 @@ else()
 
     message(STATUS "Utils added as a library")
 
+    set(exclude_list ".cmake-c-only-probe;build_c_only_check")
+    EXCLUDE_DIRS(${PROJECT_NAME}_INCLUDES ${exclude_list})
+    EXCLUDE_PATHS(${PROJECT_NAME}_SOURCES ${exclude_list})
+
     message(STATUS "${PROJECT_NAME} includes:")
     foreach(dir ${${PROJECT_NAME}_INCLUDES})
         message(STATUS "${dir}")
@@ -135,10 +143,6 @@ else()
         ${PROJECT_NAME}
         PUBLIC
         ${${PROJECT_NAME}_INCLUDES}
-    )
-    target_link_libraries(
-        ${CMAKE_PROJECT_NAME}
-        ${PROJECT_NAME}
     )
 
 endif()
