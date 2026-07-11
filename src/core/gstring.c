@@ -54,6 +54,10 @@ void util_add_char(char* phrase, size_t max_len, char symbol, size_t target_len,
 static void _write_digits(char* dst, size_t max, unsigned value, unsigned count) 
 {
     unsigned i = count;
+	while (i >= max) {
+		i--;
+		value /= 10;
+	}
     dst[i] = '\0';
     while (i--) {
         dst[i] = '0' + (value % 10);

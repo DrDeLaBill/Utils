@@ -27,7 +27,7 @@ void util_debug_hex_dump(const uint8_t* buf, uint32_t start_counter, uint16_t le
     uint32_t i = 0;
     printPretty("- offset -    0  1  2  3  4  5  6  7 |  8  9  A  B  C  D  E  F | 0123456789ABCDEF\n");
     do {
-        printPretty("0x%08X:  ", (unsigned int)(start_counter + i * cols_count));
+        printPretty("0x%08X:  ", (uint32_t)(start_counter + i * cols_count));
         for (uint32_t j = 0; j < cols_count; j++) {
             if (i * cols_count + j >= len) {
             	gprint("   ");
@@ -106,13 +106,13 @@ int util_convert_range(int val, int rngl1, int rngh1, int rngl2, int rngh2)
     return rngl2 + ((delta * range2) / range1);
 }
 
-unsigned util_hash(const uint8_t* data, const unsigned size)
+uint32_t util_hash(const uint8_t* data, const uint32_t size)
 {
-    const unsigned OFFSET_BASIS = 2166136261;
-    const unsigned FNV_PRIME = 16777619;
-    unsigned hash = OFFSET_BASIS;
-    for (unsigned i = 0; i < size; i++) {
-        hash ^= (unsigned)data[i];
+    const uint32_t OFFSET_BASIS = 2166136261;
+    const uint32_t FNV_PRIME = 16777619;
+    uint32_t hash = OFFSET_BASIS;
+    for (uint32_t i = 0; i < size; i++) {
+        hash ^= (uint32_t)data[i];
         hash *= FNV_PRIME;
     }
     return hash;

@@ -1,47 +1,49 @@
-# Utils Library (RU)
+# Utils Library
 
-English version: [README.md](README.md)
+Английская версия: [README.md](README.md)
 
-Кроссплатформенная библиотека C/C++ утилит для embedded и host-сценариев.
+Кроссплатформенная библиотека C/C++ утилит для embedded и host-проектов. Текущий код организован как отдельная CMake-библиотека с публичными заголовками в `inc/` и реализацией в `src/`.
+
+## 1. Подключение библиотеки
+
+`utilslib` - это статическая CMake-цель, которую экспортирует этот проект. Добавьте библиотеку как поддиректорию и свяжите её с нужной целью:
+
+```cmake
+add_subdirectory(path/to/Utils)
+target_link_libraries(your_target PRIVATE utilslib)
+```
+
+После линковки публичные заголовки подключаются автоматически, поэтому можно включать файлы из `core/`, `containers/`, `patterns/` и `cxx_meta/` напрямую, например:
+
+```cpp
+#include "gtime.h"
+#include "CircleBuffer.hpp"
+```
+
+Если нужен только набор заголовков в кастомной системе сборки, добавьте `src/Utils/inc` в include path и соберите соответствующие файлы из `src/Utils/src`.
+
+## 2. Обзор
 
 Библиотека содержит:
-- C-модули для базовых сервисов, контейнеров и автоматов состояний.
-- C++17-слой утилит (таймеры, typelist/meta, stopwatch).
-- Портируемый API времени с платформенными ветками.
-- Набор регрессионных тестов на GoogleTest (Debug/Release).
 
-## Содержание
+- C-модули для runtime-хелперов, строк, версий, времени, отладки, архивации, контейнеров и автоматов состояний.
+- C++17-хелперы для таймеров, typelist/meta-утилит и небольших вспомогательных обёрток.
+- Портируемый API времени с ветками для Zephyr, FreeRTOS, HAL, Arduino, host-сборок и MSVC.
+- Набор регрессионных тестов на GoogleTest.
 
-1. Обзор
-2. Структура проекта
-3. Требования
-4. Сборка и тесты
-5. Подключение в другом CMake-проекте
-6. Заметки по портируемости
-7. Обзор модулей
-8. Формат и API Archiver
-9. Docker CI сборка
-10. Диагностика проблем
+Основные CMake-цели:
 
-## 1. Обзор
+- `utilslib` - статическая библиотека
+- `utilstest` - исполняемый файл тестов
 
-Цели:
-- Переиспользуемые утилиты для MCU и desktop-симуляции.
-- Стабильное поведение в Debug и Release.
-- Единый API для C и C++ потребителей.
-
-Основные цели CMake:
-- библиотека: `utilslib`
-- тесты: `utilstest`
-
-## 2. Структура проекта
+## 3. Структура проекта
 
 ```text
-inc/utils/
-  core/        # C-заголовки: time, log, string, utils, version, debug, archiver
-  containers/  # C/C++ буферы/очереди и сортировка
-  patterns/    # FSM, GSTATE, GPID
-  cxx_meta/    # C++17 meta/utility слой
+inc/
+  core/
+  containers/
+  patterns/
+  cxx_meta/
 
 src/
   core/
@@ -57,17 +59,20 @@ test/
   test.cpp
 ```
 
-## 3. Требования
+Имена модулей соответствуют файлам заголовков и исходников в этих папках.
 
-- CMake >= 3.18
-- компилятор C/C++ с поддержкой C++17
-- для первой конфигурации тестов нужен доступ в сеть (FetchContent GoogleTest)
+## 4. Требования
+
+- CMake 3.18 или новее
+- компилятор C и C++ с поддержкой C++17
+- доступ в сеть на первом configure для загрузки GoogleTest через FetchContent
 
 Проверенные окружения:
-- Windows + MSVC
-- Linux + GCC
 
-## 4. Сборка и тесты
+- Windows с MSVC
+- Linux с GCC
+
+## 5. Сборка и тесты
 
 Конфигурация:
 
@@ -89,68 +94,82 @@ ctest --test-dir build -C Debug --output-on-failure
 ctest --test-dir build -C Release --output-on-failure
 ```
 
-## 5. Подключение в другом CMake-проекте
+Чистая пересборка:
 
-```cmake
-add_subdirectory(path/to/Utils)
-target_link_libraries(your_target PRIVATE utilslib)
+```powershell
+Remove-Item -Recurse -Force build
+cmake -S . -B build
+cmake --build build --config Debug
+ctest --test-dir build -C Debug --output-on-failure
 ```
 
-Публичные include-директории экспортируются из `inc/utils/**`.
+## 6. Обзор модулей
 
-## 6. Заметки по портируемости
+### Core
 
-API времени:
+- `gtime` - кроссплатформенные функции времени и `gtimer_t`
+- `gstring` - форматирование строк и числовые хелперы
+- `gutils` - общие utility-функции
+- `gversion` - парсинг и сравнение версий
+- `bedug` - отладочные хелперы и runtime-проверки
+- `bmacro` - вспомогательные макросы для отладки и assert
+- `archiver` - frame-based store codec с CRC-проверкой
+
+### Containers
+
+- `circle_buf_gc` - C ring buffer
+- `queue_gc` - C-очередь поверх ring buffer
+- `CircleBuffer` - C++ шаблон кольцевого буфера
+- `GQueue` и `GStack` - контейнерные обёртки
+- `gsort` - функции сортировки
+
+### Patterns
+
+- `fsm_gc` - автомат состояний, основанный на событиях
+- `gstate` - управление очередью состояний
+- `gpid` - PID-регулятор
+
+### C++ Meta
+
+- `GTimer`
+- `CodeStopwatch`
+- `TypeListBuilder` и `TypeListService`
+- `glambda`
+- `variables.hpp`
+
+## 7. Портируемый API времени
+
+Библиотека предоставляет функции времени:
+
 - `getMillis()`
 - `getMillis64bit()`
 - `getMicroseconds()`
 
-Есть ветки для:
+Поддерживаемые ветки сейчас включают:
+
 - Zephyr
-- ESP
+- ESP-IDF
 - STM32 HAL
 - Arduino
 - FreeRTOS
-- Host GCC
+- host-сборки GCC
 - MSVC
 
-Отдельно для bare-metal AVR (`__AVR__` без `ARDUINO`):
-- все функции времени возвращают `0`.
-- это ожидаемо, чтобы пользователь подключал board-specific таймеры.
+Для bare-metal AVR без Arduino функции времени возвращают `0` по задумке, потому что board-specific backend должен предоставить сам проект.
 
-## 7. Обзор модулей
+## 8. API Archiver
 
-Core:
-- `gtime`, `glog`, `gstring`, `gutils`, `gversion`, `bedug`, `bmacro`, `archiver`
+`archiver` реализован как детерминированный `STORE` frame codec с проверкой целостности CRC16-CCITT.
 
-Containers:
-- `circle_buf_gc`, `queue_gc`, `CircleBuffer`, `GQueue`, `GStack`, `gsort`
+Публичный API из `archiver.h`:
 
-Patterns:
-- `fsm_gc`, `gstate`, `gpid`
-
-C++ meta:
-- `GTimer`, `CodeStopwatch`, typelist/meta заголовки
-
-## 8. Формат и API Archiver
-
-`archiver` реализован как детерминированный frame-based codec в режиме `STORE` (без сжатия) с проверкой целостности `CRC16-CCITT`.
-
-Поля заголовка кадра:
-- `magic` (`0x5241`)
-- `version` (`1`)
-- `algo` (`ARCHIVER_ALGO_STORE`)
-- `src_len`
-- `payload_len`
-- `crc16` (по payload)
-
-API:
 - `archiver_status_t zip(const uint8_t* src, uint8_t* arch, uint32_t src_len, uint32_t arch_len)`
 - `archiver_status_t unzip(const uint8_t* arch, uint8_t* dst, uint32_t arch_len, uint32_t dst_len)`
 - `uint16_t archiver_crc16_ccitt(const uint8_t* data, uint32_t len)`
 - `uint32_t archiver_min_frame_size(void)`
 
 Коды статуса:
+
 - `ARCHIVER_OK`
 - `ARCHIVER_BAD_ARGS`
 - `ARCHIVER_NO_SPACE`
@@ -158,21 +177,9 @@ API:
 - `ARCHIVER_BAD_CRC`
 - `ARCHIVER_UNSUPPORTED_ALGO`
 
-Покрытые сценарии тестами:
-- roundtrip `zip -> unzip`
-- детекция битого CRC
-- недостаточный размер destination buffer
+## 9. Диагностика проблем
 
-## 9. Docker CI сборка
-
-```bash
-docker build --no-cache --progress=plain .
-```
-
-Dockerfile собирает и прогоняет тесты в Debug и Release.
-
-## 10. Диагностика проблем
-
-- Если CMake не конфигурируется: проверьте версию CMake и доступ в сеть.
-- Если тесты не обнаружены: перезапустите configure после добавления новых файлов в `test/`.
-- Если на AVR время всегда `0`: это штатное поведение bare-metal ветки, подключите собственный таймер backend.
+- Если configure не проходит, проверьте версию CMake и доступ в сеть на первом запуске для загрузки GoogleTest.
+- Если тесты не находятся, повторите configure после добавления файлов в `test/`.
+- Если на AVR время всегда `0`, это штатное поведение bare-metal ветки без Arduino.
+- Если используется `library.json`, нужно обновить устаревшие пути `utils/...` под текущую структуру `inc/` и `src/`.
