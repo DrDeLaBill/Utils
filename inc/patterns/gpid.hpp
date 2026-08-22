@@ -24,7 +24,7 @@ private:
 
     // General parameters
     gq15_16_t _inputAlpha;
-    gq15_16_t _iTauAtatck;        // integral time constant when moving toward the target
+    gq15_16_t _iTauAttack;        // integral time constant when moving toward the target
     gq15_16_t _iTauDecay;         // integral time constant when moving away from the target
     gq15_16_t _dDeadzone;         // dead zone for measured velocity
     gq15_16_t _dAwayFactor;       // factor for D when moving away from the target (0 = disable D in this case)
@@ -39,6 +39,8 @@ private:
     gq15_16_t _pidFilteredInput;  // for derivative calculation
     gq15_16_t _pidDerOutput;
     gq15_16_t _pidOutput;
+
+    bool _saturated;              // flag indicating if the output is saturated
 
     // Derivative calculation
     gq15_16_t _pidPrevDerAngle;   // previous angle for derivative
@@ -76,6 +78,14 @@ public:
      */
     void setGains(float pidKp, float pidKi, float pidKd);
 
+    /** 
+     * @brief Set PID gains for position and velocity loops in Q15.16 format
+     * @param pidKp Proportional gain for the position loop (P -> target velocity) in Q15.16 format
+     * @param pidKi Integral gain for the velocity loop (I -> PWM) in Q15.16 format
+     * @param pidKd Derivative gain for the velocity loop (D -> PWM) in Q15.16 format
+     */
+    void setGains_q15_16(gq15_16_t pidKp, gq15_16_t pidKi, gq15_16_t pidKd);
+
     /**
      * @brief Set minimum and maximum output values
      * @param minOut Minimum absolute output value (PWM units), to overcome static friction
@@ -103,25 +113,45 @@ public:
      * @brief Update the PID controller through the float compatibility adapter
      * @param current Current signal level
      * @param target Target signal level
+     * @param pause_integral If true, the integral term will not be updated (useful for anti-windup)
      * @return PID controller output (PWM units), positive for one direction, negative for the other
      */
     float update_f(
         float current,
-        float target
+        float target,
+        bool pause_integral = false
     );
 
     /**
      * @brief Update the PID controller with Q15.16 values
      * @param current Current signal level in Q15.16 format
      * @param target Target signal level in Q15.16 format
+     * @param pause_integral If true, the integral term will not be updated (useful for anti-windup)
      * @return PID controller output in Q15.16 format
      */
     gq15_16_t update_q15_16(
+        gq15_16_t current,
+        gq15_16_t target,
+        bool pause_integral = false
+    );
+
+    /**
+     * @brief Update the PID controller with Q15.16 values, optimized for fast execution in ISR context
+     * @param current Current signal level in Q15.16 format
+     * @param target Target signal level in Q15.16 format
+     * @return PID controller output in Q15.16 format
+     */
+    gq15_16_t update_pi_fast_q15_16(
         gq15_16_t current,
         gq15_16_t target
     );
 
     void show();
+
+    bool saturated() const
+    {
+        return _saturated;
+    }
 
 private:
     void print(

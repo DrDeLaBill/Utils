@@ -58,11 +58,12 @@ GPID::GPID(
     float dMaxMeasuredVel
 ):
     _pidKp(GQ_ZERO), _pidKi(GQ_ZERO), _pidKd(GQ_ZERO),
-    _inputAlpha(gq15_16_from_float(inputAlpha)), _iTauAtatck(gq15_16_from_float(iTauAttack)), _iTauDecay(gq15_16_from_float(iTauDecay)),
+    _inputAlpha(gq15_16_from_float(inputAlpha)), _iTauAttack(gq15_16_from_float(iTauAttack)), _iTauDecay(gq15_16_from_float(iTauDecay)),
     _dDeadzone(gq15_16_from_float(dDeadzone)), _dAwayFactor(gq15_16_from_float(dAwayFactor)), _dMaxMeasuredVel(gq15_16_from_float(dMaxMeasuredVel)),
     _minOut(gq15_16_from_float(minOut)), _maxOut(gq15_16_from_float(maxOut)),
     _pidIntegral(GQ_ZERO), _pidDerivative(GQ_ZERO), _pidPrevErr(GQ_ZERO),
     _pidFilteredInput(GQ_ZERO), _pidDerOutput(GQ_ZERO), _pidOutput(GQ_ZERO),
+    _saturated(false),
     _pidPrevDerAngle(GQ_ZERO), _lastRunTimeUs(0), _lastDerTimeUs(0),
     _debugEnabled(false), _debugDelayMs(0), 
     _debugErr(GQ_ZERO), _debugPidOutput(0), _debugKp(0), _debugKi(0), _debugKd(0),
@@ -78,6 +79,13 @@ void GPID::setGains(float pidKp, float pidKi, float pidKd)
     _pidKd = gq15_16_from_float(pidKd);
 }
 
+void GPID::setGains_q15_16(gq15_16_t pidKp, gq15_16_t pidKi, gq15_16_t pidKd)
+{
+    _pidKp = pidKp;
+    _pidKi = pidKi;
+    _pidKd = pidKd;
+}
+
 void GPID::setOutputLimits(float minOut, float maxOut)
 {
     _minOut = gq15_16_from_float(minOut);
@@ -91,6 +99,7 @@ void GPID::reset()
     _pidPrevErr = GQ_ZERO;
     _pidDerOutput = GQ_ZERO;
     _pidOutput = GQ_ZERO;
+    _saturated = false;
 
     _lastRunTimeUs = 0;
     _lastDerTimeUs = 0;
@@ -144,14 +153,16 @@ void GPID::show()
 
 float GPID::update_f(
     float current,
-    float target
+    float target,
+    bool pause_integral
 ) {
-    return gq15_16_to_float(update_q15_16(gq15_16_from_float(current), gq15_16_from_float(target)));
+    return gq15_16_to_float(update_q15_16(gq15_16_from_float(current), gq15_16_from_float(target), pause_integral));
 }
 
 gq15_16_t GPID::update_q15_16(
     gq15_16_t current,
-    gq15_16_t target
+    gq15_16_t target,
+    bool pause_integral
 ) {
     gq15_16_t dt = GQ_DEFAULT_DT;
     uint64_t now_us = getMicroseconds();
@@ -182,10 +193,10 @@ gq15_16_t GPID::update_q15_16(
         gq15_16_t unsat_out = gq15_16_add(gq15_16_add(kp_out, ki_out), kd_out);
         bool saturated_pos = (unsat_out > _maxOut && err > GQ_ZERO);
         bool saturated_neg = (unsat_out < -_maxOut && err < GQ_ZERO);
-        if (!saturated_pos && !saturated_neg) {
+        if (!saturated_pos && !saturated_neg && !pause_integral) {
             gq15_16_t integral = gq15_16_mul(err, dt);
             if (_gq15_16_sign(err) * _gq15_16_sign(_pidIntegral) > 0) {
-                _pidIntegral = gq15_16_add(gq15_16_mul(_pidIntegral, gq15_16_sub(GQ_ONE, _iTauAtatck)), integral);
+                _pidIntegral = gq15_16_add(gq15_16_mul(_pidIntegral, gq15_16_sub(GQ_ONE, _iTauAttack)), integral);
             } else {
                 _pidIntegral = gq15_16_add(gq15_16_mul(_pidIntegral, gq15_16_sub(GQ_ONE, _iTauDecay)), integral);
             }
@@ -202,7 +213,11 @@ gq15_16_t GPID::update_q15_16(
     } else if (out < GQ_ZERO) {
         out = -gq15_16_add(_minOut, gq15_16_div(gq15_16_mul(_gq15_16_abs(out), gq15_16_sub(_maxOut, _minOut)), _maxOut));
     }
-    _pidOutput = _gq15_16_clamp(out, _maxOut);
+    _pidOutput = out;
+    _saturated = (_pidOutput >= _maxOut || _pidOutput <= -_maxOut);
+    if (_saturated) {
+        _pidOutput = _gq15_16_clamp(_pidOutput, _maxOut);
+    }
 
     print(
         err,
@@ -216,5 +231,42 @@ gq15_16_t GPID::update_q15_16(
 
     _pidPrevErr = err;
 
+    return _pidOutput;
+}
+
+gq15_16_t GPID::update_pi_fast_q15_16(
+    gq15_16_t current,
+    gq15_16_t target
+) {
+    // 1. Быстрый EMA-фильтр без плавающей точки
+    if (_inputAlpha > GQ_ZERO) {
+        _pidFilteredInput = gq15_16_add(
+            gq15_16_mul(_inputAlpha, current),
+            gq15_16_mul(gq15_16_sub(GQ_ONE, _inputAlpha), _pidFilteredInput)
+        );
+    } else {
+        _pidFilteredInput = current;
+    }
+
+    gq15_16_t err = gq15_16_sub(target, _pidFilteredInput);
+    
+    gq15_16_t kp_out = gq15_16_mul(_pidKp, err);
+
+    gq15_16_t ki_out = GQ_ZERO;
+    if (_pidKi > GQ_ZERO) {
+        if (!_saturated) {
+            _pidIntegral = gq15_16_add(_pidIntegral, err);
+            _pidIntegral = _gq15_16_clamp(_pidIntegral, _maxOut);
+        }
+        ki_out = gq15_16_mul(_pidKi, _pidIntegral);
+    }
+
+    gq15_16_t out = gq15_16_add(kp_out, ki_out);
+    _pidOutput = _gq15_16_clamp(out, _maxOut);
+    _saturated = (_pidOutput >= _maxOut || _pidOutput <= -_maxOut);
+    if (_saturated) {
+        _pidOutput = _gq15_16_clamp(_pidOutput, _maxOut);
+    }
+    _pidPrevErr = err;
     return _pidOutput;
 }
