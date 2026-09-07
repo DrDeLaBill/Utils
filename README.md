@@ -128,6 +128,7 @@ ctest --test-dir build -C Debug --output-on-failure
 - `fsm_gc` - event-driven finite state machine
 - `gstate` - queued state management
 - `gpid` - PID controller implementation
+- `gadrc` - fixed-point linear ADRC controller for first-order and second-order loops
 
 ### C++ Meta
 

@@ -128,6 +128,7 @@ ctest --test-dir build -C Debug --output-on-failure
 - `fsm_gc` - автомат состояний, основанный на событиях
 - `gstate` - управление очередью состояний
 - `gpid` - PID-регулятор
+- `gadrc` - fixed-point линейный ADRC-регулятор для контуров первого и второго порядка
 
 ### C++ Meta
 

@@ -25,7 +25,7 @@
 #elif defined(_MSC_VER)
     #include <time.h>
 #else
-    #warning Please select the target STM32xxxx used in your application
+    #warning Please select the target MCU you are using
 #endif
 
 #if defined(_MSC_VER)
