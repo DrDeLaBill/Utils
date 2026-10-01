@@ -22,7 +22,7 @@ typedef struct __g_print_msg_filter_t {
     gtimer_t timer;
 } g_print_msg_filter_t;
 
-CIRCLE_BUFFER_GC_HEADER_INIT(GPRINT_MSG_FILTER_CNT, g_print_msg_filter_t, g_print_msg_filters);
+CIRCLE_BUFFER_GC_HEADER_INIT(GPRINT_MSG_FILTER_CNT, g_print_msg_filter_t, g_print_msg_filters)
 
 bool  __g_print_msg_filter_check(const char* msg, uint32_t delay_ms)
 {

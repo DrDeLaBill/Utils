@@ -33,13 +33,22 @@ bool circle_buf_gc_init(circle_buf_gc_t* p, uint8_t* ptr, unsigned unit_size, un
     return true;
 }
 
-unsigned circle_buf_gc_count(const circle_buf_gc_t* p) 
+size_t circle_buf_gc_count(const circle_buf_gc_t* p) 
 {
     if (!p || p->m_bedacode != BEDACODE) {
         BEDUG_ASSERT(false, "circle_buf_gc_count uninitialized buffer");
         return 0;
     }
-    return p->m_write_cnt;
+    return (size_t)p->m_write_cnt;
+}
+
+size_t circle_buf_gc_length(const circle_buf_gc_t* p)
+{
+    if (!p || p->m_bedacode != BEDACODE) {
+        BEDUG_ASSERT(false, "circle_buf_gc_size uninitialized buffer");
+        return 0;
+    }
+    return (size_t)p->m_length;
 }
 
 void circle_buf_gc_free(circle_buf_gc_t* p)

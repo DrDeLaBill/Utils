@@ -60,7 +60,7 @@ static void _write_digits(char* dst, size_t max, unsigned value, unsigned count)
 	}
     dst[i] = '\0';
     while (i--) {
-        dst[i] = '0' + (value % 10);
+        dst[i] = '0' + (char)(value % 10);
         value /= 10;
     }
 }
@@ -101,7 +101,7 @@ void util_int_to_str_with_point(char* target, unsigned size, int value, unsigned
 	_write_digits(
 		target + len,
 		size - len,
-		value,
+		(unsigned)__abs(value),
 		point_count
 	);
 }
